@@ -1,0 +1,331 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Sitters with Love API",
+    "description": "Documentación de la API para el backend de Sitters with Love"
+  },
+  "host": "127.0.0.1:5001",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/clientes": {
+      "get": {
+        "summary": "Obtener todos los clientes",
+        "description": "Devuelve una lista de todos los clientes en la base de datos.",
+        "responses": {
+          "200": {
+            "description": "Lista de clientes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Cliente"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clientes/{id_cliente}": {
+      "get": {
+        "summary": "Obtener un cliente por ID",
+        "parameters": [
+          {
+            "name": "id_cliente",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cliente encontrado",
+            "schema": {
+              "$ref": "#/definitions/Cliente"
+            }
+          },
+          "404": {
+            "description": "Cliente no encontrado"
+          }
+        }
+      }
+    },
+    "/animales": {
+      "get": {
+        "summary": "Obtener todos los animales",
+        "responses": {
+          "200": {
+            "description": "Lista de animales",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Animal"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear un nuevo animal",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Animal"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Animal creado exitosamente"
+          }
+        }
+      }
+    },
+    "/animales/{id_animal}": {
+      "get": {
+        "summary": "Obtener un animal por ID",
+        "parameters": [
+          {
+            "name": "id_animal",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Animal encontrado",
+            "schema": {
+              "$ref": "#/definitions/Animal"
+            }
+          },
+          "404": {
+            "description": "Animal no encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar un animal",
+        "parameters": [
+          {
+            "name": "id_animal",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Animal"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Animal actualizado exitosamente"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar un animal",
+        "parameters": [
+          {
+            "name": "id_animal",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Animal eliminado exitosamente"
+          }
+        }
+      }
+    },
+    "/contratos": {
+      "get": {
+        "summary": "Obtener todos los contratos",
+        "responses": {
+          "200": {
+            "description": "Lista de contratos",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Contrato"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear un nuevo contrato",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contrato"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Contrato creado exitosamente"
+          }
+        }
+      }
+    },
+    "/contratos/{id_contrato}": {
+      "get": {
+        "summary": "Obtener un contrato por ID",
+        "parameters": [
+          {
+            "name": "id_contrato",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contrato encontrado",
+            "schema": {
+              "$ref": "#/definitions/Contrato"
+            }
+          },
+          "404": {
+            "description": "Contrato no encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar un contrato",
+        "parameters": [
+          {
+            "name": "id_contrato",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contrato"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contrato actualizado exitosamente"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar un contrato",
+        "parameters": [
+          {
+            "name": "id_contrato",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contrato eliminado exitosamente"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Cliente": {
+      "type": "object",
+      "properties": {
+        "id_cliente": {
+          "type": "integer"
+        },
+        "nombre": {
+          "type": "string"
+        },
+        "apellidos": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "Animal": {
+      "type": "object",
+      "properties": {
+        "id_animal": {
+          "type": "integer"
+        },
+        "id_cliente": {
+          "type": "integer"
+        },
+        "tipo_animal": {
+          "type": "string"
+        },
+        "nombre": {
+          "type": "string"
+        },
+        "edad": {
+          "type": "integer"
+        },
+        "medicacion": {
+          "type": "string"
+        }
+      }
+    },
+    "Contrato": {
+      "type": "object",
+      "properties": {
+        "id_contrato": {
+          "type": "integer"
+        },
+        "id_cliente": {
+          "type": "integer"
+        },
+        "fecha_inicio": {
+          "type": "string",
+          "format": "date"
+        },
+        "fecha_fin": {
+          "type": "string",
+          "format": "date"
+        },
+        "numero_visitas_diarias": {
+          "type": "integer"
+        },
+        "horario_visitas": {
+          "type": "string"
+        },
+        "pago_adelantado": {
+          "type": "number",
+          "format": "float"
+        },
+        "estado_pago_adelantado": {
+          "type": "string"
+        },
+        "pago_final": {
+          "type": "number",
+          "format": "float"
+        },
+        "estado_pago_final": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
