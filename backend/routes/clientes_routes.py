@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models.cliente import Cliente
+from models.Clientes import Clientes
 from utils.auth import requerir_autenticacion
 
 clientes_bp = Blueprint('clientes', __name__)

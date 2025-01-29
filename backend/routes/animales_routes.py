@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models.animales import Animal
+from models.Animales import Animales
 
 animales_bp = Blueprint('animales', __name__)
 

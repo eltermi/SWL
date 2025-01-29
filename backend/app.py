@@ -6,13 +6,17 @@ from routes.contratos_routes import contratos_bp
 from routes.animales_routes import animales_bp
 
 # Importar los modelos
-from models.cliente import Cliente
-from models.contrato import Contrato
-from models.animal import Animal
-from models.usuario import Usuario
+from models.Clientes import Clientes
+from models.Contratos import Contratos
+from models.Animales import Animales
+from models.Usuarios import Usuarios
 
 # Crear la instancia de la aplicación Flask
 app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Sitters with Love API is running!"
 
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://usuario:password@localhost/swl'

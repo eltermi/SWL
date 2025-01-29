@@ -1,16 +1,26 @@
-from extensions import db
+from typing import List, Optional
+from models import Base  # Importa Base desde __init__.py
+from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
+from sqlalchemy.dialects.mysql import LONGBLOB
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+import datetime
+import decimal
 
-class Animal(db.Model):
+class Animales(Base):
     __tablename__ = 'animales'
-    id_animal = db.Column(db.Integer, primary_key=True)
-    id_cliente = db.Column(db.Integer, db.ForeignKey('clientes.id_cliente'), nullable=False)
-    tipo_animal = db.Column(db.String(50), nullable=False)
-    nombre = db.Column(db.String(50), nullable=False)
-    edad = db.Column(db.Integer)
-    medicacion = db.Column(db.Text)
-    foto = db.Column(db.LargeBinary)  # Para almacenar imágenes directamente en la base de datos
+    __table_args__ = (
+        ForeignKeyConstraint(['id_cliente'], ['clientes.id_cliente'], ondelete='CASCADE', name='animales_ibfk_1'),
+        Index('id_cliente', 'id_cliente')
+    )
 
-    cliente = db.relationship('Cliente', backref=db.backref('animales', lazy=True))
+    id_animal: Mapped[int] = mapped_column(Integer, primary_key=True)
+    tipo_animal: Mapped[str] = mapped_column(String(50))
+    nombre: Mapped[str] = mapped_column(String(50))
+    id_cliente: Mapped[Optional[int]] = mapped_column(Integer)
+    edad: Mapped[Optional[int]] = mapped_column(Integer)
+    medicacion: Mapped[Optional[str]] = mapped_column(Text)
+    foto: Mapped[Optional[bytes]] = mapped_column(LONGBLOB)
 
-    def __repr__(self):
-        return f'<Animal {self.nombre} ({self.tipo_animal})>'
+    clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='animales')
+
+

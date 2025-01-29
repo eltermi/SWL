@@ -1,7 +1,13 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
-from models.cliente import Cliente
+from models.Clientes import Clientes
+from models.Animales import Animales
+from models.ContactosAdicionales import ContactosAdicionales
+from models.Tarifas import Tarifas
+from models.TarifasContrato import TarifasContrato
+from models.Usuarios import Usuarios
+
 from utils.auth import generar_token, verificar_token
 
 auth_bp = Blueprint('auth_bp', __name__)

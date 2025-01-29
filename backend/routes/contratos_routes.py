@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models.contratos import Contrato
+from models.Contratos import Contratos
 
 contratos_bp = Blueprint('contratos', __name__)
 
