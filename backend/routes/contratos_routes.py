@@ -7,7 +7,7 @@ contratos_bp = Blueprint('contratos', __name__)
 # Obtener todos los contratos
 @contratos_bp.route('/contratos', methods=['GET'])
 def obtener_contratos():
-    contratos = Contrato.query.all()
+    contratos = Contratos.query.all()
     return jsonify([{
         'id_contrato': contrato.id_contrato,
         'id_cliente': contrato.id_cliente,
@@ -25,7 +25,7 @@ def obtener_contratos():
 @contratos_bp.route('/contratos', methods=['POST'])
 def crear_contrato():
     datos = request.json
-    nuevo_contrato = Contrato(
+    nuevo_contrato = Contratos(
         id_cliente=datos['id_cliente'],
         fecha_inicio=datos['fecha_inicio'],
         fecha_fin=datos['fecha_fin'],
@@ -43,7 +43,7 @@ def crear_contrato():
 # Obtener un contrato por ID
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['GET'])
 def obtener_contrato(id_contrato):
-    contrato = Contrato.query.get_or_404(id_contrato)
+    contrato = Contratos.query.get_or_404(id_contrato)
     return jsonify({
         'id_contrato': contrato.id_contrato,
         'id_cliente': contrato.id_cliente,
@@ -60,7 +60,7 @@ def obtener_contrato(id_contrato):
 # Actualizar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['PUT'])
 def actualizar_contrato(id_contrato):
-    contrato = Contrato.query.get_or_404(id_contrato)
+    contrato = Contratos.query.get_or_404(id_contrato)
     datos = request.json
     contrato.fecha_inicio = datos.get('fecha_inicio', contrato.fecha_inicio)
     contrato.fecha_fin = datos.get('fecha_fin', contrato.fecha_fin)
@@ -76,7 +76,7 @@ def actualizar_contrato(id_contrato):
 # Eliminar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['DELETE'])
 def eliminar_contrato(id_contrato):
-    contrato = Contrato.query.get_or_404(id_contrato)
+    contrato = Contratos.query.get_or_404(id_contrato)
     db.session.delete(contrato)
     db.session.commit()
     return jsonify({'mensaje': 'Contrato eliminado exitosamente'})

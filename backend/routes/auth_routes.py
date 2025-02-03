@@ -20,11 +20,11 @@ def registro():
         return jsonify({"mensaje": "Email y contraseña son requeridos"}), 400
 
     # Comprobar si el cliente ya existe
-    if Cliente.query.filter_by(email=datos['email']).first():
+    if Clientes.query.filter_by(email=datos['email']).first():
         return jsonify({"mensaje": "El email ya está registrado"}), 400
 
     # Crear nuevo cliente
-    nuevo_cliente = Cliente(
+    nuevo_cliente = Clientes(
         nombre=datos.get('nombre'),
         apellidos=datos.get('apellidos'),
         email=datos['email'],
@@ -40,7 +40,7 @@ def registro():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     datos = request.json
-    cliente = Cliente.query.filter_by(email=datos['email']).first()
+    cliente = Clientes.query.filter_by(email=datos['email']).first()
 
     if not cliente or not check_password_hash(cliente.password_hash, datos['password']):
         return jsonify({"mensaje": "Credenciales inválidas"}), 401

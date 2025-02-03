@@ -1,5 +1,6 @@
 from typing import List, Optional
 from models import Base  # Importa Base desde __init__.py
+from models import Contratos, Tarifas
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship

@@ -8,7 +8,7 @@ clientes_bp = Blueprint('clientes', __name__)
 @clientes_bp.route('/clientes', methods=['GET'])
 @requerir_autenticacion
 def obtener_clientes():
-    clientes = Cliente.query.all()
+    clientes = Clientes.query.all()
     return jsonify([{
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
@@ -20,7 +20,7 @@ def obtener_clientes():
 @clientes_bp.route('/clientes', methods=['POST'])
 def crear_cliente():
     datos = request.json
-    nuevo_cliente = Cliente(
+    nuevo_cliente = Clientes(
         nombre=datos['nombre'],
         apellidos=datos['apellidos'],
         email=datos.get('email'),
@@ -33,7 +33,7 @@ def crear_cliente():
 # Obtener un cliente por ID
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['GET'])
 def obtener_cliente(id_cliente):
-    cliente = Cliente.query.get_or_404(id_cliente)
+    cliente = Clientes.query.get_or_404(id_cliente)
     return jsonify({
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
@@ -44,7 +44,7 @@ def obtener_cliente(id_cliente):
 # Actualizar un cliente
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['PUT'])
 def actualizar_cliente(id_cliente):
-    cliente = Cliente.query.get_or_404(id_cliente)
+    cliente = Clientes.query.get_or_404(id_cliente)
     datos = request.json
     cliente.nombre = datos.get('nombre', cliente.nombre)
     cliente.apellidos = datos.get('apellidos', cliente.apellidos)
@@ -56,7 +56,7 @@ def actualizar_cliente(id_cliente):
 # Eliminar un cliente
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['DELETE'])
 def eliminar_cliente(id_cliente):
-    cliente = Cliente.query.get_or_404(id_cliente)
+    cliente = Clientes.query.get_or_404(id_cliente)
     db.session.delete(cliente)
     db.session.commit()
     return jsonify({'mensaje': 'Cliente eliminado exitosamente'})

@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 # Crear motor de la base de datos (ajusta la URL según tu configuración)
-DATABASE_URL = "mysql+pymysql://rafa:rafa08@localhost/nombre_de_tu_base"
+DATABASE_URL = "mysql+pymysql://sitters:gatos@localhost/SWL"
 
 engine = create_engine(DATABASE_URL, echo=True)  # Cambia 'echo' a False en producción
 
