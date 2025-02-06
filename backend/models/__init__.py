@@ -1,9 +1,10 @@
-from sqlalchemy.orm import declarative_base
+from extensions import db  #importar la instancia de la db
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import configure_mappers
 
-# Definir la base para los modelos
-Base = declarative_base()
+configure_mappers()  # 🔹 Esto fuerza a SQLAlchemy a registrar todas las relaciones correctamente
+
 
 # Crear motor de la base de datos (ajusta la URL según tu configuración)
 DATABASE_URL = "mysql+pymysql://sitters:gatos@localhost/SWL"

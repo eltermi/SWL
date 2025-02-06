@@ -9,7 +9,7 @@ Creando un nuevo cliente...
 <!doctype html>
 <html lang=en>
   <head>
-    <title>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+    <title>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
  // Werkzeug Debugger</title>
     <link rel="stylesheet" href="?__debugger__=yes&amp;cmd=resource&amp;f=style.css">
     <link rel="shortcut icon"
@@ -19,20 +19,20 @@ Creando un nuevo cliente...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
     <div class="debugger">
 <h1>sqlalchemy.exc.InvalidRequestError</h1>
 <div class="detail">
-  <p class="errormsg">sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+  <p class="errormsg">sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </p>
 </div>
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649012528">
+  <ul><li><div class="frame" id="frame-4392370240">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -45,7 +45,7 @@ Creando un nuevo cliente...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649012816">
+<li><div class="frame" id="frame-4392370528">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -63,7 +63,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649012960">
+<li><div class="frame" id="frame-4392370672">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -81,7 +81,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013104">
+<li><div class="frame" id="frame-4392370816">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -99,7 +99,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013248">
+<li><div class="frame" id="frame-4392370960">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -117,7 +117,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013392">
+<li><div class="frame" id="frame-4392371104">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -135,7 +135,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013536">
+<li><div class="frame" id="frame-4392371248">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/clientes_routes.py"</cite>,
       line <em class="line">23</em>,
       in <code class="function">crear_cliente</code></h4>
@@ -153,14 +153,14 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">    </span>)</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013680">
+<li><div class="frame" id="frame-4392371392">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">4</em>,
       in <code class="function">__init__</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4649013824">
+<li><div class="frame" id="frame-4392371536">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state.py"</cite>,
       line <em class="line">566</em>,
       in <code class="function">_initialize_instance</code></h4>
@@ -178,7 +178,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">            </span>with util.safe_reraise():</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649013968">
+<li><div class="frame" id="frame-4392371680">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/event/attr.py"</cite>,
       line <em class="line">497</em>,
       in <code class="function">__call__</code></h4>
@@ -196,7 +196,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">    </span>def __len__(self) -&gt; int:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014112">
+<li><div class="frame" id="frame-4392371824">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4405</em>,
       in <code class="function">_event_on_init</code></h4>
@@ -214,7 +214,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws"></span>class _ColumnMapping(Dict[&#34;ColumnElement[Any]&#34;, &#34;MapperProperty[Any]&#34;]):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014256">
+<li><div class="frame" id="frame-4392371968">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">2401</em>,
       in <code class="function">_check_configure</code></h4>
@@ -232,7 +232,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014400">
+<li><div class="frame" id="frame-4392372112">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4213</em>,
       in <code class="function">_configure_registries</code></h4>
@@ -250,7 +250,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014544">
+<li><div class="frame" id="frame-4392372256">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4250</em>,
       in <code class="function">_do_configure_registries</code></h4>
@@ -268,7 +268,7 @@ Creando un nuevo cliente...
 <pre class="line after"><span class="ws">                    </span>mapper._expire_memoizations()</pre></div>
 </div>
 </ul>
-  <blockquote>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+  <blockquote>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </blockquote>
 </div>
 
@@ -312,7 +312,7 @@ Creando un nuevo cliente...
     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
   File &#34;/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py&#34;, line 4250, in _do_configure_registries
     raise e
-sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </textarea>
 </div>
 <div class="explanation">
@@ -383,7 +383,7 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
   File "/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4250, in _do_configure_registries
     raise e
-sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Contratos(contratos)]'. Original exception was: Mapper 'Mapper[TarifasContrato(tarifas_contrato)]' has no property 'contratos'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Tarifas(tarifas)]'. Original exception was: Mapper 'Mapper[TarifasContrato(tarifas_contrato)]' has no property 'tarifas'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 
 
 -->
@@ -403,7 +403,7 @@ Obteniendo cliente con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -416,7 +416,7 @@ Obteniendo cliente con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649014688">
+  <ul><li><div class="frame" id="frame-4392372400">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -429,7 +429,7 @@ Obteniendo cliente con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014832">
+<li><div class="frame" id="frame-4392372544">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -447,7 +447,7 @@ Obteniendo cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649014976">
+<li><div class="frame" id="frame-4392372688">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -465,7 +465,7 @@ Obteniendo cliente con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649015120">
+<li><div class="frame" id="frame-4392372832">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -483,7 +483,7 @@ Obteniendo cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649015264">
+<li><div class="frame" id="frame-4392372976">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -501,7 +501,7 @@ Obteniendo cliente con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649015408">
+<li><div class="frame" id="frame-4392373120">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -519,7 +519,7 @@ Obteniendo cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649015552">
+<li><div class="frame" id="frame-4392373264">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/clientes_routes.py"</cite>,
       line <em class="line">36</em>,
       in <code class="function">obtener_cliente</code></h4>
@@ -636,7 +636,7 @@ Actualizando cliente con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -649,7 +649,7 @@ Actualizando cliente con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649015840">
+  <ul><li><div class="frame" id="frame-4392373696">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -662,7 +662,7 @@ Actualizando cliente con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649015984">
+<li><div class="frame" id="frame-4392373408">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -680,7 +680,7 @@ Actualizando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016128">
+<li><div class="frame" id="frame-4392373840">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -698,7 +698,7 @@ Actualizando cliente con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016272">
+<li><div class="frame" id="frame-4392373984">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -716,7 +716,7 @@ Actualizando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016416">
+<li><div class="frame" id="frame-4392374128">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -734,7 +734,7 @@ Actualizando cliente con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016560">
+<li><div class="frame" id="frame-4392374272">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -752,7 +752,7 @@ Actualizando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016704">
+<li><div class="frame" id="frame-4392374416">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/clientes_routes.py"</cite>,
       line <em class="line">47</em>,
       in <code class="function">actualizar_cliente</code></h4>
@@ -869,7 +869,7 @@ Eliminando cliente con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -882,7 +882,7 @@ Eliminando cliente con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649016848">
+  <ul><li><div class="frame" id="frame-4392374560">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -895,7 +895,7 @@ Eliminando cliente con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649016992">
+<li><div class="frame" id="frame-4392374704">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -913,7 +913,7 @@ Eliminando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649017136">
+<li><div class="frame" id="frame-4392374848">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -931,7 +931,7 @@ Eliminando cliente con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649017280">
+<li><div class="frame" id="frame-4392374992">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -949,7 +949,7 @@ Eliminando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649017424">
+<li><div class="frame" id="frame-4392375136">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -967,7 +967,7 @@ Eliminando cliente con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649017568">
+<li><div class="frame" id="frame-4392375280">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -985,7 +985,7 @@ Eliminando cliente con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649017712">
+<li><div class="frame" id="frame-4392375424">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/clientes_routes.py"</cite>,
       line <em class="line">59</em>,
       in <code class="function">eliminar_cliente</code></h4>
@@ -1101,7 +1101,7 @@ Obteniendo todos los animales...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -1114,7 +1114,7 @@ Obteniendo todos los animales...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649017856">
+  <ul><li><div class="frame" id="frame-4392375568">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -1127,7 +1127,7 @@ Obteniendo todos los animales...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018000">
+<li><div class="frame" id="frame-4392375712">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1145,7 +1145,7 @@ Obteniendo todos los animales...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018144">
+<li><div class="frame" id="frame-4392375856">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1163,7 +1163,7 @@ Obteniendo todos los animales...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018288">
+<li><div class="frame" id="frame-4392376000">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1181,7 +1181,7 @@ Obteniendo todos los animales...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018432">
+<li><div class="frame" id="frame-4392376144">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1199,7 +1199,7 @@ Obteniendo todos los animales...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018576">
+<li><div class="frame" id="frame-4392376288">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -1217,7 +1217,7 @@ Obteniendo todos los animales...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649018720">
+<li><div class="frame" id="frame-4392376432">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">10</em>,
       in <code class="function">obtener_animales</code></h4>
@@ -1334,7 +1334,7 @@ Creando un nuevo animal...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -1347,7 +1347,7 @@ Creando un nuevo animal...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649019296">
+  <ul><li><div class="frame" id="frame-4392376576">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -1360,7 +1360,7 @@ Creando un nuevo animal...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649019584">
+<li><div class="frame" id="frame-4392376864">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1378,7 +1378,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649019728">
+<li><div class="frame" id="frame-4392377008">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1396,7 +1396,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649019872">
+<li><div class="frame" id="frame-4392377152">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1414,7 +1414,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649020016">
+<li><div class="frame" id="frame-4392377296">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1432,7 +1432,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649020160">
+<li><div class="frame" id="frame-4392377440">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -1450,7 +1450,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649020304">
+<li><div class="frame" id="frame-4392377584">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">24</em>,
       in <code class="function">crear_animal</code></h4>
@@ -1567,7 +1567,7 @@ Obteniendo animal con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -1580,7 +1580,7 @@ Obteniendo animal con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649020592">
+  <ul><li><div class="frame" id="frame-4392173232">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -1593,7 +1593,7 @@ Obteniendo animal con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649020736">
+<li><div class="frame" id="frame-4392173376">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1611,7 +1611,7 @@ Obteniendo animal con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649020880">
+<li><div class="frame" id="frame-4392173088">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1629,7 +1629,7 @@ Obteniendo animal con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021024">
+<li><div class="frame" id="frame-4392377728">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1647,7 +1647,7 @@ Obteniendo animal con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021168">
+<li><div class="frame" id="frame-4392377872">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1665,7 +1665,7 @@ Obteniendo animal con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021312">
+<li><div class="frame" id="frame-4392378016">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -1683,7 +1683,7 @@ Obteniendo animal con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021456">
+<li><div class="frame" id="frame-4392378160">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">38</em>,
       in <code class="function">obtener_animal</code></h4>
@@ -1800,7 +1800,7 @@ Actualizando animal con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -1813,7 +1813,7 @@ Actualizando animal con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649021600">
+  <ul><li><div class="frame" id="frame-4392378304">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -1826,7 +1826,7 @@ Actualizando animal con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021744">
+<li><div class="frame" id="frame-4392378448">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1844,7 +1844,7 @@ Actualizando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649021888">
+<li><div class="frame" id="frame-4392378592">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1862,7 +1862,7 @@ Actualizando animal con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649022032">
+<li><div class="frame" id="frame-4392378736">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1880,7 +1880,7 @@ Actualizando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649022176">
+<li><div class="frame" id="frame-4392378880">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1898,7 +1898,7 @@ Actualizando animal con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649022320">
+<li><div class="frame" id="frame-4392379024">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -1916,7 +1916,7 @@ Actualizando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649022464">
+<li><div class="frame" id="frame-4392379168">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">51</em>,
       in <code class="function">actualizar_animal</code></h4>
@@ -2033,7 +2033,7 @@ Eliminando animal con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -2046,7 +2046,7 @@ Eliminando animal con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649022896">
+  <ul><li><div class="frame" id="frame-4392379312">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -2059,7 +2059,7 @@ Eliminando animal con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649022608">
+<li><div class="frame" id="frame-4392379456">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2077,7 +2077,7 @@ Eliminando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023040">
+<li><div class="frame" id="frame-4392379600">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2095,7 +2095,7 @@ Eliminando animal con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023184">
+<li><div class="frame" id="frame-4392379744">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2113,7 +2113,7 @@ Eliminando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023328">
+<li><div class="frame" id="frame-4392379888">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2131,7 +2131,7 @@ Eliminando animal con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023472">
+<li><div class="frame" id="frame-4392380032">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -2149,7 +2149,7 @@ Eliminando animal con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023616">
+<li><div class="frame" id="frame-4392380176">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">63</em>,
       in <code class="function">eliminar_animal</code></h4>
@@ -2265,7 +2265,7 @@ Obteniendo todos los contratos...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -2278,7 +2278,7 @@ Obteniendo todos los contratos...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649023760">
+  <ul><li><div class="frame" id="frame-4392380320">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -2291,7 +2291,7 @@ Obteniendo todos los contratos...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649023904">
+<li><div class="frame" id="frame-4392380464">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2309,7 +2309,7 @@ Obteniendo todos los contratos...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024048">
+<li><div class="frame" id="frame-4392380608">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2327,7 +2327,7 @@ Obteniendo todos los contratos...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024192">
+<li><div class="frame" id="frame-4392380752">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2345,7 +2345,7 @@ Obteniendo todos los contratos...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024336">
+<li><div class="frame" id="frame-4392380896">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2363,7 +2363,7 @@ Obteniendo todos los contratos...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024480">
+<li><div class="frame" id="frame-4392381040">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -2381,7 +2381,7 @@ Obteniendo todos los contratos...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024624">
+<li><div class="frame" id="frame-4392381184">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">10</em>,
       in <code class="function">obtener_contratos</code></h4>
@@ -2488,7 +2488,7 @@ Creando un nuevo contrato...
 <!doctype html>
 <html lang=en>
   <head>
-    <title>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+    <title>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
  // Werkzeug Debugger</title>
     <link rel="stylesheet" href="?__debugger__=yes&amp;cmd=resource&amp;f=style.css">
     <link rel="shortcut icon"
@@ -2498,20 +2498,20 @@ Creando un nuevo contrato...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
     <div class="debugger">
 <h1>sqlalchemy.exc.InvalidRequestError</h1>
 <div class="detail">
-  <p class="errormsg">sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+  <p class="errormsg">sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </p>
 </div>
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649024768">
+  <ul><li><div class="frame" id="frame-4392381328">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -2524,7 +2524,7 @@ Creando un nuevo contrato...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649024912">
+<li><div class="frame" id="frame-4392381472">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2542,7 +2542,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649025056">
+<li><div class="frame" id="frame-4392381616">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2560,7 +2560,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649025200">
+<li><div class="frame" id="frame-4392381760">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2578,7 +2578,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649025344">
+<li><div class="frame" id="frame-4392381904">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2596,7 +2596,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304128">
+<li><div class="frame" id="frame-4392382048">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -2614,7 +2614,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304272">
+<li><div class="frame" id="frame-4392382192">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">28</em>,
       in <code class="function">crear_contrato</code></h4>
@@ -2632,14 +2632,14 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>horario_visitas=datos[&#39;horario_visitas&#39;],</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304416">
+<li><div class="frame" id="frame-4392382336">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">4</em>,
       in <code class="function">__init__</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4649304560">
+<li><div class="frame" id="frame-4392382480">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state.py"</cite>,
       line <em class="line">566</em>,
       in <code class="function">_initialize_instance</code></h4>
@@ -2657,7 +2657,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">            </span>with util.safe_reraise():</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304704">
+<li><div class="frame" id="frame-4392382624">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/event/attr.py"</cite>,
       line <em class="line">497</em>,
       in <code class="function">__call__</code></h4>
@@ -2675,7 +2675,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">    </span>def __len__(self) -&gt; int:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304848">
+<li><div class="frame" id="frame-4392382768">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4405</em>,
       in <code class="function">_event_on_init</code></h4>
@@ -2693,7 +2693,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span>class _ColumnMapping(Dict[&#34;ColumnElement[Any]&#34;, &#34;MapperProperty[Any]&#34;]):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649304992">
+<li><div class="frame" id="frame-4392382912">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">2401</em>,
       in <code class="function">_check_configure</code></h4>
@@ -2711,7 +2711,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649305136">
+<li><div class="frame" id="frame-4392383056">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4213</em>,
       in <code class="function">_configure_registries</code></h4>
@@ -2729,7 +2729,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649305280">
+<li><div class="frame" id="frame-4392383200">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py"</cite>,
       line <em class="line">4250</em>,
       in <code class="function">_do_configure_registries</code></h4>
@@ -2747,7 +2747,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                    </span>mapper._expire_memoizations()</pre></div>
 </div>
 </ul>
-  <blockquote>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+  <blockquote>sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </blockquote>
 </div>
 
@@ -2791,7 +2791,7 @@ Creando un nuevo contrato...
     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
   File &#34;/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py&#34;, line 4250, in _do_configure_registries
     raise e
-sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Contratos(contratos)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;contratos&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can&#39;t proceed with initialization of other mappers. Triggering mapper: &#39;Mapper[Tarifas(tarifas)]&#39;. Original exception was: Mapper &#39;Mapper[TarifasContrato(tarifas_contrato)]&#39; has no property &#39;tarifas&#39;.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 </textarea>
 </div>
 <div class="explanation">
@@ -2862,7 +2862,7 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
   File "/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/mapper.py", line 4250, in _do_configure_registries
     raise e
-sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Contratos(contratos)]'. Original exception was: Mapper 'Mapper[TarifasContrato(tarifas_contrato)]' has no property 'contratos'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[Tarifas(tarifas)]'. Original exception was: Mapper 'Mapper[TarifasContrato(tarifas_contrato)]' has no property 'tarifas'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
 
 
 -->
@@ -2882,7 +2882,7 @@ Obteniendo contrato con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -2895,7 +2895,7 @@ Obteniendo contrato con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649305424">
+  <ul><li><div class="frame" id="frame-4392383344">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -2908,7 +2908,7 @@ Obteniendo contrato con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649305568">
+<li><div class="frame" id="frame-4392383488">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2926,7 +2926,7 @@ Obteniendo contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649305712">
+<li><div class="frame" id="frame-4392383632">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -2944,7 +2944,7 @@ Obteniendo contrato con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649305856">
+<li><div class="frame" id="frame-4392383776">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2962,7 +2962,7 @@ Obteniendo contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306000">
+<li><div class="frame" id="frame-4392383920">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -2980,7 +2980,7 @@ Obteniendo contrato con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306144">
+<li><div class="frame" id="frame-4392384064">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -2998,7 +2998,7 @@ Obteniendo contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306288">
+<li><div class="frame" id="frame-4392384208">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">46</em>,
       in <code class="function">obtener_contrato</code></h4>
@@ -3115,7 +3115,7 @@ Actualizando contrato con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -3128,7 +3128,7 @@ Actualizando contrato con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649306432">
+  <ul><li><div class="frame" id="frame-4392384352">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -3141,7 +3141,7 @@ Actualizando contrato con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306576">
+<li><div class="frame" id="frame-4392384496">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -3159,7 +3159,7 @@ Actualizando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306720">
+<li><div class="frame" id="frame-4392384640">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -3177,7 +3177,7 @@ Actualizando contrato con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649306864">
+<li><div class="frame" id="frame-4392384784">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -3195,7 +3195,7 @@ Actualizando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307008">
+<li><div class="frame" id="frame-4392384928">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -3213,7 +3213,7 @@ Actualizando contrato con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307152">
+<li><div class="frame" id="frame-4392385072">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -3231,7 +3231,7 @@ Actualizando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307296">
+<li><div class="frame" id="frame-4392385216">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">63</em>,
       in <code class="function">actualizar_contrato</code></h4>
@@ -3348,7 +3348,7 @@ Eliminando contrato con ID 1...
       var CONSOLE_MODE = false,
           EVALEX = true,
           EVALEX_TRUSTED = false,
-          SECRET = "VQsEbpNIKYdKbKWXxxJP";
+          SECRET = "d4HwzQnyuZINNl1fnAci";
     </script>
   </head>
   <body style="background-color: #fff">
@@ -3361,7 +3361,7 @@ Eliminando contrato con ID 1...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4649307440">
+  <ul><li><div class="frame" id="frame-4392385360">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -3374,7 +3374,7 @@ Eliminando contrato con ID 1...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307584">
+<li><div class="frame" id="frame-4392385504">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -3392,7 +3392,7 @@ Eliminando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307728">
+<li><div class="frame" id="frame-4392385648">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -3410,7 +3410,7 @@ Eliminando contrato con ID 1...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649307872">
+<li><div class="frame" id="frame-4392385792">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -3428,7 +3428,7 @@ Eliminando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649308016">
+<li><div class="frame" id="frame-4392385936">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -3446,7 +3446,7 @@ Eliminando contrato con ID 1...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649308160">
+<li><div class="frame" id="frame-4392386080">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -3464,7 +3464,7 @@ Eliminando contrato con ID 1...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4649308304">
+<li><div class="frame" id="frame-4392386224">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">79</em>,
       in <code class="function">eliminar_contrato</code></h4>

@@ -1,13 +1,13 @@
 from typing import List, Optional
-from models import Base  # Importa Base desde __init__.py
 from models import Clientes
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from extensions import db
 import datetime
 import decimal
 
-class ContactosAdicionales(Base):
+class ContactosAdicionales(db.Model):
     __tablename__ = 'contactos_adicionales'
     __table_args__ = (
         ForeignKeyConstraint(['id_cliente'], ['clientes.id_cliente'], ondelete='CASCADE', name='contactos_adicionales_ibfk_1'),

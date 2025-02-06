@@ -22,13 +22,13 @@ curl -X POST "$BASE_URL/clientes" -H "Content-Type: application/json" -d '{
 echo -e "\n"
 
 # GET /clientes/{id_cliente}
-echo "Obteniendo cliente con ID 1..."
-curl -X GET "$BASE_URL/clientes/1" -H "Content-Type: application/json"
+echo "Obteniendo cliente con ID 2..."
+curl -X GET "$BASE_URL/clientes/2" -H "Content-Type: application/json"
 echo -e "\n"
 
 # PUT /clientes/{id_cliente}
-echo "Actualizando cliente con ID 1..."
-curl -X PUT "$BASE_URL/clientes/1" -H "Content-Type: application/json" -d '{
+echo "Actualizando cliente con ID 2..."
+curl -X PUT "$BASE_URL/clientes/2" -H "Content-Type: application/json" -d '{
   "nombre": "Juan Actualizado",
   "apellidos": "García Actualizado",
   "email": "juan.actualizado@ejemplo.com",
@@ -37,8 +37,8 @@ curl -X PUT "$BASE_URL/clientes/1" -H "Content-Type: application/json" -d '{
 echo -e "\n"
 
 # DELETE /clientes/{id_cliente}
-echo "Eliminando cliente con ID 1..."
-curl -X DELETE "$BASE_URL/clientes/1" -H "Content-Type: application/json"
+echo "Eliminando cliente con ID 2..."
+curl -X DELETE "$BASE_URL/clientes/2" -H "Content-Type: application/json"
 echo -e "\n"
 
 # === ANIMALES ===

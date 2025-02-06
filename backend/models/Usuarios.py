@@ -1,12 +1,12 @@
 from typing import List, Optional
-from models import Base  # Importa Base desde __init__.py
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from extensions import db
 import datetime
 import decimal
 
-class Usuarios(Base):
+class Usuarios(db.Model):
     __tablename__ = 'usuarios'
     __table_args__ = (
         Index('username', 'username', unique=True),

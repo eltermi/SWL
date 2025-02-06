@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models.Clientes import Clientes
+from models import Clientes
 from utils.auth import requerir_autenticacion
 
 clientes_bp = Blueprint('clientes', __name__)
 
 @clientes_bp.route('/clientes', methods=['GET'])
-@requerir_autenticacion
 def obtener_clientes():
     clientes = Clientes.query.all()
     return jsonify([{

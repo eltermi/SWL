@@ -1,13 +1,13 @@
 from typing import List, Optional
-from models import Base  # Importa Base desde __init__.py
 from models import Animales, ContactosAdicionales, Contratos
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from extensions import db
 import datetime
 import decimal
 
-class Clientes(Base):
+class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
     __tablename__ = 'clientes'
 
     id_cliente: Mapped[int] = mapped_column(Integer, primary_key=True)

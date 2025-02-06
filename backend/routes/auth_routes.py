@@ -40,11 +40,17 @@ def registro():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     datos = request.json
-    cliente = Clientes.query.filter_by(email=datos['email']).first()
 
-    if not cliente or not check_password_hash(cliente.password_hash, datos['password']):
+    if not datos.get('username') or not datos.get('password'):
+        return jsonify({"mensaje": "Username y contraseña son requeridos"}), 400
+
+    # Buscar usuario en la base de datos
+    usuario = Usuarios.query.filter_by(username=datos['username']).first()
+
+    if not usuario or not check_password_hash(usuario.password_hash, datos['password']):
         return jsonify({"mensaje": "Credenciales inválidas"}), 401
 
-    # Generar token
-    token = generar_token({"id_cliente": cliente.id_cliente, "email": cliente.email})
+    # Generar token con la información del usuario
+    token = generar_token({"id_usuario": usuario.id_usuario, "username": usuario.username, "rol": usuario.rol})
+
     return jsonify({"token": token}), 200
