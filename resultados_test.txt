@@ -2,10 +2,10 @@
 Obteniendo todos los clientes...
 [
   {
-    "apellidos": "Charokopou",
+    "apellidos": "Ll\u00e9venes",
     "email": null,
     "id_cliente": 2,
-    "nombre": "Eleftheria"
+    "nombre": "Miguel"
   },
   {
     "apellidos": "Garc\u00eda",
@@ -17,6 +17,12 @@ Obteniendo todos los clientes...
     "apellidos": "Garc\u00eda",
     "email": "juan@ejemplo.com",
     "id_cliente": 4,
+    "nombre": "Juan"
+  },
+  {
+    "apellidos": "Garc\u00eda",
+    "email": "juan@ejemplo.com",
+    "id_cliente": 5,
     "nombre": "Juan"
   }
 ]
@@ -30,10 +36,10 @@ Creando un nuevo cliente...
 
 Obteniendo cliente con ID 2...
 {
-  "apellidos": "Charokopou",
+  "apellidos": "Ll\u00e9venes",
   "email": null,
   "id_cliente": 2,
-  "nombre": "Eleftheria"
+  "nombre": "Miguel"
 }
 
 
@@ -104,7 +110,7 @@ Creando un nuevo animal...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4575920624">
+  <ul><li><div class="frame" id="frame-4577431120">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1964</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -122,7 +128,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>self.dispatch.after_cursor_execute(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575920768">
+<li><div class="frame" id="frame-4577431264">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py"</cite>,
       line <em class="line">942</em>,
       in <code class="function">do_execute</code></h4>
@@ -140,7 +146,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">    </span>def is_disconnect(self, e, connection, cursor):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575920912">
+<li><div class="frame" id="frame-4577431408">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">153</em>,
       in <code class="function">execute</code></h4>
@@ -158,7 +164,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>&#34;&#34;&#34;Run several data against one query.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921056">
+<li><div class="frame" id="frame-4577431552">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">322</em>,
       in <code class="function">_query</code></h4>
@@ -176,7 +182,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>self.rownumber = 0</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921200">
+<li><div class="frame" id="frame-4577431696">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">563</em>,
       in <code class="function">query</code></h4>
@@ -194,7 +200,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>return self._affected_rows</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921344">
+<li><div class="frame" id="frame-4577431840">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">825</em>,
       in <code class="function">_read_query_result</code></h4>
@@ -212,7 +218,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921488">
+<li><div class="frame" id="frame-4577431984">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">1199</em>,
       in <code class="function">read</code></h4>
@@ -230,7 +236,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>self._read_load_local_packet(first_packet)</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921632">
+<li><div class="frame" id="frame-4577432128">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">775</em>,
       in <code class="function">_read_packet</code></h4>
@@ -248,7 +254,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>while True:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921776">
+<li><div class="frame" id="frame-4577432272">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/protocol.py"</cite>,
       line <em class="line">219</em>,
       in <code class="function">raise_for_error</code></h4>
@@ -266,7 +272,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575921920">
+<li><div class="frame" id="frame-4577432416">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/err.py"</cite>,
       line <em class="line">150</em>,
       in <code class="function">raise_mysql_exception</code></h4>
@@ -280,7 +286,7 @@ Creando un nuevo animal...
 </div>
 
 <li><div class="exc-divider">The above exception was the direct cause of the following exception:</div>
-<li><div class="frame" id="frame-4419308560">
+<li><div class="frame" id="frame-4575934448">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -293,7 +299,7 @@ Creando un nuevo animal...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419310720">
+<li><div class="frame" id="frame-4575934736">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -311,7 +317,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419310864">
+<li><div class="frame" id="frame-4575933728">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -329,7 +335,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311008">
+<li><div class="frame" id="frame-4575934880">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -347,7 +353,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311152">
+<li><div class="frame" id="frame-4575935024">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -365,7 +371,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311296">
+<li><div class="frame" id="frame-4575935168">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -383,7 +389,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311440">
+<li><div class="frame" id="frame-4575935312">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/animales_routes.py"</cite>,
       line <em class="line">32</em>,
       in <code class="function">crear_animal</code></h4>
@@ -401,7 +407,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span>def obtener_animal(id_animal):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311584">
+<li><div class="frame" id="frame-4575935456">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py"</cite>,
       line <em class="line">599</em>,
       in <code class="function">commit</code></h4>
@@ -419,7 +425,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>execution_options: Optional[CoreExecuteOptionsParameter] = None,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419311872">
+<li><div class="frame" id="frame-4575935600">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">2032</em>,
       in <code class="function">commit</code></h4>
@@ -437,14 +443,14 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>If no transaction is in progress, this method raises an</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419312016">
+<li><div class="frame" id="frame-4575935744">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">2</em>,
       in <code class="function">commit</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4419312160">
+<li><div class="frame" id="frame-4575935888">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py"</cite>,
       line <em class="line">139</em>,
       in <code class="function">_go</code></h4>
@@ -462,7 +468,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                    </span>return ret_value</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419312304">
+<li><div class="frame" id="frame-4575936032">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">1313</em>,
       in <code class="function">commit</code></h4>
@@ -480,14 +486,14 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">            </span>):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419312448">
+<li><div class="frame" id="frame-4575936176">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">2</em>,
       in <code class="function">_prepare_impl</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4419312592">
+<li><div class="frame" id="frame-4575936320">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py"</cite>,
       line <em class="line">139</em>,
       in <code class="function">_go</code></h4>
@@ -505,7 +511,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                    </span>return ret_value</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419312736">
+<li><div class="frame" id="frame-4577427520">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">1288</em>,
       in <code class="function">_prepare_impl</code></h4>
@@ -523,7 +529,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                    </span>&#34;creating new objects?&#34;</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419312880">
+<li><div class="frame" id="frame-4577427664">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4353</em>,
       in <code class="function">flush</code></h4>
@@ -541,7 +547,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>util.warn(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313024">
+<li><div class="frame" id="frame-4577427808">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4488</em>,
       in <code class="function">_flush</code></h4>
@@ -559,7 +565,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>objects: Iterable[object],</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313168">
+<li><div class="frame" id="frame-4577427952">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py"</cite>,
       line <em class="line">146</em>,
       in <code class="function">__exit__</code></h4>
@@ -577,7 +583,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313312">
+<li><div class="frame" id="frame-4577428096">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4449</em>,
       in <code class="function">_flush</code></h4>
@@ -595,7 +601,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313456">
+<li><div class="frame" id="frame-4577428240">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py"</cite>,
       line <em class="line">466</em>,
       in <code class="function">execute</code></h4>
@@ -613,7 +619,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313600">
+<li><div class="frame" id="frame-4577428384">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py"</cite>,
       line <em class="line">642</em>,
       in <code class="function">execute</code></h4>
@@ -631,7 +637,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313744">
+<li><div class="frame" id="frame-4577428528">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py"</cite>,
       line <em class="line">93</em>,
       in <code class="function">save_obj</code></h4>
@@ -649,7 +655,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">            </span>insert,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419313888">
+<li><div class="frame" id="frame-4577428672">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py"</cite>,
       line <em class="line">1233</em>,
       in <code class="function">_emit_insert_statements</code></h4>
@@ -667,7 +673,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419314032">
+<li><div class="frame" id="frame-4577428816">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1416</em>,
       in <code class="function">execute</code></h4>
@@ -685,7 +691,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419314176">
+<li><div class="frame" id="frame-4577428960">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py"</cite>,
       line <em class="line">515</em>,
       in <code class="function">_execute_on_connection</code></h4>
@@ -703,7 +709,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419315328">
+<li><div class="frame" id="frame-4577429104">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1638</em>,
       in <code class="function">_execute_clauseelement</code></h4>
@@ -721,7 +727,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">            </span>execution_options,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419315472">
+<li><div class="frame" id="frame-4577429248">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1843</em>,
       in <code class="function">_execute_context</code></h4>
@@ -739,7 +745,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>self,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419315616">
+<li><div class="frame" id="frame-4577429392">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1983</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -757,7 +763,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419315760">
+<li><div class="frame" id="frame-4577429536">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">2352</em>,
       in <code class="function">_handle_dbapi_exception</code></h4>
@@ -775,7 +781,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">            </span>del self._reentrant_error</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419315904">
+<li><div class="frame" id="frame-4577429680">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1964</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -793,7 +799,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>self.dispatch.after_cursor_execute(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419316048">
+<li><div class="frame" id="frame-4577429824">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py"</cite>,
       line <em class="line">942</em>,
       in <code class="function">do_execute</code></h4>
@@ -811,7 +817,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">    </span>def is_disconnect(self, e, connection, cursor):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419316192">
+<li><div class="frame" id="frame-4577429968">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">153</em>,
       in <code class="function">execute</code></h4>
@@ -829,7 +835,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>&#34;&#34;&#34;Run several data against one query.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419316336">
+<li><div class="frame" id="frame-4577430112">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">322</em>,
       in <code class="function">_query</code></h4>
@@ -847,7 +853,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>self.rownumber = 0</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419316480">
+<li><div class="frame" id="frame-4577430256">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">563</em>,
       in <code class="function">query</code></h4>
@@ -865,7 +871,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>return self._affected_rows</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419320944">
+<li><div class="frame" id="frame-4577430400">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">825</em>,
       in <code class="function">_read_query_result</code></h4>
@@ -883,7 +889,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419321088">
+<li><div class="frame" id="frame-4577430544">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">1199</em>,
       in <code class="function">read</code></h4>
@@ -901,7 +907,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">                </span>self._read_load_local_packet(first_packet)</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419321232">
+<li><div class="frame" id="frame-4577430688">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">775</em>,
       in <code class="function">_read_packet</code></h4>
@@ -919,7 +925,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws">        </span>while True:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4419321376">
+<li><div class="frame" id="frame-4577430832">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/protocol.py"</cite>,
       line <em class="line">219</em>,
       in <code class="function">raise_for_error</code></h4>
@@ -937,7 +943,7 @@ Creando un nuevo animal...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575920192">
+<li><div class="frame" id="frame-4577430976">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/err.py"</cite>,
       line <em class="line">150</em>,
       in <code class="function">raise_mysql_exception</code></h4>
@@ -1353,7 +1359,7 @@ Creando un nuevo contrato...
 <h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
 <div class="traceback">
   <h3></h3>
-  <ul><li><div class="frame" id="frame-4575931856">
+  <ul><li><div class="frame" id="frame-4577437744">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1964</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -1371,7 +1377,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>self.dispatch.after_cursor_execute(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932000">
+<li><div class="frame" id="frame-4577437888">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py"</cite>,
       line <em class="line">942</em>,
       in <code class="function">do_execute</code></h4>
@@ -1389,7 +1395,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">    </span>def is_disconnect(self, e, connection, cursor):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932144">
+<li><div class="frame" id="frame-4577438032">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">153</em>,
       in <code class="function">execute</code></h4>
@@ -1407,7 +1413,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>&#34;&#34;&#34;Run several data against one query.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932288">
+<li><div class="frame" id="frame-4577438176">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">322</em>,
       in <code class="function">_query</code></h4>
@@ -1425,7 +1431,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>self.rownumber = 0</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932432">
+<li><div class="frame" id="frame-4577438320">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">563</em>,
       in <code class="function">query</code></h4>
@@ -1443,7 +1449,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>return self._affected_rows</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932576">
+<li><div class="frame" id="frame-4577438464">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">825</em>,
       in <code class="function">_read_query_result</code></h4>
@@ -1461,7 +1467,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932720">
+<li><div class="frame" id="frame-4577438608">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">1199</em>,
       in <code class="function">read</code></h4>
@@ -1479,7 +1485,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>self._read_load_local_packet(first_packet)</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575932864">
+<li><div class="frame" id="frame-4577438752">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">775</em>,
       in <code class="function">_read_packet</code></h4>
@@ -1497,7 +1503,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>while True:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575933008">
+<li><div class="frame" id="frame-4577438896">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/protocol.py"</cite>,
       line <em class="line">219</em>,
       in <code class="function">raise_for_error</code></h4>
@@ -1515,7 +1521,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575933152">
+<li><div class="frame" id="frame-4577439040">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/err.py"</cite>,
       line <em class="line">150</em>,
       in <code class="function">raise_mysql_exception</code></h4>
@@ -1529,7 +1535,7 @@ Creando un nuevo contrato...
 </div>
 
 <li><div class="exc-divider">The above exception was the direct cause of the following exception:</div>
-<li><div class="frame" id="frame-4575926384">
+<li><div class="frame" id="frame-4575934304">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1536</em>,
       in <code class="function">__call__</code></h4>
@@ -1542,7 +1548,7 @@ Creando un nuevo contrato...
 <span class="ws">        </span>       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575925808">
+<li><div class="frame" id="frame-4575934016">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1514</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1560,7 +1566,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>finally:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575925952">
+<li><div class="frame" id="frame-4575933296">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">1511</em>,
       in <code class="function">wsgi_app</code></h4>
@@ -1578,7 +1584,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>error = sys.exc_info()[1]</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575926528">
+<li><div class="frame" id="frame-4575933584">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">919</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1596,7 +1602,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>rv: ft.ResponseReturnValue | HTTPException,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575926672">
+<li><div class="frame" id="frame-4577432704">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">917</em>,
       in <code class="function">full_dispatch_request</code></h4>
@@ -1614,7 +1620,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">    </span>def finalize_request(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575926816">
+<li><div class="frame" id="frame-4577432848">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/flask/app.py"</cite>,
       line <em class="line">902</em>,
       in <code class="function">dispatch_request</code></h4>
@@ -1632,7 +1638,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>error handling.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575926960">
+<li><div class="frame" id="frame-4577432992">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/backend/routes/contratos_routes.py"</cite>,
       line <em class="line">40</em>,
       in <code class="function">crear_contrato</code></h4>
@@ -1650,7 +1656,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span>def obtener_contrato(id_contrato):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575927248">
+<li><div class="frame" id="frame-4577433136">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py"</cite>,
       line <em class="line">599</em>,
       in <code class="function">commit</code></h4>
@@ -1668,7 +1674,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>execution_options: Optional[CoreExecuteOptionsParameter] = None,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575927392">
+<li><div class="frame" id="frame-4577433280">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">2032</em>,
       in <code class="function">commit</code></h4>
@@ -1686,14 +1692,14 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>If no transaction is in progress, this method raises an</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575927536">
+<li><div class="frame" id="frame-4577433424">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">2</em>,
       in <code class="function">commit</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4575927680">
+<li><div class="frame" id="frame-4577433568">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py"</cite>,
       line <em class="line">139</em>,
       in <code class="function">_go</code></h4>
@@ -1711,7 +1717,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                    </span>return ret_value</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575927824">
+<li><div class="frame" id="frame-4577433712">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">1313</em>,
       in <code class="function">commit</code></h4>
@@ -1729,14 +1735,14 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">            </span>):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575927968">
+<li><div class="frame" id="frame-4577433856">
   <h4>File <cite class="filename">"&lt;string&gt;"</cite>,
       line <em class="line">2</em>,
       in <code class="function">_prepare_impl</code></h4>
   <div class="source "></div>
 </div>
 
-<li><div class="frame" id="frame-4575928112">
+<li><div class="frame" id="frame-4577434000">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py"</cite>,
       line <em class="line">139</em>,
       in <code class="function">_go</code></h4>
@@ -1754,7 +1760,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                    </span>return ret_value</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928256">
+<li><div class="frame" id="frame-4577434144">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">1288</em>,
       in <code class="function">_prepare_impl</code></h4>
@@ -1772,7 +1778,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                    </span>&#34;creating new objects?&#34;</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928400">
+<li><div class="frame" id="frame-4577434288">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4353</em>,
       in <code class="function">flush</code></h4>
@@ -1790,7 +1796,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>util.warn(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928544">
+<li><div class="frame" id="frame-4577434432">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4488</em>,
       in <code class="function">_flush</code></h4>
@@ -1808,7 +1814,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>objects: Iterable[object],</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928688">
+<li><div class="frame" id="frame-4577434576">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py"</cite>,
       line <em class="line">146</em>,
       in <code class="function">__exit__</code></h4>
@@ -1826,7 +1832,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928832">
+<li><div class="frame" id="frame-4577434720">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py"</cite>,
       line <em class="line">4449</em>,
       in <code class="function">_flush</code></h4>
@@ -1844,7 +1850,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575928976">
+<li><div class="frame" id="frame-4577434864">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py"</cite>,
       line <em class="line">466</em>,
       in <code class="function">execute</code></h4>
@@ -1862,7 +1868,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929120">
+<li><div class="frame" id="frame-4577435008">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/unitofwork.py"</cite>,
       line <em class="line">642</em>,
       in <code class="function">execute</code></h4>
@@ -1880,7 +1886,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929264">
+<li><div class="frame" id="frame-4577435152">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py"</cite>,
       line <em class="line">93</em>,
       in <code class="function">save_obj</code></h4>
@@ -1898,7 +1904,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">            </span>insert,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929408">
+<li><div class="frame" id="frame-4577435296">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/orm/persistence.py"</cite>,
       line <em class="line">1233</em>,
       in <code class="function">_emit_insert_statements</code></h4>
@@ -1916,7 +1922,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929552">
+<li><div class="frame" id="frame-4577435440">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1416</em>,
       in <code class="function">execute</code></h4>
@@ -1934,7 +1940,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929696">
+<li><div class="frame" id="frame-4577435584">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py"</cite>,
       line <em class="line">515</em>,
       in <code class="function">_execute_on_connection</code></h4>
@@ -1952,7 +1958,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929840">
+<li><div class="frame" id="frame-4577435728">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1638</em>,
       in <code class="function">_execute_clauseelement</code></h4>
@@ -1970,7 +1976,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">            </span>execution_options,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575929984">
+<li><div class="frame" id="frame-4577435872">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1843</em>,
       in <code class="function">_execute_context</code></h4>
@@ -1988,7 +1994,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>self,</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930128">
+<li><div class="frame" id="frame-4577436016">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1983</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -2006,7 +2012,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930272">
+<li><div class="frame" id="frame-4577436160">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">2352</em>,
       in <code class="function">_handle_dbapi_exception</code></h4>
@@ -2024,7 +2030,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">            </span>del self._reentrant_error</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930416">
+<li><div class="frame" id="frame-4577436304">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py"</cite>,
       line <em class="line">1964</em>,
       in <code class="function">_exec_single_context</code></h4>
@@ -2042,7 +2048,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>self.dispatch.after_cursor_execute(</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930560">
+<li><div class="frame" id="frame-4577436448">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py"</cite>,
       line <em class="line">942</em>,
       in <code class="function">do_execute</code></h4>
@@ -2060,7 +2066,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">    </span>def is_disconnect(self, e, connection, cursor):</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930704">
+<li><div class="frame" id="frame-4577436592">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">153</em>,
       in <code class="function">execute</code></h4>
@@ -2078,7 +2084,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>&#34;&#34;&#34;Run several data against one query.</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930848">
+<li><div class="frame" id="frame-4577436736">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/cursors.py"</cite>,
       line <em class="line">322</em>,
       in <code class="function">_query</code></h4>
@@ -2096,7 +2102,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>self.rownumber = 0</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575930992">
+<li><div class="frame" id="frame-4577436880">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">563</em>,
       in <code class="function">query</code></h4>
@@ -2114,7 +2120,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>return self._affected_rows</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575931136">
+<li><div class="frame" id="frame-4577437024">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">825</em>,
       in <code class="function">_read_query_result</code></h4>
@@ -2132,7 +2138,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575931280">
+<li><div class="frame" id="frame-4577437168">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">1199</em>,
       in <code class="function">read</code></h4>
@@ -2150,7 +2156,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">                </span>self._read_load_local_packet(first_packet)</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575931424">
+<li><div class="frame" id="frame-4577437312">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/connections.py"</cite>,
       line <em class="line">775</em>,
       in <code class="function">_read_packet</code></h4>
@@ -2168,7 +2174,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws">        </span>while True:</pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575931568">
+<li><div class="frame" id="frame-4577437456">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/protocol.py"</cite>,
       line <em class="line">219</em>,
       in <code class="function">raise_for_error</code></h4>
@@ -2186,7 +2192,7 @@ Creando un nuevo contrato...
 <pre class="line after"><span class="ws"></span> </pre></div>
 </div>
 
-<li><div class="frame" id="frame-4575931712">
+<li><div class="frame" id="frame-4577437600">
   <h4>File <cite class="filename">"/Users/rafa/Sitters_with_love/aplicacion/venv/lib/python3.13/site-packages/pymysql/err.py"</cite>,
       line <em class="line">150</em>,
       in <code class="function">raise_mysql_exception</code></h4>
