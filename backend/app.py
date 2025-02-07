@@ -9,15 +9,18 @@ from routes.contactos_routes import contactos_bp
 from routes.tarifas_routes import tarifas_bp
 from routes.tarifas_contrato_routes import tarifas_contrato_bp
 from routes.usuarios_routes import usuarios_bp
-
 from models import *  # Asegurar que los modelos se importan
 
+import os
+
 # Crear la instancia de la aplicación Flask
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend", static_url_path="")
 
 @app.route("/")
 def home():
-    return "Sitters with Love API is running!"
+    return send_from_directory(app.static_folder, "index.html")
+def index():
+    return send_from_directory(app.static_folder, "index.html")
 
 # Configurar Swagger UI
 SWAGGER_URL = "/swagger"
