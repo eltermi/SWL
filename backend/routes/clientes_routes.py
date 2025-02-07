@@ -7,12 +7,23 @@ clientes_bp = Blueprint('clientes', __name__)
 
 @clientes_bp.route('/clientes', methods=['GET'])
 def obtener_clientes():
-    clientes = Clientes.query.all()
+    filtro = request.args.get('buscar', '').strip()
+
+    if filtro:
+        clientes = Clientes.query.filter(
+            (Clientes.nombre.ilike(f"%{filtro}%")) |
+            (Clientes.apellidos.ilike(f"%{filtro}%")) |
+            (Clientes.municipio.ilike(f"%{filtro}%"))
+        ).all()
+    else:
+        clientes = Clientes.query.all()
+
     return jsonify([{
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
         'apellidos': cliente.apellidos,
-        'email': cliente.email
+        'email': cliente.email,
+        'municipio': cliente.municipio
     } for cliente in clientes])
 
 # Crear un nuevo cliente

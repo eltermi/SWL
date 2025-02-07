@@ -1,0 +1,27 @@
+/* Contenido base para clientes.html */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - Sitters with Love</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gestión de Clientes</h1>
+        <input type="text" id="buscar" placeholder="Buscar por nombre, apellidos o localidad">
+    </header>
+    <main>
+        <form id="cliente-form">
+            <input type="text" id="nombre" placeholder="Nombre" required>
+            <input type="text" id="apellidos" placeholder="Apellidos" required>
+            <input type="email" id="email" placeholder="Correo Electrónico" required>
+            <button type="submit">Añadir Cliente</button>
+        </form>
+        <ul id="clientes-list"></ul>
+    </main>
+    <script src="js/api.js"></script>
+    <script src="js/clientes.js"></script>
+</body>
+</html>
