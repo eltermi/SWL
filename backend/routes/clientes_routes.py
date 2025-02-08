@@ -6,6 +6,7 @@ from utils.auth import requerir_autenticacion
 clientes_bp = Blueprint('clientes', __name__)
 
 @clientes_bp.route('/clientes', methods=['GET'])
+@requerir_autenticacion
 def obtener_clientes():
     filtro = request.args.get('buscar', '').strip()
 
@@ -28,6 +29,7 @@ def obtener_clientes():
 
 # Crear un nuevo cliente
 @clientes_bp.route('/clientes', methods=['POST'])
+@requerir_autenticacion
 def crear_cliente():
     datos = request.json
     nuevo_cliente = Clientes(
@@ -42,6 +44,7 @@ def crear_cliente():
 
 # Obtener un cliente por ID
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['GET'])
+@requerir_autenticacion
 def obtener_cliente(id_cliente):
     cliente = Clientes.query.get_or_404(id_cliente)
     return jsonify({
@@ -53,6 +56,7 @@ def obtener_cliente(id_cliente):
 
 # Actualizar un cliente
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['PUT'])
+@requerir_autenticacion
 def actualizar_cliente(id_cliente):
     cliente = Clientes.query.get_or_404(id_cliente)
     datos = request.json
@@ -65,6 +69,7 @@ def actualizar_cliente(id_cliente):
 
 # Eliminar un cliente
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['DELETE'])
+@requerir_autenticacion
 def eliminar_cliente(id_cliente):
     cliente = Clientes.query.get_or_404(id_cliente)
     db.session.delete(cliente)

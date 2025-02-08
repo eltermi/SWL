@@ -1,3 +1,6 @@
 __pycache__
 sqlacodegen-env
+venv
+.vscode
+.git
 

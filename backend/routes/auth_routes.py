@@ -51,6 +51,6 @@ def login():
         return jsonify({"mensaje": "Credenciales inválidas"}), 401
 
     # Generar token con la información del usuario
-    token = generar_token({"id_usuario": usuario.id_usuario, "username": usuario.username, "rol": usuario.rol})
+    token = generar_token({"id_usuario": usuario.id_usuario, "username": usuario.username})
 
     return jsonify({"token": token}), 200

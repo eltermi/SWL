@@ -1,7 +1,9 @@
 import jwt
 from datetime import datetime, timedelta
+from flask import request, jsonify
+from functools import wraps
 
-SECRET_KEY = "TuClaveSecretaSegura"  # Cambia esto a una clave más segura
+SECRET_KEY = "TuClaveSecretaSegura"  # Cambia esto a una clave segura
 
 def generar_token(data, expiracion=60):
     """
@@ -21,7 +23,7 @@ def verificar_token(token):
     """
     Verifica un token JWT.
     :param token: Token en formato string
-    :return: Información decodificada si es válido
+    :return: Información decodificada si es válido o None si es inválido
     """
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
@@ -31,21 +33,23 @@ def verificar_token(token):
     except jwt.InvalidTokenError:
         return None  # Token inválido
 
-from flask import request, jsonify
-from functools import wraps
-from utils.auth import verificar_token
-
 def requerir_autenticacion(func):
     @wraps(func)
     def envoltura(*args, **kwargs):
         token = request.headers.get("Authorization")
-        if not token:
-            return jsonify({"mensaje": "Token no proporcionado"}), 401
+        print(f"🔍 Token recibido en backend: {token}")  # <-- Depuración
+        print(request.headers)
 
-        data = verificar_token(token.split(" ")[1])  # Quitar "Bearer"
+        if not token or not token.startswith("Bearer "):
+            return jsonify({"mensaje": "Token no proporcionado o formato incorrecto"}), 401
+
+        token = token.split(" ")[1]  # Eliminar "Bearer "
+        data = verificar_token(token)
+
         if not data:
+            print("❌ Token inválido o expirado")  # <-- Depuración
             return jsonify({"mensaje": "Token inválido o expirado"}), 401
 
-        request.cliente = data  # Pasar datos del cliente a la solicitud
+        request.usuario = data
         return func(*args, **kwargs)
     return envoltura

@@ -19,20 +19,27 @@ function fetchAPI(url, options = {}) {
     }).catch(error => console.error("Error en la API:", error));
 }
 
-function cargarClientes(filtro = "") {
-    fetchAPI(`/clientes?buscar=${filtro}`)
+function cargarClientes(busqueda = "") {
+    fetchAPI(`/clientes?buscar=${busqueda}`)
         .then(clientes => {
-            const lista = document.getElementById('clientes-list');
-            lista.innerHTML = '';
+            console.log("📡 Clientes recibidos:", clientes); // Debug
+
+            if (!Array.isArray(clientes)) {
+                console.error("❌ La API no devolvió un array de clientes:", clientes);
+                return;
+            }
+
+            const lista = document.getElementById("clientes-list");
+            lista.innerHTML = "";
+
             clientes.forEach(cliente => {
-                const item = document.createElement('li');
-                item.innerHTML = `
-                    ${cliente.nombre} ${cliente.apellidos} - ${cliente.email} 
-                    <button onclick="editarCliente(${cliente.id_cliente})">Editar</button>
-                    <button onclick="eliminarCliente(${cliente.id_cliente})">Eliminar</button>
-                `;
-                lista.appendChild(item);
+                const li = document.createElement("li");
+                li.textContent = `${cliente.nombre} ${cliente.apellidos} - ${cliente.email}`;
+                lista.appendChild(li);
             });
+        })
+        .catch(error => {
+            console.error("🚨 Error cargando clientes:", error);
         });
 }
 
