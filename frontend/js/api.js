@@ -1,55 +1,82 @@
-function fetchAPI(url, options = {}) {
-    console.log(`📡 fetchAPI ejecutado para: ${url}`);
+/**
+ * api.js - Manejo de peticiones con autenticación JWT para Sitters with Love
+ * © 2025 Sitters with Love
+ */
+
+console.log("🛠 api.js cargado correctamente.");
+
+/**
+ * Función para realizar peticiones autenticadas a la API
+ * @param {string} url - URL del endpoint (ej: "/clientes")
+ * @param {object} options - Opciones de configuración de fetch (ej: método, cuerpo, etc.)
+ * @returns {Promise} - Respuesta de la API en JSON
+ */
+async function fetchAPI(url, options = {}) {
+    console.log(`📡 Ejecutando fetchAPI para: ${url}`);
 
     const token = sessionStorage.getItem("token");
     console.log(`🔑 Token en sessionStorage:`, token);
 
-    if (!options) options = {};
-    if (!options.headers) options.headers = {};
-
-    options.headers["Content-Type"] = "application/json";
-
-    if (token) {
-        options.headers["Authorization"] = `Bearer ${token}`;
-        console.log(`✅ Token añadido a los headers:`, options.headers);
-    } else {
-        console.warn("⚠️ No hay token en sessionStorage. Redirigiendo a login.");
+    // Verificación básica de que el token existe antes de enviar la petición
+    if (!token) {
+        console.warn("⚠️ No hay token almacenado. Redirigiendo a login.");
         window.location.href = "index.html";
         return Promise.reject("Token no encontrado");
     }
 
+    // Asegurar que options existe y tiene headers
+    options = options || {};
+    options.headers = options.headers || {};
+
+    // Añadir el header de autenticación
+    options.headers["Authorization"] = `Bearer ${token}`;
+    options.headers["Content-Type"] = "application/json";
+
     console.log(`🚀 Enviando petición con headers:`, options);
 
-    return fetch(url, options)
-        .then(async res => {
-            console.log(`📡 Respuesta recibida desde ${url}:`, res.status);
+    try {
+        const response = await fetch(url, options);
 
-            if (res.status === 401) {
-                console.error("❌ Error 401: Token inválido o expirado.");
-                logout();
-                return Promise.reject("Token inválido o expirado");
-            }
+        console.log(`📡 Respuesta recibida (${response.status}) desde ${url}`);
 
-            try {
-                const data = await res.json();
-                console.log(`📡 Datos recibidos de ${url}:`, data);
-                return data;
-            } catch (error) {
-                console.error("🚨 Error parseando JSON:", error);
-                return Promise.reject("Error en la respuesta JSON");
-            }
-        })
-        .catch(error => console.error("🚨 Error en la API:", error));
+        // Manejo de errores de autenticación
+        if (response.status === 401) {
+            console.error("❌ Error 401: Token inválido o expirado. Cerrando sesión.");
+            logout();
+            return Promise.reject("Token inválido o expirado");
+        }
+
+        // Intentar parsear la respuesta como JSON
+        const data = await response.json();
+        console.log(`📡 Datos recibidos de ${url}:`, data);
+        return data;
+
+    } catch (error) {
+        console.error("🚨 Error en la API:", error);
+        return Promise.reject("Error en la comunicación con la API");
+    }
 }
 
+/**
+ * Función para cerrar sesión
+ * Elimina el token y redirige al usuario a la página de login
+ */
+function logout() {
+    console.log("🔴 Cierre de sesión: eliminando token y redirigiendo.");
+    sessionStorage.removeItem("token");
+    window.location.href = "index.html";
+}
 
-
-/* Redirigir si no hay token en las páginas protegidas */
+/**
+ * Verificar si hay un token en sessionStorage al cargar la página
+ * Si no hay token y no estamos en `index.html`, redirige a login
+ */
 document.addEventListener("DOMContentLoaded", function () {
     const token = sessionStorage.getItem("token");
     console.log(`🔍 Verificando token en carga de página: ${token ? "Presente" : "No encontrado"}`);
 
     if (!token && !window.location.href.includes("index.html")) {
+        console.warn("⚠️ Token no encontrado, redirigiendo a login.");
         window.location.href = "index.html";
-    }    
+    }
 });

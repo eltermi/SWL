@@ -37,17 +37,17 @@ def requerir_autenticacion(func):
     @wraps(func)
     def envoltura(*args, **kwargs):
         token = request.headers.get("Authorization")
-        print(f"🔍 Token recibido en backend: {token}")  # <-- Depuración
-        print(request.headers)
+        print(f"🔍 Token recibido en backend: {token}")  # Debug
 
         if not token or not token.startswith("Bearer "):
+            print("❌ Token no recibido o mal formateado")  # Debug
             return jsonify({"mensaje": "Token no proporcionado o formato incorrecto"}), 401
 
-        token = token.split(" ")[1]  # Eliminar "Bearer "
+        token = token.split(" ")[1]  # Extraer solo el token real
         data = verificar_token(token)
 
         if not data:
-            print("❌ Token inválido o expirado")  # <-- Depuración
+            print("❌ Token inválido o expirado")  # Debug
             return jsonify({"mensaje": "Token inválido o expirado"}), 401
 
         request.usuario = data

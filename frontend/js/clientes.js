@@ -6,10 +6,18 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchAPI(url, options = {}) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        console.warn("⚠️ No hay token. Redirigiendo a login.");
+        window.location.href = "index.html";
+        return Promise.reject("No hay token");
+    }
+
     return fetch(url, {
         ...options,
         headers: {
-            'Content-Type': 'application/json'
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
         }
     }).then(response => {
         if (!response.ok) {
@@ -18,6 +26,7 @@ function fetchAPI(url, options = {}) {
         return response.json();
     }).catch(error => console.error("Error en la API:", error));
 }
+
 
 function cargarClientes(busqueda = "") {
     fetchAPI(`/clientes?buscar=${busqueda}`)
