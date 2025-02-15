@@ -43,7 +43,12 @@ function cargarClientes(busqueda = "") {
 
             clientes.forEach(cliente => {
                 const li = document.createElement("li");
-                li.textContent = `${cliente.nombre} ${cliente.apellidos} - ${cliente.email}`;
+                if (cliente.apellidos) {
+                    li.textContent = `${cliente.nombre} ${cliente.apellidos} - ${cliente.direccion}`;
+                }else {
+                    li.textContent = `${cliente.nombre} - ${cliente.direccion}`;
+                }
+                
                 lista.appendChild(li);
             });
         })
@@ -56,11 +61,21 @@ function agregarCliente(event) {
     event.preventDefault();
     const nombre = document.getElementById('nombre').value;
     const apellidos = document.getElementById('apellidos').value;
+    const calle = document.getElementById('calle').value;
+    const piso = document.getElementById('piso').value;
+    const codigo_postal = document.getElementById('codigo_postal').value;
+    const municipio = document.getElementById('municipio').value;
+    const pais = document.getElementById('pais').value;
+    const telefono = document.getElementById('telefono').value;
     const email = document.getElementById('email').value;
+    const nacionalidad = document.getElementById('nacionalidad').value;
+    const idioma = document.getElementById('idioma').value;
+    const genero = document.getElementById('genero').value;
+    const referencia_origen = document.getElementById('referencia_origen').value;
 
     fetchAPI('/clientes', {
         method: 'POST',
-        body: JSON.stringify({ nombre, apellidos, email })
+        body: JSON.stringify({ nombre, apellidos, calle, piso, codigo_postal, municipio, pais, telefono, email, nacionalidad, idioma, genero, referencia_origen })
     }).then(() => {
         cargarClientes();
         document.getElementById('cliente-form').reset();

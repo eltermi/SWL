@@ -23,6 +23,7 @@ def obtener_clientes():
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
         'apellidos': cliente.apellidos,
+        'direccion': cliente.calle + ". " + cliente.codigo_postal + " " + cliente.municipio,
         'email': cliente.email,
         'municipio': cliente.municipio
     } for cliente in clientes])
@@ -35,6 +36,15 @@ def crear_cliente():
     nuevo_cliente = Clientes(
         nombre=datos['nombre'],
         apellidos=datos['apellidos'],
+        calle=datos['calle'],
+        piso=datos.get('piso'),
+        codigo_postal=datos['codigo_postal'],
+        municipio=datos['municipio'],
+        pais=datos['pais'],
+        nacionalidad=datos.get('nacionalidad'),
+        idioma=datos.get('idioma'),
+        genero=datos['genero'],
+        referencia_origen=datos.get('referencia_origen'),
         email=datos.get('email'),
         telefono=datos.get('telefono')
     )
