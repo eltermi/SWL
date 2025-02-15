@@ -1,0 +1,42 @@
+completion_list.html:12 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/utils.js net::ERR_FILE_NOT_FOUND
+chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/utils.js:1 
+            
+            
+           Failed to load resource: net::ERR_FILE_NOT_FOUND
+completion_list.html:13 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/extensionState.js net::ERR_FILE_NOT_FOUND
+chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/extensionState.js:1 
+            
+            
+           Failed to load resource: net::ERR_FILE_NOT_FOUND
+completion_list.html:14 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/heuristicsRedefinitions.js net::ERR_FILE_NOT_FOUND
+console.log("🔄 Redirigiendo a:", sessionStorage.getItem("redirectAfterLogin"));
+console.log("🔑 Token actual:", sessionStorage.getItem("token"));
+
+chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/heuristicsRedefinitions.js:1 
+            
+            
+           Failed to load resource: net::ERR_FILE_NOT_FOUND
+VM113:1 🔄 Redirigiendo a: /index.html
+VM113:2 🔑 Token actual: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkX3VzdWFyaW8iOjMsInVzZXJuYW1lIjoibWFyaWEifSwiZXhwIjoxNzM5NjQ5NDIyLCJpYXQiOjE3Mzk2NDU4MjJ9.wyTe51jymsgeIsbJLUqirG8Zr8hMDRVlNlOtj5uEjew
+undefined
+completion_list.html:12 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/utils.js net::ERR_FILE_NOT_FOUND
+completion_list.html:13 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/extensionState.js net::ERR_FILE_NOT_FOUND
+completion_list.html:14 
+            
+            
+           GET chrome-extension://pejdijmoenmkgeppbflobdenhhabjlaj/heuristicsRedefinitions.js net::ERR_FILE_NOT_FOUND

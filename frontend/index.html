@@ -8,10 +8,16 @@
 </head>
 <body>
     <div class="login-container">
-        <h1>Login</h1>
-        <input type="text" id="username" placeholder="Usuario">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="login()">Iniciar sesión</button>
+        <h2>Iniciar sesión</h2>
+        <form id="login-form">
+            <label for="usuario">Usuario:</label>
+            <input type="text" id="usuario" placeholder="Usuario" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Iniciar sesión</button>
+        </form>
     </div>
     <script src="js/auth.js"></script>
 </body>

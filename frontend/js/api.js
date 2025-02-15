@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!token && !window.location.href.includes("index.html")) {
         console.warn("⚠️ Token no encontrado, redirigiendo a login.");
+        sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
         window.location.href = "index.html";
     }
 });
