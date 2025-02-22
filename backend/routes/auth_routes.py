@@ -8,7 +8,7 @@ from models.Tarifas import Tarifas
 from models.TarifasContrato import TarifasContrato
 from models.Usuarios import Usuarios
 
-from utils.auth import generar_token, verificar_token
+from utils.auth import generar_token
 
 auth_bp = Blueprint('auth_bp', __name__)
 

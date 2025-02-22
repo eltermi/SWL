@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models.Contratos import Contratos
+from models import Contratos
+from datetime import date
+from utils.auth import requerir_autenticacion
 
 contratos_bp = Blueprint('contratos', __name__)
 
@@ -80,3 +82,31 @@ def eliminar_contrato(id_contrato):
     db.session.delete(contrato)
     db.session.commit()
     return jsonify({'mensaje': 'Contrato eliminado exitosamente'})
+
+
+@contratos_bp.route('/contratos/activos', methods=['GET'])
+@requerir_autenticacion
+def obtener_contratos_activos():
+    """
+    Devuelve todos los contratos con fecha_fin igual o superior a hoy.
+    """
+    hoy = date.today()
+    contratos = Contratos.query.filter(Contratos.fecha_fin >= hoy).all()
+
+    resultado = [
+        {
+            "id_contrato": contrato.id_contrato,
+            "id_cliente": contrato.id_cliente,
+            "fecha_inicio": contrato.fecha_inicio.strftime("%Y-%m-%d"),
+            "fecha_fin": contrato.fecha_fin.strftime("%Y-%m-%d"),
+            "numero_visitas_diarias": contrato.numero_visitas_diarias,
+            "horario_visitas": contrato.horario_visitas,
+            "pago_adelantado": contrato.pago_adelantado,
+            "estado_pago_adelantado": contrato.estado_pago_adelantado,
+            "pago_final": contrato.pago_final,
+            "estado_pago_final": contrato.estado_pago_final,
+        }
+        for contrato in contratos
+    ]
+
+    return jsonify(resultado), 200

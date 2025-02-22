@@ -1,7 +1,3 @@
-// Sitters with Love - Aplicación Completa (Actualizada)
-
-// auth.js
-
 // Verificar si el usuario ya está autenticado
 function isAuthenticated() {
     return !!sessionStorage.getItem('token');
@@ -11,7 +7,7 @@ function isAuthenticated() {
 function checkAuthentication() {
     if (!isAuthenticated()) {
         sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-        window.location.href = 'index.html';
+        window.location.href = '/';
     }
 }
 
@@ -27,24 +23,33 @@ async function login(event) {
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('/login', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
         
         if (!response.ok) {
-            throw new Error('Login failed');
+            throw new Error('Fallo en el inicio de sesión');
         }
         
         const data = await response.json();
-        sessionStorage.setItem('token', data.token);
+        //console.log("🔍 Token recibido en frontend:", data.token);
+        
+        if (data.token) {
+            sessionStorage.setItem('token', data.token);
+        } else {
+            console.error("❌ No se recibió token en la respuesta.");
+            return;
+        }
+
         
         // Obtener la página donde intentaba acceder antes de autenticarselet redirectPage = sessionStorage.getItem('redirectAfterLogin');
 
         let redirectPage = sessionStorage.getItem('redirectAfterLogin');
-        if (!redirectPage || redirectPage.includes("index.html")) {
-            redirectPage = "clientes.html";  // Página por defecto si no hay otra página válida
+        console.info("n auth.js " + redirectPage)
+        if (!redirectPage || redirectPage == ("/")) {
+            redirectPage = "/clientes";  // Página por defecto si no hay otra página válida
         }
 
         sessionStorage.removeItem('redirectAfterLogin');
@@ -58,13 +63,14 @@ async function login(event) {
 // Cerrar sesión
 function logout() {
     sessionStorage.removeItem('token');
-    window.location.href = 'index.html';
+    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);// Guardar la última página visitada antes de ser redirigido a login
+    window.location.href = '/';
 }
 
 // Añadir el evento para que el login se active al presionar 'Enter'
 document.getElementById('login-form').addEventListener('submit', login);
 
 // Verificar autenticación en páginas protegidas
-if (!window.location.pathname.includes("index.html")) {
+if (!window.location.pathname.includes("/")) {
     checkAuthentication();
 }

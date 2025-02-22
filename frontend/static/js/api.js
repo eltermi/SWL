@@ -3,8 +3,6 @@
  * © 2025 Sitters with Love
  */
 
-console.log("🛠 api.js cargado correctamente.");
-
 /**
  * Función para realizar peticiones autenticadas a la API
  * @param {string} url - URL del endpoint (ej: "/clientes")
@@ -20,7 +18,7 @@ async function fetchAPI(url, options = {}) {
     // Verificación básica de que el token existe antes de enviar la petición
     if (!token) {
         console.warn("⚠️ No hay token almacenado. Redirigiendo a login.");
-        window.location.href = "index.html";
+        window.location.href = "/";
         return Promise.reject("Token no encontrado");
     }
 
@@ -64,7 +62,8 @@ async function fetchAPI(url, options = {}) {
 function logout() {
     console.log("🔴 Cierre de sesión: eliminando token y redirigiendo.");
     sessionStorage.removeItem("token");
-    window.location.href = "index.html";
+    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);// Guardar la última página visitada antes de ser redirigido a login
+    window.location.href = "/";
 }
 
 /**
@@ -73,11 +72,11 @@ function logout() {
  */
 document.addEventListener("DOMContentLoaded", function () {
     const token = sessionStorage.getItem("token");
-    console.log(`🔍 Verificando token en carga de página: ${token ? "Presente" : "No encontrado"}`);
+    console.log("🔍 Verificando token en carga de página: " + token);
 
-    if (!token && !window.location.href.includes("index.html")) {
+    if (!token && !window.location.href.includes("/")) {
         console.warn("⚠️ Token no encontrado, redirigiendo a login.");
         sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
-        window.location.href = "index.html";
+        window.location.href = "/";
     }
 });

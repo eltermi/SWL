@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
+
+body {
+    font-family: 'SF Pro Display', sans-serif;
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 0;
+}
+
+.calendar-container {
+    max-width: 100%;
+    width: 400px;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.day-section {
+    margin-bottom: 10px;
+}
+
+.day-header {
+    color: #d0021b;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    padding: 5px 15px;
+}
+
+.contract-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px 0;
+}
+
+.contract-item {
+    font-size: 16px;
+    font-weight: 400;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contract-item:last-child {
+    border-bottom: none;
+}
+
+.contract-item .time {
+    color: #9b9b9b;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media screen and (max-width: 480px) {
+    .calendar-container {
+        width: 95%;
+        padding: 8px;
+    }
+
+    .day-header {
+        font-size: 13px;
+        padding: 5px 10px;
+    }
+
+    .contract-item {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .contract-item .time {
+        font-size: 13px;
+    }
+}

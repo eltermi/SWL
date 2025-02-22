@@ -1,5 +1,6 @@
 /* Contenido base para clientes.js */
 document.addEventListener('DOMContentLoaded', function () {
+    console.debug("Llegamos a clientes.js");
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
@@ -9,10 +10,11 @@ function fetchAPI(url, options = {}) {
     const token = sessionStorage.getItem("token");
     if (!token) {
         console.warn("⚠️ No hay token. Redirigiendo a login.");
-        window.location.href = "index.html";
+        window.location.href = "/";
         return Promise.reject("No hay token");
     }
 
+    console.info("En clientes.js " + token);
     return fetch(url, {
         ...options,
         headers: {
@@ -29,7 +31,7 @@ function fetchAPI(url, options = {}) {
 
 
 function cargarClientes(busqueda = "") {
-    fetchAPI(`/clientes?buscar=${busqueda}`)
+    fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
             console.log("📡 Clientes recibidos:", clientes); // Debug
 
@@ -73,7 +75,10 @@ function agregarCliente(event) {
     const genero = document.getElementById('genero').value;
     const referencia_origen = document.getElementById('referencia_origen').value;
 
-    fetchAPI('/clientes', {
+    console.info(nombre);
+    console.info(JSON.stringify({ nombre, apellidos, calle, piso, codigo_postal, municipio, pais, telefono, email, nacionalidad, idioma, genero, referencia_origen }));
+
+    fetchAPI('/api/clientes', {
         method: 'POST',
         body: JSON.stringify({ nombre, apellidos, calle, piso, codigo_postal, municipio, pais, telefono, email, nacionalidad, idioma, genero, referencia_origen })
     }).then(() => {
@@ -83,7 +88,7 @@ function agregarCliente(event) {
 }
 
 function eliminarCliente(id) {
-    fetchAPI(`/clientes/${id}`, { method: 'DELETE' })
+    fetchAPI(`/api/clientes/${id}`, { method: 'DELETE' })
         .then(() => cargarClientes());
 }
 
@@ -93,7 +98,7 @@ function editarCliente(id) {
     const nuevoEmail = prompt("Nuevo correo electrónico:");
 
     if (nuevoNombre && nuevoApellidos && nuevoEmail) {
-        fetchAPI(`/clientes/${id}`, {
+        fetchAPI(`/api/clientes/${id}`, {
             method: 'PUT',
             body: JSON.stringify({ nombre: nuevoNombre, apellidos: nuevoApellidos, email: nuevoEmail })
         }).then(() => cargarClientes());

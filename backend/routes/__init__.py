@@ -7,6 +7,7 @@ from routes.contactos_routes import contactos_bp
 from routes.tarifas_routes import tarifas_bp
 from routes.tarifas_contrato_routes import tarifas_contrato_bp
 from routes.usuarios_routes import usuarios_bp
+from routes.dashboard_routes import dashboard_bp
 
 def register_blueprints(app):
     app.register_blueprint(clientes_bp)
@@ -17,3 +18,4 @@ def register_blueprints(app):
     app.register_blueprint(tarifas_bp)
     app.register_blueprint(tarifas_contrato_bp)
     app.register_blueprint(usuarios_bp)
+    app.register_blueprint(dashboard_bp)

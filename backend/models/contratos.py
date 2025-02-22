@@ -4,7 +4,7 @@ from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
-import datetime
+from datetime import date
 import decimal
 
 class Contratos(db.Model):
@@ -15,8 +15,8 @@ class Contratos(db.Model):
     )
 
     id_contrato: Mapped[int] = mapped_column(Integer, primary_key=True)
-    fecha_inicio: Mapped[datetime.date] = mapped_column(Date)
-    fecha_fin: Mapped[datetime.date] = mapped_column(Date)
+    fecha_inicio: Mapped[date] = mapped_column(Date)
+    fecha_fin: Mapped[date] = mapped_column(Date)
     numero_visitas_diarias: Mapped[int] = mapped_column(Integer)
     horario_visitas: Mapped[dict] = mapped_column(JSON)
     pago_adelantado: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2))
@@ -30,4 +30,9 @@ class Contratos(db.Model):
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contratos')
     tarifas_contrato: Mapped[List['TarifasContrato']] = relationship('TarifasContrato', back_populates='contratos')
 
-
+def obtener_contratos_activos():
+    """
+    Devuelve todos los contratos en los que la fecha de finalización es igual o superior a hoy.
+    """
+    hoy = date.today()
+    return Contratos.query.filter(Contratos.fecha_fin >= hoy).all()

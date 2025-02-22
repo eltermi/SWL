@@ -1,0 +1,17 @@
+ 
+            
+            
+           GET http://localhost:5001/api/clientes 401 (UNAUTHORIZED)
+login @ :5001/static/js/auth.js:55
+fetch('/api/clientes', {
+    method: 'GET',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+    }
+}).then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+
+Promise {<pending>}[[Prototype]]: Promise[[PromiseState]]: "fulfilled"[[PromiseResult]]: undefined
+VM1411:8 (11) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]0: {apellidos: 'Delia', direccion: '7, rue du Brill. 3397 Roeser', email: null, id_cliente: 1, municipio: 'Roeser', …}1: {apellidos: 'Taheri', direccion: '191, rue de Hamm. 1713 Luxembourg', email: null, id_cliente: 2, municipio: 'Luxembourg', …}2: {apellidos: null, direccion: '41, rue de Kiem. 1857 Neudorf', email: null, id_cliente: 3, municipio: 'Neudorf', …}3: {apellidos: null, direccion: '80 am Bongert. 1270 Merl', email: null, id_cliente: 4, municipio: 'Merl', …}4: {apellidos: 'Miller', direccion: '185A, route de Thionville. 2611 Howald', email: null, id_cliente: 5, municipio: 'Howald', …}5: {apellidos: 'Ávila', direccion: '8, rue Joseph Tockert. 2620 Hollerich', email: null, id_cliente: 6, municipio: 'Hollerich', …}6: {apellidos: null, direccion: '4, rue Tubis. 2629 Cessange', email: null, id_cliente: 7, municipio: 'Cessange', …}7: {apellidos: null, direccion: "98, route d'Arlon. 1150 Rollingergrund-north Bellair", email: null, id_cliente: 8, municipio: 'Rollingergrund-north Bellair', …}8: {apellidos: null, direccion: '17, Gewaennchen. 5828 Fenteng Hesper', email: null, id_cliente: 9, municipio: 'Fenteng Hesper', …}9: {apellidos: 'Charokopou', direccion: '3, rue Chingiz T. Aitmatov. 1161 Dommeldange', email: null, id_cliente: 11, municipio: 'Dommeldange', …}10: {apellidos: 'uyg', direccion: 'uyg. uyg uyg', email: 'jh@dfdd.com', id_cliente: 14, municipio: 'uyg', …}length: 11[[Prototype]]: Array(0)

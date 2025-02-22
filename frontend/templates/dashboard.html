@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sitters with Love{% endblock %}
+
+{% block content %}
+    <div id="dashboard-content"></div>
+    <button onclick="logout()">Cerrar sesión</button>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -27,6 +27,7 @@ def verificar_token(token):
     """
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        print(f"Data decoded {decoded["data"]}")
         return decoded["data"]
     except jwt.ExpiredSignatureError:
         return None  # Token expirado
@@ -44,6 +45,7 @@ def requerir_autenticacion(func):
             return jsonify({"mensaje": "Token no proporcionado o formato incorrecto"}), 401
 
         token = token.split(" ")[1]  # Extraer solo el token real
+        print("Aqui llamo tb a verificar token")
         data = verificar_token(token)
 
         if not data:
