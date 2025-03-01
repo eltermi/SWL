@@ -34,7 +34,6 @@ async function login(event) {
         }
         
         const data = await response.json();
-        //console.log("🔍 Token recibido en frontend:", data.token);
         
         if (data.token) {
             sessionStorage.setItem('token', data.token);
@@ -47,7 +46,6 @@ async function login(event) {
         // Obtener la página donde intentaba acceder antes de autenticarselet redirectPage = sessionStorage.getItem('redirectAfterLogin');
 
         let redirectPage = sessionStorage.getItem('redirectAfterLogin');
-        console.info("n auth.js " + redirectPage)
         if (!redirectPage || redirectPage == ("/")) {
             redirectPage = "/clientes";  // Página por defecto si no hay otra página válida
         }

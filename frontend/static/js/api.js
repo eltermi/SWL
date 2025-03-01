@@ -10,14 +10,11 @@
  * @returns {Promise} - Respuesta de la API en JSON
  */
 async function fetchAPI(url, options = {}) {
-    console.log(`📡 Ejecutando fetchAPI para: ${url}`);
-
+    
     const token = sessionStorage.getItem("token");
-    console.log(`🔑 Token en sessionStorage:`, token);
-
+    
     // Verificación básica de que el token existe antes de enviar la petición
     if (!token) {
-        console.warn("⚠️ No hay token almacenado. Redirigiendo a login.");
         window.location.href = "/";
         return Promise.reject("Token no encontrado");
     }
@@ -30,27 +27,20 @@ async function fetchAPI(url, options = {}) {
     options.headers["Authorization"] = `Bearer ${token}`;
     options.headers["Content-Type"] = "application/json";
 
-    console.log(`🚀 Enviando petición con headers:`, options);
-
     try {
         const response = await fetch(url, options);
 
-        console.log(`📡 Respuesta recibida (${response.status}) desde ${url}`);
-
         // Manejo de errores de autenticación
         if (response.status === 401) {
-            console.error("❌ Error 401: Token inválido o expirado. Cerrando sesión.");
             logout();
             return Promise.reject("Token inválido o expirado");
         }
 
         // Intentar parsear la respuesta como JSON
         const data = await response.json();
-        console.log(`📡 Datos recibidos de ${url}:`, data);
         return data;
 
     } catch (error) {
-        console.error("🚨 Error en la API:", error);
         return Promise.reject("Error en la comunicación con la API");
     }
 }
@@ -60,7 +50,6 @@ async function fetchAPI(url, options = {}) {
  * Elimina el token y redirige al usuario a la página de login
  */
 function logout() {
-    console.log("🔴 Cierre de sesión: eliminando token y redirigiendo.");
     sessionStorage.removeItem("token");
     sessionStorage.setItem('redirectAfterLogin', window.location.pathname);// Guardar la última página visitada antes de ser redirigido a login
     window.location.href = "/";
@@ -72,11 +61,36 @@ function logout() {
  */
 document.addEventListener("DOMContentLoaded", function () {
     const token = sessionStorage.getItem("token");
-    console.log("🔍 Verificando token en carga de página: " + token);
 
     if (!token && !window.location.href.includes("/")) {
-        console.warn("⚠️ Token no encontrado, redirigiendo a login.");
         sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
         window.location.href = "/";
+    }else if(token){
+        getUsuario();
     }
 });
+
+/**
+ * Función para recuperar el usuario activo en la sesión y mostrarlo en la cabecera
+ * @returns numbre de usuario
+ */
+function getUsuario() {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/";
+        return;
+    }
+
+    fetchAPI('/api/dashboard/usuario', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
+    }).then(data => {
+        if (data && data.username) {
+            document.getElementById('div-de-usuario').innerHTML = `<p>${data.username}</p>`;
+        } else {
+        }
+    }).catch(error => console.error("🚨 Error obteniendo el usuario:", error));
+}

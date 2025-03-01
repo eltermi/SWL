@@ -10,19 +10,32 @@
 <body>
     <header>
         <h1>Sitters with Love</h1>
+        <div class="hamburger" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
         <nav>
-            <ul>
+            <ul class="menu" id="menu">
                 <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
                 <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
                 <li><a href="{{ url_for('home') }}">Inicio</a></li>
             </ul>
         </nav>
+        <div id="div-de-usuario"></div>
     </header>
 
     <main>
-        {% block content %}{% endblock %}
+        <div id="contenedor" class="container">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
+    <script>
+        function toggleMenu() {
+            document.getElementById('menu').classList.toggle('show');
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/api.js') }}"></script>
 </body>
 </html>

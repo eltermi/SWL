@@ -1,6 +1,5 @@
 /* Contenido base para clientes.js */
 document.addEventListener('DOMContentLoaded', function () {
-    console.debug("Llegamos a clientes.js");
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
@@ -9,12 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function fetchAPI(url, options = {}) {
     const token = sessionStorage.getItem("token");
     if (!token) {
-        console.warn("⚠️ No hay token. Redirigiendo a login.");
         window.location.href = "/";
         return Promise.reject("No hay token");
     }
 
-    console.info("En clientes.js " + token);
     return fetch(url, {
         ...options,
         headers: {
@@ -33,10 +30,8 @@ function fetchAPI(url, options = {}) {
 function cargarClientes(busqueda = "") {
     fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
-            console.log("📡 Clientes recibidos:", clientes); // Debug
 
             if (!Array.isArray(clientes)) {
-                console.error("❌ La API no devolvió un array de clientes:", clientes);
                 return;
             }
 
@@ -74,9 +69,6 @@ function agregarCliente(event) {
     const idioma = document.getElementById('idioma').value;
     const genero = document.getElementById('genero').value;
     const referencia_origen = document.getElementById('referencia_origen').value;
-
-    console.info(nombre);
-    console.info(JSON.stringify({ nombre, apellidos, calle, piso, codigo_postal, municipio, pais, telefono, email, nacionalidad, idioma, genero, referencia_origen }));
 
     fetchAPI('/api/clientes', {
         method: 'POST',
