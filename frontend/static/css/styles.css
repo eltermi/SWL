@@ -90,6 +90,7 @@ nav {
     font-size: 25px;
     text-transform: uppercase;
     margin-bottom: 5px;
+    text-align: center;
 }
 .gato-header {
     color: #6426009a;
@@ -166,6 +167,7 @@ nav {
 .animales {
     font-weight: bold;
     font-size: 16px;
+    padding-bottom: 10px;;
     margin-bottom: 5px;
 }
 
