@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Animales - Sitters with Love{% endblock %}
+
+{% block content %}
+
+
+<h2 id="cabecera" class="day-header">Animales</h2>
+<input type="text" id="buscar" class="buscar" placeholder="Buscar animales">
+<div id="lista-animales"></div>
+<div id="muestra-animal"></div>
+<div id="form-crea-animal"> 
+       <form id="animal-form" enctype="multipart/form-data">
+        <input type="text" id="form-nombre-animal" placeholder="Nombre" required> 
+        <select id="form-nombre-cliente" required>
+            <option value="">Selecciona un cliente</option>
+        </select>
+        <input type="text" id="form-edad" placeholder="Edad">
+        <input type="text" id="form-tipo-animal" placeholder="Tipo de animal">
+        <input type="text" id="form-medicacion" placeholder="Medicación" >
+        <input type="file" id="form-foto" accept="image/*">
+        <button type="submit">Añadir Animal</button>
+    </form>
+</div>
+<script src="{{ url_for('static', filename='js/animales.js') }}"></script>
+{% endblock %}
