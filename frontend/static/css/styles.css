@@ -29,16 +29,16 @@ header {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px  auto;
+    margin: 20px auto;
     flex-direction: column;
-    overflow-x: auto; /* Permite el desplazamiento horizontal si el contenido es demasiado ancho */
 }
 
-.container > * {
+.container>* {
     flex: 1;
 }
 
-header, .container {
+header,
+.container {
     box-sizing: border-box;
 }
 
@@ -50,6 +50,7 @@ nav {
     background: white;
     padding: 10px;
 }
+
 .menu {
     list-style: none;
     padding: 0;
@@ -58,18 +59,22 @@ nav {
     justify-content: center;
     gap: 20px;
 }
+
 .menu li {
     padding: 15px;
     text-align: center;
 }
+
 .menu li a {
     text-decoration: none;
     color: black;
     display: block;
 }
+
 .menu li:hover {
     background: #f4f4f4;
 }
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -78,20 +83,32 @@ nav {
     top: 20px;
     right: 20px;
 }
+
 .hamburger div {
     width: 30px;
     height: 4px;
     background: black;
     margin: 5px 0;
 }
-.day-header {
-    color: #d0021b;
+
+.day-header,
+.entityHeader {
     font-weight: 800;
-    font-size: 25px;
     text-transform: uppercase;
     margin-bottom: 5px;
     text-align: center;
 }
+
+.day-header {
+    color: #d0021b;
+    font-size: 20px;
+}
+
+.entityHeader {
+    color: #2d0808;
+    font-size: 25px;
+}
+
 .gato-header {
     color: #6426009a;
     font-weight: 600;
@@ -99,51 +116,116 @@ nav {
     text-transform: uppercase;
     margin-bottom: 5px;
 }
-#contratos-activos {
-    max-width: 600px;
-    margin: 20px auto;
-    font-family: Arial, sans-serif;
-}
-.contrato {
-    /*border: 1px solid #ccc;*/
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    cursor: pointer; /* 🔥 Hace que el cursor cambie a mano cuando se pasa sobre el div */
-    transition: background-color 0.2s;
-}
-.contratoHidd {
-    /*border: 1px solid #ccc;*/
-    padding: 15px;
-    margin-bottom: 10px;
-    display: none;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    cursor: pointer; /* 🔥 Hace que el cursor cambie a mano cuando se pasa sobre el div */
-    transition: background-color 0.2s;
-}
-.contrato:hover {
-    background-color: #f0f0f0; /* Efecto hover para que se note que es clickeable */
+
+.buscar {
+    border-radius: 3px;
+    font-size: 15px;
+    display: block;
+    margin: 0 auto 15px;
 }
 
-.contrato-content {
+.centrar {
+    display: block;
+    margin: 10px;
+}
+
+#contratos-activos,
+#lista-clientes,
+#muestra-cliente,
+#form-crea-cliente,
+#form-crea-animal,
+#lista-animales,
+#muestra-animal {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+#lista-animales h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #00310d;
+    padding-bottom: 5px;
+    font-family: 'Arial', sans-serif;
+}
+
+#lista-animales h3+.animal {
+    margin-top: 5px;
+}
+
+#lista-animales .animal:last-of-type {
+    margin-bottom: 30px;
+}
+
+.contrato,
+.cliente,
+.animal {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
     display: flex;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: space-between; /* Detalles a la izquierda, imagen a la derecha */
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-wrap: wrap;
+}
+
+.contratoHidd,
+.clienteHidd,
+.animalHidd {
+    display: none;
+    padding: 15px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.contrato:hover,
+.cliente:hover,
+.animal:hover {
+    background-color: #f0f0f0;
+}
+
+.contrato-content,
+.cliente-content,
+.animal-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    gap: 15px; /* Espacio entre detalles y foto */
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
 .detalles {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    padding-left: 20px;
+}
+
+.detalles p {
+    margin: 2px 0;
+    font-size: 15px;
+}
+
+.detalles .nombreCliente {
+    font-size: 18px;
+    /* o el tamaño que quieras */
+}
+
+.detalles .nombreAnimal {
+    font-size: 17px;
+    /* o el tamaño que quieras */
 }
 
 .contrato-foto {
@@ -164,42 +246,86 @@ nav {
     object-fit: cover;
     border-radius: 10px;
 }
-.animales {
+
+.nombreCliente,
+.nombreAnimal {
     font-weight: bold;
-    font-size: 16px;
-    padding-bottom: 10px;;
     margin-bottom: 5px;
 }
 
-.detalles {
-    padding-left: 20px;  /* Desplaza los detalles hacia la derecha */
+.nombreAnimal {
+    color: #5c0101;
+    padding-bottom: 10px;
 }
 
-.detalles p {
-    margin: 2px 0;
-    font-size: 14px;
-    color: #555;
+.telefono,
+.encabezado,
+.fecha_contrato {
+    font-size: 16px;
+    margin-bottom: 5px;
 }
+
+.animales {
+    color: #5c0101;
+    font-weight: bold;
+    font-size: 16px;
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    flex: 1;
+}
+
+.tabla-horario {
+    width: 35%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.tabla-horario th,
+.tabla-horario td {
+    padding: 6px;
+}
+
+.tabla-horario th {
+    background-color: #f9f9f9;
+    font-weight: bold;
+}
+
+/* Layout general para .animal */
+.animal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+.animal img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* MOBILE */
 @media (max-width: 768px) {
 
-    header, .container {
-        box-sizing: border-box;
-    }
-    
+    header,
     .container {
         width: 90%;
-        min-width: 90%; /* Asegura que siempre tenga al menos el 90% */
+        min-width: 90%;
         padding: 15px;
-        display: block; /* Asegura que se comporte como un bloque */
+        box-sizing: border-box;
     }
-    header {
-        padding: 15px 0;
-        width: 90%;
-        min-width: 90%; /* Asegura que siempre tenga al menos el 90% */
-    }
+
     h1 {
         font-size: 24px;
     }
+
     .menu {
         flex-direction: column;
         position: absolute;
@@ -211,47 +337,106 @@ nav {
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         display: none;
     }
+
     .hamburger {
         display: flex;
     }
+
     .menu.show {
         display: flex;
     }
-    .day-header {
-        color: #d0021b;
-        font-weight: 600;
-        font-size: 20px;
-        text-transform: uppercase;
-        margin-bottom: 5px;
+
+    .animal {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
     }
-    #contratos-activos {
-        max-width: 600px;
-        margin: 20px auto;
-        font-family: Arial, sans-serif;
+
+    .animal .detalles {
+        flex: 1;
+        padding-left: 0;
     }
-    
-    .contrato {
-        margin-bottom: 20px;
-        padding: 10px;
-        border-radius: 8px;
-        background: #f9f9f9;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+    .animal .contrato-foto {
+        margin-left: 10px;
+        width: 100px;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
     }
-    
-    .animales {
-        font-weight: bold;
+
+    .animal .contrato-foto img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    #form-crea-cliente h2 {
+        text-align: center;
+    }
+
+    .form-columns {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-column {
+        flex: 1 1 45%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-columns input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .form-button {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .form-button button {
+        padding: 10px 20px;
         font-size: 16px;
-        margin-bottom: 5px;
+        cursor: pointer;
+        background-color: #d0021b;
+        color: white;
+        border: none;
+        border-radius: 5px;
     }
-    
-    .detalles {
-        padding-left: 20px;  /* Desplaza los detalles hacia la derecha */
+
+    @media (max-width: 768px) {
+        .form-columns {
+            flex-direction: column;
+        }
+
+        .form-column {
+            flex: 1 1 100%;
+        }
     }
-   
-    .detalles p {
-        margin: 2px 0;
-        font-size: 14px;
-        color: #555;
+
+    /* DESKTOP fallback */
+    @media (min-width: 769px) {
+        .animal {
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .animal .detalles {
+            padding-left: 20px;
+        }
+
+        .animal .contrato-foto {
+            width: 100px;
+        }
     }
-   
 }

@@ -20,3 +20,5 @@ def get_dashboard():
         return jsonify({"error": "Usuario no encontrado"}), 404
 
     return jsonify({"username": usuario.username}), 200
+
+

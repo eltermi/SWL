@@ -4,26 +4,37 @@
 
 {% block content %}
 
-<button onclick="logout()">Cerrar sesión</button>
-<input type="text" id="buscar" placeholder="Buscar clientes">
-<form id="cliente-form">
-    <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="text" id="apellidos" placeholder="Apellidos">
-    <input type="text" id="calle" placeholder="Calle" required>
-    <input type="text" id="piso" placeholder="Piso">
-    <input type="text" id="codigo_postal" placeholder="Código Postal" required>
-    <input type="text" id="municipio" placeholder="Municipio / Barrio" required>
-    <input type="text" id="pais" placeholder="País">
-    <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222" requiredº>
-    <input type="email" id="email" placeholder="Correo Electrónico">
-    <input type="text" id="nacionalidad" placeholder="País de origen">
-    <input type="text" id="idioma" placeholder="Idioma">
-    <input type="text" id="genero" placeholder="Género M/F">
-    <input type="text" id="referencia_origen" placeholder="Referencia">
-    <button type="submit">Añadir Cliente</button>
-</form>
+<h2 id="cabecera" class="day-header">Clientes</h2>
+<input type="text" id="buscar" class="buscar" placeholder="Buscar clientes">
+<div id="lista-clientes"></div>
+<div id="muestra-cliente"></div>
 
-<h2>Lista de Clientes</h2>
-    <ul id="clientes-list"></ul>
-    <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+<div id="form-crea-cliente"> 
+    <h2 style="text-align:center">AÑADIR CLIENTE</h2>
+    <form id="cliente-form" class="form-columns">
+        <div class="form-column">
+            <input type="text" id="nombre" placeholder="Nombre" required>
+            <input type="text" id="apellidos" placeholder="Apellidos">
+            <input type="text" id="calle" placeholder="Calle" required>
+            <input type="text" id="piso" placeholder="Piso">
+            <input type="text" id="codigo_postal" placeholder="Código Postal" required>
+            <input type="text" id="municipio" placeholder="Municipio / Barrio" required>
+            <input type="text" id="pais" placeholder="País">
+        </div>
+        <div class="form-column">
+            <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222" required>
+            <input type="email" id="email" placeholder="Correo Electrónico">
+            <input type="text" id="nacionalidad" placeholder="País de origen">
+            <input type="text" id="idioma" placeholder="Idioma">
+            <input type="text" id="genero" placeholder="Género M/F">
+            <input type="text" id="referencia_origen" placeholder="Referencia">
+        </div>
+        <div class="form-button">
+            <button type="submit">Añadir Cliente</button>
+        </div>
+    </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+
 {% endblock %}

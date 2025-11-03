@@ -26,32 +26,117 @@ function fetchAPI(url, options = {}) {
     }).catch(error => console.error("Error en la API:", error));
 }
 
-
 function cargarClientes(busqueda = "") {
+    const container = document.getElementById("lista-clientes");
+    const muestraCliente = document.getElementById("muestra-cliente");
+
+    container.innerHTML = "";
+    muestraCliente.innerHTML = "";
+    muestraCliente.style.display = "none";
+    document.getElementById("form-crea-cliente").style.display = "block";
+    container.style.display = "block";
+
     fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
-
-            if (!Array.isArray(clientes)) {
-                return;
-            }
-
-            const lista = document.getElementById("clientes-list");
-            lista.innerHTML = "";
-
             clientes.forEach(cliente => {
-                const li = document.createElement("li");
-                if (cliente.apellidos) {
-                    li.textContent = `${cliente.nombre} ${cliente.apellidos} - ${cliente.direccion}`;
-                }else {
-                    li.textContent = `${cliente.nombre} - ${cliente.direccion}`;
-                }
-                
-                lista.appendChild(li);
+                const clienteDiv = document.createElement("div");
+                clienteDiv.classList.add("cliente");
+                clienteDiv.setAttribute("data-id", cliente.id_cliente);
+                clienteDiv.addEventListener("click", () => {
+                    obtenerDetallesCliente(cliente.id_cliente);
+                });
+
+                clienteDiv.innerHTML = `
+                    <div class="cliente-content">
+                        <div class="detalles">
+                            <p class="nombreCliente">${cliente.nombre}${cliente.apellidos ? " " + cliente.apellidos : ""}</p>
+                            <p>${cliente.calle}</p>
+                            <p>L-${cliente.codigo_postal}, ${cliente.municipio}</p>
+                            <p>${cliente.telefono}</p>
+                        </div>
+                        <div class="detalles">
+                            <p class="nombreAnimal">${cliente.gatos ?? ""}</p>
+                            <p>&nbsp;</p>
+                            <p>&nbsp;</p>
+                            <p>&nbsp;</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(clienteDiv);
             });
         })
-        .catch(error => {
-            console.error("🚨 Error cargando clientes:", error);
-        });
+        .catch(error => console.error("\uD83D\uDEA8 Error cargando clientes:", error));
+}
+function obtenerDetallesCliente(id_cliente) {
+    fetchAPI(`/api/clientes/${id_cliente}`)
+        .then(cliente => {
+            const container = document.getElementById("lista-clientes");
+            const muestraCliente = document.getElementById("muestra-cliente");
+
+            container.style.display = "none";
+            muestraCliente.style.display = "block";
+            document.getElementById("form-crea-cliente").style.display = "none";
+
+            let contenidoHTML = `
+                <div class="cliente">
+                    <div class="cliente-content">
+                        <div class="detalles">
+                            <p class="encabezado">${cliente.nombre}${cliente.apellidos ? " " + cliente.apellidos : ""}</p>
+                            <p>${cliente.telefono}</p>
+                            ${cliente.ad_nombre ? `<p class="encabezado">${cliente.ad_nombre} ${cliente.ad_apellidos ? cliente.ad_apellidos : ''}</p>` : ''}
+                            ${cliente.ad_nombre ? `<p class="telefono">${cliente.ad_telefono}</p>` : ''}
+                            <p class="encabezado">Dirección</p>
+                            <p>${cliente.calle} ${cliente.piso ? ". " + cliente.piso : ""}</p>
+                            <p>L-${cliente.codigo_postal} ${cliente.municipio}</p>
+                            <p>${cliente.pais}</p>
+                            ${cliente.email ? `<p class="encabezado">email</p> <p>${cliente.email}` : '<p>&nbsp;</p>'}
+                            ${!cliente.ad_nombre ? "<p>&nbsp;</p>" : ""}
+                            ${!cliente.ad_nombre ? "<p>&nbsp;</p>" : ""}
+                        </div>
+                        <div class="detalles">
+                            <p class="encabezado">Nacionalidad</p>
+                            <p>${cliente.nacionalidad}</p>
+                            <p class="encabezado">Idioma(s) de contacto</p>
+                            <p>${cliente.idioma}</p>
+                            <p class="encabezado">Género</p>
+                            <p>${cliente.genero}</p>
+                            <p class="encabezado">Referencia</p>
+                            <p>${cliente.referencia ?? "N/A"}</p>
+                            <p class="encabezado"></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return fetchAPI(`/api/animales/cliente/${id_cliente}`)
+                .then(animales => {
+                    contenidoHTML += `<div class="cliente"><div class="animales-wrapper">`;
+
+                    if (animales.length > 0) {
+                        animales.forEach(animal => {
+                            contenidoHTML += `
+                                <div class="animal">
+                                    <div class="detalles">
+                                        <p class="animales">${animal.nombre_animal}</p>
+                                        <p>${animal.tipo_animal}</p>
+                                        <p>${animal.edad}</p>
+                                        <p>${animal.medicacion ?? "No hay medicación"}</p>
+                                    </div>
+                                    <div class="contrato-foto">
+                                        ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre_animal}">` : "<div class='no-foto'>No hay foto disponible</div>"}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    contenidoHTML += `</div></div>`;
+                    contenidoHTML += `<button class="centrar" onclick="cargarClientes()">Volver a clientes</button>`;
+                    contenidoHTML += `<button class="centrar" onclick="mostrarFormularioContrato(${id_cliente})">Nuevo contrato</button>`;
+                    muestraCliente.innerHTML = contenidoHTML;
+                });
+        })
+        .catch(error => console.error("🚨 Error al obtener detalles del cliente:", error));
 }
 
 function agregarCliente(event) {
@@ -100,4 +185,69 @@ function editarCliente(id) {
 function buscarClientes(event) {
     const filtro = event.target.value;
     cargarClientes(filtro);
+}
+
+function mostrarFormularioContrato(idCliente) {
+    const muestraCliente = document.getElementById("muestra-cliente");
+    const formularioHTML = `
+        <div id="form-crea-cliente">
+            <form id="form-contrato">
+                <input type="date" class="formulario-input" id="fecha_inicio" required placeholder="Fecha de inicio">
+                <input type="date" class="formulario-input" id="fecha_fin" required placeholder="Fecha de fin">
+                <input type="text" class="formulario-input" id="numero_visitas_diarias" placeholder="Número de visitas diarias">
+                <input type="time" class="formulario-input" id="hora_manana" placeholder="Hora de la mañana">
+                <input type="time" class="formulario-input" id="hora_tarde" placeholder="Hora de la tarde">
+                <input type="text" class="formulario-input" id="pago_adelantado" placeholder="Pago adelantado (€)">
+                <select id="estado_pago_adelantado" class="formulario-input">
+                    <option value="Pagado">Pagado</option>
+                    <option value="Pendiente" selected>Pendiente</option>
+                </select>
+                <input type="text" class="formulario-input" id="pago_final" placeholder="Pago final (€)">
+                <select id="estado_pago_final" class="formulario-input">
+                    <option value="Pagado">Pagado</option>
+                    <option value="Pendiente" selected>Pendiente</option>
+                </select>
+                <input type="text" class="formulario-input" id="observaciones" placeholder="Observaciones">
+                <button type="submit">Guardar contrato</button>
+            </form>
+        </div>
+    `;
+    muestraCliente.insertAdjacentHTML("beforeend", formularioHTML);
+
+    document.getElementById("form-contrato").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const fecha_inicio = document.getElementById("fecha_inicio").value;
+        const fecha_fin = document.getElementById("fecha_fin").value;
+        const numero_visitas_diarias = document.getElementById("numero_visitas_diarias").value;
+        const hora_manana = document.getElementById("hora_manana").value;
+        const hora_tarde = document.getElementById("hora_tarde").value;
+        const pago_adelantado = document.getElementById("pago_adelantado").value;
+        const estado_pago_adelantado = document.getElementById("estado_pago_adelantado").value;
+        const pago_final = document.getElementById("pago_final").value;
+        const estado_pago_final = document.getElementById("estado_pago_final").value;
+        const observaciones = document.getElementById("observaciones").value;
+
+        const horario_visitas = {};
+        if (hora_manana) horario_visitas["Mañana"] = hora_manana;
+        if (hora_tarde) horario_visitas["Tarde"] = hora_tarde;
+
+        fetchAPI('/api/contratos', {
+            method: 'POST',
+            body: JSON.stringify({
+                id_cliente: idCliente,
+                fecha_inicio,
+                fecha_fin,
+                numero_visitas_diarias,
+                horario_visitas,
+                pago_adelantado,
+                estado_pago_adelantado,
+                pago_final,
+                estado_pago_final,
+                observaciones
+            })
+        }).then(() => {
+            alert("Contrato creado correctamente");
+            cargarClientes();
+        });
+    });
 }

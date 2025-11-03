@@ -36,7 +36,8 @@ def crear_contrato():
         pago_adelantado=datos['pago_adelantado'],
         estado_pago_adelantado=datos['estado_pago_adelantado'],
         pago_final=datos['pago_final'],
-        estado_pago_final=datos['estado_pago_final']
+        estado_pago_final=datos['estado_pago_final'],
+        observaciones=datos['observaciones']
     )
     db.session.add(nuevo_contrato)
     db.session.commit()
@@ -48,12 +49,28 @@ def obtener_contrato(id_contrato):
     contrato = Contratos.obtener_contrato(id_contrato)
     return contrato
 
-@contratos_bp.route('/contratos/activos', methods=['GET'])
+@contratos_bp.route('/dashboard/contratos_activos', methods=['GET'])
 def obtener_contratos_activos():
-    
-    contratos_activos = Contratos.obtener_contratos_activos()
+    contratos = Contratos.obtener_contratos_activos()
 
-    return jsonify(contratos_activos), 200
+    # Convertir a formato JSON-serializable
+    contratos_json = {}
+    for dia, lista_contratos in contratos.items():
+        contratos_json[dia] = []
+        for c in lista_contratos:contratos_json[dia].append({
+        'id_contrato': int(c['id_contrato']),
+        'id_cliente': int(c['id_cliente']),
+        'fecha_inicio': str(c['fecha_inicio']),
+        'fecha_fin': str(c['fecha_fin']),
+        'visitas': int(c['visitas']),
+        'horario': c['horario'],
+        'tarifa': c['tarifa'],
+        'nombre_animales': c['nombre_animales'],
+        'estado_pago_adelantado': c['estado_pago_adelantado'],
+        'estado_pago_final': c['estado_pago_final']
+    })
+
+    return jsonify(contratos_json)
 
 # Actualizar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['PUT'])

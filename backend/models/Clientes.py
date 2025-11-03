@@ -29,4 +29,88 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
     contactos_adicionales: Mapped[List['ContactosAdicionales']] = relationship('ContactosAdicionales', back_populates='clientes')
     contratos: Mapped[List['Contratos']] = relationship('Contratos', back_populates='clientes')
 
+    @classmethod
+    def obtener_clientes(cls, filtro):
+        sql_query_select = text("""
+                    SELECT clientes.id_cliente,
+                    clientes.nombre,
+                    clientes.apellidos,
+                    clientes.calle,
+                    clientes.piso,
+                    clientes.codigo_postal,
+                    clientes.municipio,
+                    clientes.telefono,
+                    contactos_adicionales.nombre as ad_nombre,
+                    contactos_adicionales.apellidos as ad_apellidos,
+                    contactos_adicionales.telefono as ad_telefono,
+                        -- Concatenamos los nombres de los gatos, cambiando la última coma por " y "
+                    CASE 
+                        WHEN COUNT(animales.nombre) > 1 
+                        THEN CONCAT(
+                                SUBSTRING_INDEX(GROUP_CONCAT(animales.nombre ORDER BY animales.nombre SEPARATOR ', '), ', ', COUNT(animales.nombre) - 1), 
+                                ' y ', 
+                                SUBSTRING_INDEX(GROUP_CONCAT(animales.nombre ORDER BY animales.nombre SEPARATOR ', '), ', ', -1)
+                        ) 
+                        ELSE GROUP_CONCAT(animales.nombre ORDER BY animales.nombre SEPARATOR ', ') 
+                    END AS gatos
+                FROM SWL.clientes
+                LEFT JOIN animales ON animales.id_cliente = clientes.id_cliente
+                LEFT JOIN contactos_adicionales ON contactos_adicionales.id_cliente = clientes.id_cliente
+        """)
 
+        sql_query_group = text("""
+                GROUP BY clientes.id_cliente,
+                        clientes.nombre,
+                        clientes.apellidos,
+                        clientes.municipio,
+                        clientes.telefono,
+                        contactos_adicionales.nombre,
+                        contactos_adicionales.apellidos,
+                        contactos_adicionales.telefono 
+                ORDER BY clientes.nombre
+        """)
+
+        if filtro:
+            filtro = f"%{filtro}%"  # Añadir los % en Python
+            sql_where = text("""
+                WHERE clientes.nombre like :filtro
+                    OR clientes.municipio like :filtro
+                    OR clientes.nacionalidad like :filtro
+                    OR animales.nombre like :filtro
+                    OR contactos_adicionales.nombre like :filtro
+            """)
+            sql_query = text(f"{sql_query_select.text} {sql_where} {sql_query_group.text}")
+            result = db.session.execute(sql_query, {"filtro": filtro})
+        else:
+            sql_query = text(f"{sql_query_select.text} {sql_query_group.text}")
+            result = db.session.execute(sql_query)
+        return result  # Retorna la lista de diccionarios
+            
+
+    @classmethod
+    def obtener_datos_cliente(cls, id_cliente):
+        sql_query_cliente = text("""
+                     SELECT clientes.id_cliente,
+                            clientes.nombre,
+                            clientes.apellidos,
+                            clientes.calle,
+                            clientes.piso,
+                            clientes.codigo_postal,
+                            clientes.municipio,
+                            clientes.pais,
+                            clientes.telefono,
+                            clientes.email,
+                            clientes.nacionalidad,
+                            clientes.idioma,
+                            clientes.genero,
+                            clientes.referencia_origen as referencia,
+                            contactos_adicionales.nombre as ad_nombre,
+                            contactos_adicionales.apellidos as ad_apellidos,
+                            contactos_adicionales.telefono as ad_telefono,
+                            contactos_adicionales.email as ad_email
+                        FROM SWL.clientes
+                        LEFT JOIN contactos_adicionales ON contactos_adicionales.id_cliente = clientes.id_cliente
+                        WHERE clientes.id_cliente = :id_cliente
+        """)
+        result = db.session.execute(sql_query_cliente, {"id_cliente": id_cliente}).fetchone()
+        return result

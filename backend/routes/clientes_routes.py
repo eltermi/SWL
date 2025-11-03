@@ -10,22 +10,20 @@ clientes_bp = Blueprint('clientes', __name__)
 def obtener_clientes():
     filtro = request.args.get('buscar', '').strip()
 
-    if filtro:
-        clientes = Clientes.query.filter(
-            (Clientes.nombre.ilike(f"%{filtro}%")) |
-            (Clientes.apellidos.ilike(f"%{filtro}%")) |
-            (Clientes.municipio.ilike(f"%{filtro}%"))
-        ).all()
-    else:
-        clientes = Clientes.query.all()
+    clientes = Clientes.obtener_clientes(filtro)
 
     return jsonify([{
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
         'apellidos': cliente.apellidos,
-        'direccion': cliente.calle + ". " + cliente.codigo_postal + " " + cliente.municipio,
-        'email': cliente.email,
-        'municipio': cliente.municipio
+        'calle': cliente.calle,
+        'codigo_postal': cliente.codigo_postal,
+        'municipio': cliente.municipio,
+        'telefono': cliente.telefono,
+        'gatos': cliente.gatos,
+        'ad_nombre': cliente.ad_nombre,
+        'ad_apellidos': cliente.ad_apellidos,
+        'ad_telefono': cliente.ad_telefono
     } for cliente in clientes])
 
 # Crear un nuevo cliente
@@ -56,12 +54,26 @@ def crear_cliente():
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['GET'])
 @requerir_autenticacion
 def obtener_cliente(id_cliente):
-    cliente = Clientes.query.get_or_404(id_cliente)
+    cliente = Clientes.obtener_datos_cliente(id_cliente)
     return jsonify({
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
         'apellidos': cliente.apellidos,
-        'email': cliente.email
+        'calle': cliente.calle,
+        'piso': cliente.piso,
+        'codigo_postal':cliente.codigo_postal,
+        'municipio':cliente.municipio,
+        'pais': cliente.pais,
+        'telefono': cliente.telefono,
+        'email': cliente.email,
+        'nacionalidad': cliente.nacionalidad,
+        'idioma': cliente.idioma,
+        'genero': cliente.genero,
+        'referencia': cliente.referencia,
+        'ad_nombre': cliente.ad_nombre,
+        'ad_apellidos': cliente.ad_apellidos,
+        'ad_telefono': cliente.ad_telefono,
+        'ad_email': cliente.ad_email
     })
 
 # Actualizar un cliente

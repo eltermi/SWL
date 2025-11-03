@@ -29,6 +29,10 @@ def dashboard():
 def clientes():
     return render_template("clientes.html")
 
+@app.route("/animales")
+def animales():
+    return render_template("animales.html")
+
 # Configurar Swagger UI
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"  # Ruta al archivo Swagger JSON

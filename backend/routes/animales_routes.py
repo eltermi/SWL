@@ -1,32 +1,43 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Animales
+from utils.auth import requerir_autenticacion
 
 animales_bp = Blueprint('animales', __name__)
 
 # Obtener todos los animales
 @animales_bp.route('/animales', methods=['GET'])
+@requerir_autenticacion
 def obtener_animales():
-    animales = Animales.query.all()
+    filtro = request.args.get('buscar', '').strip()
+
+    animales = Animales.obtener_animales(filtro)
     return jsonify([{
-        'id_animal': animal.id_animal,
-        'id_cliente': animal.id_cliente,
-        'tipo_animal': animal.tipo_animal,
-        'nombre': animal.nombre,
-        'edad': animal.edad,
-        'medicacion': animal.medicacion
+        'id_animal': animal['id_animal'],
+        'id_cliente': animal['id_cliente'],
+        'nombre_animal': animal['nombre_animal'],
+        'nombre_cliente': animal['nombre_cliente'],
+        'apellidos_cliente': animal['apellidos_cliente'],
+        'tipo_animal': animal['tipo_animal'],
+        'edad': animal['edad'],
+        'medicacion': animal['medicacion'], 
+        'foto': animal['foto']
     } for animal in animales])
 
 # Crear un nuevo animal
 @animales_bp.route('/animales', methods=['POST'])
-def crear_animal():
-    datos = request.json
+@requerir_autenticacion
+def crear_animal(): 
+    datos = request.form
+    archivo = request.files.get('foto')
+
     nuevo_animal = Animales(
         id_cliente=datos['id_cliente'],
         tipo_animal=datos['tipo_animal'],
         nombre=datos['nombre'],
         edad=datos.get('edad'),
-        medicacion=datos.get('medicacion')
+        medicacion=datos.get('medicacion'),
+        foto=archivo.read() if archivo else None
     )
     db.session.add(nuevo_animal)
     db.session.commit()
@@ -34,6 +45,7 @@ def crear_animal():
 
 # Obtener un animal por ID
 @animales_bp.route('/animales/<int:id_animal>', methods=['GET'])
+@requerir_autenticacion
 def obtener_animal(id_animal):
     animal = Animales.query.get_or_404(id_animal)
     return jsonify({
@@ -45,8 +57,18 @@ def obtener_animal(id_animal):
         'medicacion': animal.medicacion
     })
 
+# Obtener animales de un cliente
+@animales_bp.route('/animales/cliente/<int:id_cliente>', methods=['GET'])
+@requerir_autenticacion
+def obtener_animal_cliente(id_cliente):
+    animales = Animales.obtener_animal_cliente(id_cliente)
+    print(jsonify(animales))
+    return jsonify(animales), 200
+
+
 # Actualizar un animal
 @animales_bp.route('/animales/<int:id_animal>', methods=['PUT'])
+@requerir_autenticacion
 def actualizar_animal(id_animal):
     animal = Animales.query.get_or_404(id_animal)
     datos = request.json
@@ -59,6 +81,7 @@ def actualizar_animal(id_animal):
 
 # Eliminar un animal
 @animales_bp.route('/animales/<int:id_animal>', methods=['DELETE'])
+@requerir_autenticacion
 def eliminar_animal(id_animal):
     animal = Animales.query.get_or_404(id_animal)
     db.session.delete(animal)
