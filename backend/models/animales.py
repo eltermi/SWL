@@ -99,3 +99,21 @@ class Animales(db.Model):
 
         return animales
 
+
+        @staticmethod
+        @animales_bp.route('/animales', methods=['POST'])
+        @requerir_autenticacion
+        def crear_animal():
+            datos = request.form
+            archivo = request.files.get('foto')
+            nuevo_animal = Animales(
+            id_cliente=datos['id_cliente'],
+            tipo_animal=datos['tipo_animal'],
+            nombre=datos['nombre'],
+            edad=datos.get('edad'),
+            medicacion=datos.get('medicacion'),
+            foto=archivo.read() if archivo else None
+        )
+        db.session.add(nuevo_animal)
+        db.session.commit()
+        return jsonify({'mensaje': 'Animal creado exitosamente'}), 201
