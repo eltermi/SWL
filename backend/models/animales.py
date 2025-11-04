@@ -1,10 +1,12 @@
-from typing import List, Optional
-from models import Clientes
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
 import base64
+
+if TYPE_CHECKING:
+    from models.Clientes import Clientes
 
 class Animales(db.Model):
     __tablename__ = 'animales'
@@ -98,22 +100,3 @@ class Animales(db.Model):
             })
 
         return animales
-
-
-        @staticmethod
-        @animales_bp.route('/animales', methods=['POST'])
-        @requerir_autenticacion
-        def crear_animal():
-            datos = request.form
-            archivo = request.files.get('foto')
-            nuevo_animal = Animales(
-            id_cliente=datos['id_cliente'],
-            tipo_animal=datos['tipo_animal'],
-            nombre=datos['nombre'],
-            edad=datos.get('edad'),
-            medicacion=datos.get('medicacion'),
-            foto=archivo.read() if archivo else None
-        )
-        db.session.add(nuevo_animal)
-        db.session.commit()
-        return jsonify({'mensaje': 'Animal creado exitosamente'}), 201

@@ -27,7 +27,7 @@ def verificar_token(token):
     """
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        print(f"Data decoded {decoded["data"]}")
+        print(f"Data decoded {decoded['data']}")
         return decoded["data"]
     except jwt.ExpiredSignatureError:
         return None  # Token expirado

@@ -1,11 +1,14 @@
-from typing import List, Optional
-from models import Contratos, Tarifas
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
 import datetime
 import decimal
+
+if TYPE_CHECKING:
+    from models.Contratos import Contratos
+    from models.Tarifas import Tarifas
 
 class TarifasContrato(db.Model):
     __tablename__ = 'tarifas_contrato'

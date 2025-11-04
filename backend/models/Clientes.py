@@ -1,11 +1,15 @@
-from typing import List, Optional
-from models import Animales, ContactosAdicionales, Contratos
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
 import datetime
 import decimal
+
+if TYPE_CHECKING:
+    from models.animales import Animales
+    from models.ContactosAdicionales import ContactosAdicionales
+    from models.Contratos import Contratos
 
 class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
     __tablename__ = 'clientes'
@@ -75,7 +79,7 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
             sql_where = text("""
                 WHERE clientes.nombre like :filtro
                     OR clientes.municipio like :filtro
-                    OR clientes.nacionalidad like :filtro
+                    OR clientes.apellidos like :filtro
                     OR animales.nombre like :filtro
                     OR contactos_adicionales.nombre like :filtro
             """)

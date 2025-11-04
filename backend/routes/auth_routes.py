@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from models.Clientes import Clientes
-from models.Animales import Animales
+from models.animales import Animales
 from models.ContactosAdicionales import ContactosAdicionales
 from models.Tarifas import Tarifas
 from models.TarifasContrato import TarifasContrato

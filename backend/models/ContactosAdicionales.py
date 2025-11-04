@@ -1,11 +1,13 @@
-from typing import List, Optional
-from models import Clientes
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
 import datetime
 import decimal
+
+if TYPE_CHECKING:
+    from models.Clientes import Clientes
 
 class ContactosAdicionales(db.Model):
     __tablename__ = 'contactos_adicionales'
@@ -22,5 +24,4 @@ class ContactosAdicionales(db.Model):
     email: Mapped[Optional[str]] = mapped_column(String(100))
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contactos_adicionales')
-
 

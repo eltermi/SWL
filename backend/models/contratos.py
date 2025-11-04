@@ -1,6 +1,5 @@
 from operator import and_
-from typing import List, Optional
-from models import Clientes, TarifasContrato
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text, select, and_
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -8,6 +7,10 @@ from extensions import db
 from datetime import date, timedelta
 import decimal
 import base64
+
+if TYPE_CHECKING:
+    from models.Clientes import Clientes
+    from models.TarifasContrato import TarifasContrato
 
 
 class Contratos(db.Model):

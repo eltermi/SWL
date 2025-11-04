@@ -15,7 +15,7 @@ engine = create_engine(DATABASE_URL, echo=True)  # Cambia 'echo' a False en prod
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Importar todos los modelos para que SQLAlchemy los reconozca
-from models.Animales import Animales
+from models.animales import Animales
 from models.Clientes import Clientes  
 from models.ContactosAdicionales import ContactosAdicionales
 from models.Contratos import Contratos
