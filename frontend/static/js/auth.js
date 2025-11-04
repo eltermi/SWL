@@ -1,26 +1,45 @@
-// Verificar si el usuario ya está autenticado
+const LOGIN_PATH = '/';
+const DEFAULT_REDIRECT = '/dashboard';
+
+function getCurrentRoute() {
+    return window.location.pathname + window.location.search + window.location.hash;
+}
+
+function displayLoginError(message = '') {
+    const errorBox = document.getElementById('login-error');
+    if (!errorBox) return;
+
+    if (message) {
+        errorBox.textContent = message;
+        errorBox.style.display = 'block';
+    } else {
+        errorBox.textContent = '';
+        errorBox.style.display = 'none';
+    }
+}
+
 function isAuthenticated() {
     return !!sessionStorage.getItem('token');
 }
 
-// Redirigir al usuario si no está autenticado
 function checkAuthentication() {
     if (!isAuthenticated()) {
-        sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-        window.location.href = '/';
+        sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());
+        window.location.href = LOGIN_PATH;
     }
 }
 
-// Guardar la última página visitada antes de ser redirigido a login
-if (!sessionStorage.getItem('redirectAfterLogin')) {
-    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-}
-
-// Modificar la función de login para redirigir al usuario a la última página que intentó visitar
 async function login(event) {
     event.preventDefault();
-    const username = document.getElementById('usuario').value;
+    displayLoginError();
+
+    const username = document.getElementById('usuario').value.trim();
     const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        displayLoginError('Introduce usuario y contraseña.');
+        return;
+    }
 
     try {
         const response = await fetch('/api/login', {
@@ -28,47 +47,50 @@ async function login(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-        
+
+        let data;
         if (!response.ok) {
-            throw new Error('Fallo en el inicio de sesión');
-        }
-        
-        const data = await response.json();
-        
-        if (data.token) {
-            sessionStorage.setItem('token', data.token);
+            const errorData = await response.json().catch(() => ({}));
+            const message = errorData.mensaje || 'Credenciales inválidas. Inténtalo de nuevo.';
+            throw new Error(message);
         } else {
-            console.error("❌ No se recibió token en la respuesta.");
-            return;
+            data = await response.json();
         }
 
-        
-        // Obtener la página donde intentaba acceder antes de autenticarselet redirectPage = sessionStorage.getItem('redirectAfterLogin');
+        if (!data?.token) {
+            throw new Error('No se recibió token en la respuesta.');
+        }
+
+        sessionStorage.setItem('token', data.token);
 
         let redirectPage = sessionStorage.getItem('redirectAfterLogin');
-        if (!redirectPage || redirectPage == ("/")) {
-            redirectPage = "/clientes";  // Página por defecto si no hay otra página válida
+        if (!redirectPage || redirectPage === LOGIN_PATH) {
+            redirectPage = DEFAULT_REDIRECT;
         }
 
         sessionStorage.removeItem('redirectAfterLogin');
         window.location.href = redirectPage;
-
     } catch (error) {
         console.error('Error:', error);
+        displayLoginError(error.message || 'Error en el inicio de sesión.');
     }
 }
 
-// Cerrar sesión
 function logout() {
     sessionStorage.removeItem('token');
-    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);// Guardar la última página visitada antes de ser redirigido a login
-    window.location.href = '/';
+    if (window.location.pathname !== LOGIN_PATH) {
+        sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());
+    } else {
+        sessionStorage.removeItem('redirectAfterLogin');
+    }
+    window.location.href = LOGIN_PATH;
 }
 
-// Añadir el evento para que el login se active al presionar 'Enter'
-document.getElementById('login-form').addEventListener('submit', login);
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', login);
+}
 
-// Verificar autenticación en páginas protegidas
-if (!window.location.pathname.includes("/")) {
+if (window.location.pathname !== LOGIN_PATH) {
     checkAuthentication();
 }

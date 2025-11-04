@@ -9,13 +9,19 @@
  * @param {object} options - Opciones de configuración de fetch (ej: método, cuerpo, etc.)
  * @returns {Promise} - Respuesta de la API en JSON
  */
+const LOGIN_PATH = '/';
+
+function getCurrentRoute() {
+    return window.location.pathname + window.location.search + window.location.hash;
+}
+
 async function fetchAPI(url, options = {}) {
-    
     const token = sessionStorage.getItem("token");
     
     // Verificación básica de que el token existe antes de enviar la petición
     if (!token) {
-        window.location.href = "/";
+        sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());
+        window.location.href = LOGIN_PATH;
         return Promise.reject("Token no encontrado");
     }
 
@@ -51,8 +57,12 @@ async function fetchAPI(url, options = {}) {
  */
 function logout() {
     sessionStorage.removeItem("token");
-    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);// Guardar la última página visitada antes de ser redirigido a login
-    window.location.href = "/";
+    if (window.location.pathname !== LOGIN_PATH) {
+        sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());// Guardar la última página visitada antes de ser redirigido a login
+    } else {
+        sessionStorage.removeItem('redirectAfterLogin');
+    }
+    window.location.href = LOGIN_PATH;
 }
 
 /**
@@ -61,11 +71,17 @@ function logout() {
  */
 document.addEventListener("DOMContentLoaded", function () {
     const token = sessionStorage.getItem("token");
+    const isLoginPage = window.location.pathname === LOGIN_PATH;
 
-    if (!token && !window.location.href.includes("/")) {
-        sessionStorage.setItem("redirectAfterLogin", window.location.pathname);
-        window.location.href = "/";
-    }else if(token){
+    if (!token) {
+        if (!isLoginPage) {
+            sessionStorage.setItem("redirectAfterLogin", getCurrentRoute());
+            window.location.href = LOGIN_PATH;
+        }
+        return;
+    }
+
+    if (!isLoginPage) {
         getUsuario();
     }
 });
@@ -77,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function getUsuario() {
     const token = sessionStorage.getItem("token");
     if (!token) {
-        window.location.href = "/";
+        window.location.href = LOGIN_PATH;
         return;
     }
 
@@ -88,9 +104,9 @@ function getUsuario() {
         },
         body: JSON.stringify({ token })
     }).then(data => {
-        if (data && data.username) {
-            document.getElementById('div-de-usuario').innerHTML = `<p>${data.username}</p>`;
-        } else {
+        const userContainer = document.getElementById('div-de-usuario');
+        if (userContainer && data && data.username) {
+            userContainer.innerHTML = `<p>${data.username}</p>`;
         }
     }).catch(error => console.error("🚨 Error obteniendo el usuario:", error));
 }
