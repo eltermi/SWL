@@ -27,7 +27,6 @@ def verificar_token(token):
     """
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        print(f"Data decoded {decoded["data"]}")
         return decoded["data"]
     except jwt.ExpiredSignatureError:
         return None  # Token expirado
@@ -38,18 +37,14 @@ def requerir_autenticacion(func):
     @wraps(func)
     def envoltura(*args, **kwargs):
         token = request.headers.get("Authorization")
-        print(f"🔍 Token recibido en backend: {token}")  # Debug
 
         if not token or not token.startswith("Bearer "):
-            print("❌ Token no recibido o mal formateado")  # Debug
             return jsonify({"mensaje": "Token no proporcionado o formato incorrecto"}), 401
 
         token = token.split(" ")[1]  # Extraer solo el token real
-        print("Aqui llamo tb a verificar token")
         data = verificar_token(token)
 
         if not data:
-            print("❌ Token inválido o expirado")  # Debug
             return jsonify({"mensaje": "Token inválido o expirado"}), 401
 
         request.usuario = data
