@@ -10,6 +10,8 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
     { id: "pago_adelantado", nombre: "Pago adelantado (€)" },
     { id: "pago_final", nombre: "Pago final (€)" }
 ];
+const PRECIO_VISITA = 22;
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
 
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
@@ -249,6 +251,14 @@ function mostrarFormularioContrato(idCliente) {
     idClienteContrato = idCliente;
     contratoForm.reset();
     limpiarErroresContrato();
+    const resumenDias = document.getElementById("numero_dias_resumen");
+    const totalVisitasInput = document.getElementById("numero_visitas_totales");
+    if (resumenDias) {
+        resumenDias.textContent = "Días calculados: 0";
+    }
+    if (totalVisitasInput) {
+        totalVisitasInput.value = "";
+    }
     const estadoPagoAdelantado = document.getElementById("estado_pago_adelantado");
     const estadoPagoFinal = document.getElementById("estado_pago_final");
     if (estadoPagoAdelantado) estadoPagoAdelantado.value = "Pendiente";
@@ -283,6 +293,21 @@ function inicializarModalContrato() {
         contratoForm.addEventListener("submit", gestionarEnvioContrato);
         contratoForm.addEventListener("input", manejarInputContrato);
     }
+
+    const fechaInicioInput = document.getElementById("fecha_inicio");
+    const fechaFinInput = document.getElementById("fecha_fin");
+    const visitasDiariasInput = document.getElementById("numero_visitas_diarias");
+    const visitasTotalesInput = document.getElementById("numero_visitas_totales");
+
+    fechaInicioInput?.addEventListener("change", actualizarNumeroVisitasTotales);
+    fechaFinInput?.addEventListener("change", actualizarNumeroVisitasTotales);
+    visitasDiariasInput?.addEventListener("input", actualizarNumeroVisitasTotales);
+    visitasTotalesInput?.addEventListener("input", () => {
+        const total = parseFloat(visitasTotalesInput.value);
+        if (!isNaN(total) && total >= 0) {
+            actualizarPagosDesdeVisitas(total);
+        }
+    });
 }
 
 function abrirModalContrato() {
@@ -338,6 +363,54 @@ function mostrarErroresContrato(errores) {
     const lista = errores.map(error => `<li>${error}</li>`).join("");
     errorBox.innerHTML = `<p>Completa los siguientes campos obligatorios:</p><ul>${lista}</ul>`;
     errorBox.hidden = false;
+}
+
+function calcularDiasEntre(fechaInicio, fechaFin) {
+    if (!fechaInicio || !fechaFin) return 0;
+    const inicio = new Date(`${fechaInicio}T00:00:00`);
+    const fin = new Date(`${fechaFin}T00:00:00`);
+    if (isNaN(inicio.getTime()) || isNaN(fin.getTime())) return 0;
+    const diferencia = fin.getTime() - inicio.getTime();
+    if (diferencia < 0) return 0;
+    return Math.floor(diferencia / MS_POR_DIA) + 1;
+}
+
+function actualizarNumeroVisitasTotales() {
+    const fechaInicio = document.getElementById("fecha_inicio")?.value;
+    const fechaFin = document.getElementById("fecha_fin")?.value;
+    const visitasDiariasInput = document.getElementById("numero_visitas_diarias");
+    const totalVisitasInput = document.getElementById("numero_visitas_totales");
+    const resumenDias = document.getElementById("numero_dias_resumen");
+
+    if (!visitasDiariasInput || !totalVisitasInput) return;
+
+    const dias = calcularDiasEntre(fechaInicio, fechaFin);
+    if (resumenDias) {
+        resumenDias.textContent = `Días calculados: ${dias}`;
+    }
+
+    const visitasDiarias = parseFloat(visitasDiariasInput.value);
+    if (!isNaN(visitasDiarias) && visitasDiarias > 0 && dias > 0) {
+        const total = Math.round(visitasDiarias * dias);
+        totalVisitasInput.value = total;
+        actualizarPagosDesdeVisitas(total);
+    }
+}
+
+function actualizarPagosDesdeVisitas(totalVisitas) {
+    const pagoAdelantadoInput = document.getElementById("pago_adelantado");
+    const pagoFinalInput = document.getElementById("pago_final");
+    if (!pagoAdelantadoInput || !pagoFinalInput) return;
+
+    const total = parseFloat(totalVisitas);
+    if (!isNaN(total) && total > 0) {
+        const importe = (total * PRECIO_VISITA).toFixed(2);
+        pagoAdelantadoInput.value = importe;
+        pagoFinalInput.value = importe;
+    } else {
+        pagoAdelantadoInput.value = "";
+        pagoFinalInput.value = "";
+    }
 }
 
 function gestionarEnvioContrato(event) {
