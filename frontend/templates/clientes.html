@@ -35,6 +35,69 @@
     </form>
 </div>
 
+<div id="contrato-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="contrato-modal-title">
+        <button type="button" class="modal-close" aria-label="Cerrar" data-close-modal>&times;</button>
+        <h3 id="contrato-modal-title" class="modal-title">Nuevo contrato</h3>
+        <div id="form-contrato-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
+        <form id="form-contrato" class="modal-form" novalidate>
+            <div class="modal-field">
+                <label for="fecha_inicio">Fecha de inicio <span class="required">*</span></label>
+                <input type="date" id="fecha_inicio" required>
+            </div>
+            <div class="modal-field">
+                <label for="fecha_fin">Fecha de fin <span class="required">*</span></label>
+                <input type="date" id="fecha_fin" required>
+            </div>
+            <div class="modal-field">
+                <label for="numero_visitas_diarias">Número de visitas diarias <span class="required">*</span></label>
+                <input type="text" id="numero_visitas_diarias" placeholder="Ej: 2" required>
+            </div>
+            <div class="modal-field modal-field-inline">
+                <div>
+                    <label for="hora_manana">Hora mañana</label>
+                    <input type="time" id="hora_manana">
+                </div>
+                <div>
+                    <label for="hora_tarde">Hora tarde</label>
+                    <input type="time" id="hora_tarde">
+                </div>
+            </div>
+            <div class="modal-field">
+                <label for="pago_adelantado">Pago adelantado (€) <span class="required">*</span></label>
+                <input type="text" id="pago_adelantado" placeholder="Ej: 100" required>
+            </div>
+            <div class="modal-field">
+                <label for="estado_pago_adelantado">Estado pago adelantado</label>
+                <select id="estado_pago_adelantado">
+                    <option value="Pendiente" selected>Pendiente</option>
+                    <option value="Pagado">Pagado</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label for="pago_final">Pago final (€) <span class="required">*</span></label>
+                <input type="text" id="pago_final" placeholder="Ej: 150" required>
+            </div>
+            <div class="modal-field">
+                <label for="estado_pago_final">Estado pago final</label>
+                <select id="estado_pago_final">
+                    <option value="Pendiente" selected>Pendiente</option>
+                    <option value="Pagado">Pagado</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label for="observaciones">Observaciones</label>
+                <textarea id="observaciones" rows="3" placeholder="Notas importantes"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" data-close-modal>Cancelar</button>
+                <button type="submit" class="btn-principal">Guardar contrato</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
 
 {% endblock %}
