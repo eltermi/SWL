@@ -348,6 +348,69 @@ nav {
     border-radius: 12px;
 }
 
+#contratos-programados {
+    margin-bottom: 24px;
+}
+
+.contratos-programados-card {
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.05);
+}
+
+.contratos-programados-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.contratos-programados-count {
+    background-color: #f9f9f9;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5c0101;
+}
+
+.contratos-programados-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.contratos-programados-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.contratos-programados-item:hover {
+    background-color: #ffffff;
+    border-color: #d0021b;
+}
+
+.contratos-programados-nombre {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.contratos-programados-fechas {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+}
+
 .contrato-sections {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -360,12 +423,71 @@ nav {
     padding: 12px 14px;
 }
 
+.contrato-fechas-pares {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contrato-fecha-item {
+    margin: 0;
+}
+
 .contrato-section-title {
     margin: 0 0 10px 0;
     font-size: 0.85rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #5c0101;
+    font-weight: 600;
+}
+
+.contrato-section-title--center {
+    text-align: center;
+}
+
+.horario-bloques {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.horario-bloque {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.horario-bloque-label {
+    font-size: 0.75rem;
+    color: #8c8c8c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.contrato-visitas-metricas {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.contrato-visitas-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 0;
+}
+
+.contrato-visitas-row .contrato-data-label {
+    display: inline-block;
+    margin: 0;
+}
+
+.contrato-visitas-value {
     font-weight: 600;
 }
 
@@ -456,6 +578,22 @@ nav {
     background-color: transparent;
     color: #d0021b;
     cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .contrato-fechas-pares {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .contrato-fecha-item {
+        flex: 1 1 140px;
+    }
+
+    .contratos-programados-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .contrato-detail-actions button:hover {

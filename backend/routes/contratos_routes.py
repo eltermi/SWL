@@ -86,6 +86,11 @@ def obtener_contratos_activos():
 
     return jsonify(contratos_json)
 
+@contratos_bp.route('/dashboard/contratos_programados', methods=['GET'])
+def obtener_contratos_programados():
+    contratos = Contratos.obtener_contratos_programados()
+    return jsonify(contratos)
+
 # Actualizar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['PUT'])
 def actualizar_contrato(id_contrato):

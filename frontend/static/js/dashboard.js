@@ -29,19 +29,100 @@ function fetchAPI(url, options = {}) {
 function formatearHorario(horario) {
     if (!horario || typeof horario !== "object") return "";
 
-    const manana = horario.Mañana ?? "-";
-    const tarde = horario.Tarde ?? "-";
+    const bloques = [];
+    const manana = typeof horario.Mañana === "string" ? horario.Mañana.trim() : "";
+    const tarde = typeof horario.Tarde === "string" ? horario.Tarde.trim() : "";
 
-    return `
-        <table class="tabla-horario">
-            <thead>
-                <tr><th>Mañana</th><th>Tarde</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>${manana}</td><td>${tarde}</td></tr>
-            </tbody>
-        </table>
+    if (manana) {
+        bloques.push({ etiqueta: "Mañana", valor: manana });
+    }
+    if (tarde) {
+        bloques.push({ etiqueta: "Tarde", valor: tarde });
+    }
+
+    if (!bloques.length) return "";
+
+    const bloquesHTML = bloques.map(({ etiqueta, valor }) => `
+        <div class="horario-bloque">
+            <span class="horario-bloque-label">${etiqueta}</span>
+            <span>${valor}</span>
+        </div>
+    `).join("");
+
+    return `<div class="horario-bloques">${bloquesHTML}</div>`;
+}
+
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
+
+function parseFechaContrato(fechaTexto) {
+    if (!fechaTexto || typeof fechaTexto !== "string") return null;
+    const partes = fechaTexto.split("-");
+    if (partes.length !== 3) return null;
+    const [dia, mes, anio] = partes;
+    const fecha = new Date(Number(anio), Number(mes) - 1, Number(dia));
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+}
+
+function calcularTotalVisitas(contrato) {
+    if (!contrato) return null;
+    const inicio = parseFechaContrato(contrato.fecha_inicio);
+    const fin = parseFechaContrato(contrato.fecha_fin);
+    const visitasDiarias = Number(contrato.visitas);
+
+    if (!inicio || !fin || Number.isNaN(visitasDiarias) || visitasDiarias <= 0) {
+        return null;
+    }
+
+    const diferencia = fin.getTime() - inicio.getTime();
+    if (diferencia < 0) return null;
+    const dias = Math.floor(diferencia / MS_POR_DIA) + 1;
+    return dias > 0 ? dias * visitasDiarias : null;
+}
+
+function renderContratosProgramados(contratos, container) {
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (!Array.isArray(contratos) || contratos.length === 0) {
+        container.innerHTML = `
+            <div class="contratos-programados-card">
+                <p class="contratos-programados-title contrato-section-title">Todos los contratos</p>
+                <p class="contrato-empty">No hay contratos programados.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const itemsHTML = contratos.map(contrato => {
+        const nombre = contrato.nombre_animales || "Sin animales asignados";
+        const fechaInicio = contrato.fecha_inicio ?? "-";
+        const fechaFin = contrato.fecha_fin ?? "-";
+        return `
+            <div class="contratos-programados-item" data-id="${contrato.id_contrato}">
+                <span class="contratos-programados-nombre">${nombre}</span>
+                <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
+            </div>
+        `;
+    }).join("");
+
+    container.innerHTML = `
+        <div class="contratos-programados-card">
+            <div class="contratos-programados-title-row">
+                <p class="contratos-programados-title contrato-section-title">Todos los contratos</p>
+                <span class="contratos-programados-count">${contratos.length}</span>
+            </div>
+            <div class="contratos-programados-list">${itemsHTML}</div>
+        </div>
     `;
+
+    container.querySelectorAll(".contratos-programados-item").forEach(item => {
+        item.addEventListener("click", () => {
+            const id = item.getAttribute("data-id");
+            if (id) {
+                obtenerDetallesContrato(Number(id));
+            }
+        });
+    });
 }
 
 function formatearImporte(valor) {
@@ -83,11 +164,16 @@ function getContratosActivos() {
     const h2_cabecera = document.getElementById("cabecera");
     const container = document.getElementById("contratos-activos");
     const muestraContrato = document.getElementById("muestra-contrato");
+    const listaProgramados = document.getElementById("contratos-programados");
 
     container.innerHTML = "";
     muestraContrato.innerHTML = "";
     muestraContrato.style.display = "none";
     container.style.display = "block";
+    if (listaProgramados) {
+        listaProgramados.style.display = "block";
+        listaProgramados.innerHTML = `<p class="contrato-empty">Cargando contratos...</p>`;
+    }
 
     // Función para parsear fechas DD-MM-YYYY
     function parseDate(str) {
@@ -95,8 +181,14 @@ function getContratosActivos() {
         return new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
     }
 
-    fetchAPI(`/api/dashboard/contratos_activos`)
-        .then(contratos_activos => {
+    Promise.all([
+        fetchAPI(`/api/dashboard/contratos_programados`),
+        fetchAPI(`/api/dashboard/contratos_activos`)
+    ])
+        .then(([contratosProgramados, contratos_activos]) => {
+            if (listaProgramados) {
+                renderContratosProgramados(contratosProgramados, listaProgramados);
+            }
             const hayContratos = Object.values(contratos_activos).some(lista => lista.length > 0);
             if (!hayContratos) {
                 container.innerHTML = "<p style='text-align:center'>NO HAY CONTRATOS ACTIVOS</p>";
@@ -141,6 +233,9 @@ function getContratosActivos() {
         .catch(error => {
             console.error("🚨 Error cargando contratos:", error);
             container.innerHTML = "<p>Error al cargar los contratos.</p>";
+            if (listaProgramados) {
+                listaProgramados.innerHTML = "<p>Error al cargar la lista completa.</p>";
+            }
         });
 }
 
@@ -149,9 +244,13 @@ function obtenerDetallesContrato(id_contrato) {
         .then(contrato => {
             const container = document.getElementById("contratos-activos");
             const muestraContrato = document.getElementById("muestra-contrato");
+            const listaProgramados = document.getElementById("contratos-programados");
 
             container.style.display = "none";
             muestraContrato.style.display = "block";
+            if (listaProgramados) {
+                listaProgramados.style.display = "none";
+            }
 
             const nombreAnimales = contrato.nombre_animales || "No hay animales asignados";
             const tarifaNombre = contrato.tarifa || "Tarifa no asignada";
@@ -177,6 +276,7 @@ function obtenerDetallesContrato(id_contrato) {
             const pago1 = contrato.pago_adelantado ?? 0;
             const pago2 = contrato.pago_final ?? 0;
             const pagoTotal = contrato.pago_total ?? (Number(pago1) + Number(pago2));
+            const totalVisitas = calcularTotalVisitas(contrato);
 
             const pagosHTML = `
                 <div class="contrato-payments">
@@ -185,6 +285,12 @@ function obtenerDetallesContrato(id_contrato) {
                     ${crearPagoCard({ etiqueta: "Pago Total", importe: pagoTotal, esTotal: true })}
                 </div>
             `;
+            const visitasTotalesHTML = totalVisitas !== null ? `
+                <p class="contrato-visitas-row">
+                    <span class="contrato-data-label">Totales</span>
+                    <span class="contrato-visitas-value">${totalVisitas}</span>
+                </p>
+            ` : "";
 
             muestraContrato.innerHTML = `
                 <div class="contrato-detalle-card">
@@ -193,15 +299,23 @@ function obtenerDetallesContrato(id_contrato) {
                     <div class="contrato-detail-layout">
                         <div class="contrato-detail-main">
                             <div class="contrato-sections">
-                                <div class="contrato-section">
+                                <div class="contrato-section contrato-section-fechas">
                                     <p class="contrato-section-title">Fechas</p>
-                                    <p><span class="contrato-data-label">Inicio</span>${contrato.fecha_inicio ?? "-"}</p>
-                                    <p><span class="contrato-data-label">Fin</span>${contrato.fecha_fin ?? "-"}</p>
+                                    <div class="contrato-fechas-pares">
+                                        <p class="contrato-fecha-item"><span class="contrato-data-label">Inicio</span>${contrato.fecha_inicio ?? "-"}</p>
+                                        <p class="contrato-fecha-item"><span class="contrato-data-label">Fin</span>${contrato.fecha_fin ?? "-"}</p>
+                                    </div>
                                 </div>
-                                <div class="contrato-section">
-                                    <p class="contrato-section-title">Visitas</p>
-                                    <p><span class="contrato-data-label">Por día</span>${contrato.visitas ?? "-"}</p>
-                                    ${horarioHTML || `<p class="contrato-empty">Horario no definido</p>`}
+                                <div class="contrato-section contrato-section-visitas">
+                                    <p class="contrato-section-title contrato-section-title--center">Visitas</p>
+                                    <div class="contrato-visitas-metricas">
+                                        ${visitasTotalesHTML}
+                                        <p class="contrato-visitas-row">
+                                            <span class="contrato-data-label">Por día</span>
+                                            <span class="contrato-visitas-value">${contrato.visitas ?? "-"}</span>
+                                        </p>
+                                    </div>
+                                    ${horarioHTML ?? ""}
                                 </div>
                                 <div class="contrato-section">
                                     <p class="contrato-section-title">Tarifa</p>
