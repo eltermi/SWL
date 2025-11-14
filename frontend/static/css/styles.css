@@ -287,15 +287,179 @@ nav {
 }
 
 .tabla-horario {
-    width: 35%;
+    width: 100%;
+    max-width: 320px;
     border-collapse: collapse;
     font-size: 0.9em;
     text-align: center;
+    margin-top: 6px;
 }
 
 .tabla-horario th,
 .tabla-horario td {
     padding: 6px;
+}
+
+.contrato-detalle-card {
+    border: 1px solid #e2e2e2;
+    border-radius: 16px;
+    padding: 20px;
+    background-color: #ffffff;
+    max-width: 720px;
+    margin: 0 auto 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+}
+
+.contrato-id {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #1d1d1f;
+}
+
+.contrato-detail-layout {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.contrato-detail-main {
+    flex: 2 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contrato-detail-photo {
+    flex: 1 1 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    min-height: 180px;
+    padding: 10px;
+    text-align: center;
+}
+
+.contrato-detail-photo img {
+    max-width: 100%;
+    border-radius: 12px;
+}
+
+.contrato-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.contrato-section {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+
+.contrato-section-title {
+    margin: 0 0 10px 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5c0101;
+    font-weight: 600;
+}
+
+.contrato-data-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #8c8c8c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.contrato-payments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.pago-card {
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pago-card-total {
+    background-color: #1f1f1f;
+    color: #ffffff;
+}
+
+.pago-card-total .pago-label {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.pago-card-total strong {
+    color: #ffffff;
+}
+
+.pago-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b6b6b;
+}
+
+.pago-estado {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    text-transform: capitalize;
+}
+
+.pago-estado--pagado {
+    background-color: rgba(0, 128, 0, 0.15);
+    color: #006400;
+}
+
+.pago-estado--pendiente {
+    background-color: rgba(208, 2, 27, 0.12);
+    color: #d0021b;
+}
+
+.pago-estado--sin-estado,
+.pago-estado-- {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #444444;
+}
+
+.contrato-empty {
+    color: #8c8c8c;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.contrato-detail-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.contrato-detail-actions button {
+    padding: 10px 22px;
+    border-radius: 6px;
+    border: 1px solid #d0021b;
+    background-color: transparent;
+    color: #d0021b;
+    cursor: pointer;
+}
+
+.contrato-detail-actions button:hover {
+    background-color: rgba(208, 2, 27, 0.08);
 }
 
 .tabla-horario th {
@@ -415,6 +579,59 @@ nav {
 .cliente-section p {
     margin: 0 0 8px 0;
     font-size: 15px;
+}
+
+.cliente-contracts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cliente-contract-card {
+    border: 1px solid #ededed;
+    border-radius: 12px;
+    padding: 15px;
+    background-color: #ffffff;
+}
+
+.cliente-contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cliente-contract-card .contrato-id {
+    text-align: left;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.cliente-chip {
+    background-color: rgba(208, 2, 27, 0.1);
+    color: #d0021b;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.cliente-contract-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cliente-contract-columns .tabla-horario {
+    margin-top: 0;
+}
+
+.cliente-contract-notes {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #4c4c4c;
 }
 
 .cliente-empty {

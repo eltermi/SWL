@@ -116,9 +116,12 @@ class Contratos(db.Model):
                 contratos.fecha_inicio, 
                 contratos.fecha_fin, 
                 contratos.numero_visitas_diarias as visitas, 
-                contratos.horario_visitas as horario, 
+                contratos.horario_visitas as horario,
+                contratos.pago_adelantado,
+                contratos.pago_final,
                 contratos.estado_pago_adelantado,  
                 contratos.estado_pago_final, 
+                contratos.observaciones,
                 tarifas.descripcion AS nombre_tarifa  
             FROM SWL.contratos
             LEFT JOIN clientes ON contratos.id_cliente = clientes.id_cliente
@@ -127,8 +130,9 @@ class Contratos(db.Model):
             LEFT JOIN tarifas ON tarifas.id_tarifa = tarifas_contrato.id_tarifa  
             WHERE contratos.id_contrato = :id_contrato
             GROUP BY contratos.id_contrato, contratos.id_cliente, contratos.fecha_inicio, contratos.fecha_fin, 
-                    contratos.numero_visitas_diarias, contratos.horario_visitas, contratos.estado_pago_adelantado, 
-                    contratos.estado_pago_final, tarifas.descripcion
+                    contratos.numero_visitas_diarias, contratos.horario_visitas, contratos.pago_adelantado,
+                    contratos.pago_final, contratos.estado_pago_adelantado, 
+                    contratos.estado_pago_final, contratos.observaciones, tarifas.descripcion
             ORDER BY contratos.fecha_inicio, contratos.fecha_fin;
         """)
 
@@ -140,6 +144,10 @@ class Contratos(db.Model):
         if result.foto:  # Si hay una imagen, la convertimos a Base64
                 foto_base64 = base64.b64encode(result.foto).decode("utf-8")
 
+        pago_adelantado = float(result.pago_adelantado or 0)
+        pago_final = float(result.pago_final or 0)
+        pago_total = round(pago_adelantado + pago_final, 2)
+
         contrato = {
             "id_contrato": result.id_contrato,
             "nombre_animales": result.nombre_animales,
@@ -148,7 +156,59 @@ class Contratos(db.Model):
             "horario": result.horario, 
             "visitas": result.visitas,
             "tarifa": result.nombre_tarifa,
+            "pago_adelantado": pago_adelantado,
+            "pago_final": pago_final,
+            "pago_total": pago_total,
+            "estado_pago_adelantado": result.estado_pago_adelantado,
+            "estado_pago_final": result.estado_pago_final,
+            "observaciones": result.observaciones,
             "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
         }
 
         return contrato
+
+    @classmethod
+    def obtener_contratos_cliente(cls, id_cliente):
+        sql_query = text("""
+            SELECT  c.id_contrato,
+                    c.fecha_inicio,
+                    c.fecha_fin,
+                    c.numero_visitas_diarias AS visitas,
+                    c.horario_visitas AS horario,
+                    c.pago_adelantado,
+                    c.pago_final,
+                    c.estado_pago_adelantado,
+                    c.estado_pago_final,
+                    c.observaciones,
+                    t.descripcion AS nombre_tarifa
+            FROM SWL.contratos c
+            LEFT JOIN tarifas_contrato tc ON tc.id_contrato = c.id_contrato
+            LEFT JOIN tarifas t ON t.id_tarifa = tc.id_tarifa
+            WHERE c.id_cliente = :id_cliente
+            ORDER BY c.fecha_inicio DESC, c.id_contrato DESC;
+        """)
+
+        resultados = db.session.execute(sql_query, {"id_cliente": id_cliente}).fetchall()
+
+        contratos = []
+        for row in resultados:
+            pago_adelantado = float(row.pago_adelantado or 0)
+            pago_final = float(row.pago_final or 0)
+            pago_total = round(pago_adelantado + pago_final, 2)
+
+            contratos.append({
+                "id_contrato": row.id_contrato,
+                "fecha_inicio": row.fecha_inicio.strftime("%d-%m-%Y") if row.fecha_inicio else None,
+                "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None,
+                "visitas": row.visitas,
+                "horario": row.horario,
+                "tarifa": row.nombre_tarifa,
+                "pago_adelantado": pago_adelantado,
+                "pago_final": pago_final,
+                "pago_total": pago_total,
+                "estado_pago_adelantado": row.estado_pago_adelantado,
+                "estado_pago_final": row.estado_pago_final,
+                "observaciones": row.observaciones
+            })
+
+        return contratos

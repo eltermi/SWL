@@ -7,7 +7,7 @@ tarifas_bp = Blueprint('tarifas', __name__)
 
 @tarifas_bp.route('/tarifas', methods=['GET'])
 def obtener_tarifas():
-    tarifas = Tarifas.query.all()
+    tarifas = Tarifas.query.order_by(Tarifas.id_tarifa).all()
     return jsonify([{
         'id_tarifa': tarifa.id_tarifa,
         'descripcion': tarifa.descripcion,

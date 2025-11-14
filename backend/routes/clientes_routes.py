@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
-from models import Clientes
+from models import Clientes, Contratos
 from utils.auth import requerir_autenticacion
 
 clientes_bp = Blueprint('clientes', __name__)
@@ -75,6 +75,12 @@ def obtener_cliente(id_cliente):
         'ad_telefono': cliente.ad_telefono,
         'ad_email': cliente.ad_email
     })
+
+@clientes_bp.route('/clientes/<int:id_cliente>/contratos', methods=['GET'])
+@requerir_autenticacion
+def obtener_contratos_cliente(id_cliente):
+    contratos = Contratos.obtener_contratos_cliente(id_cliente)
+    return jsonify(contratos)
 
 # Actualizar un cliente
 @clientes_bp.route('/clientes/<int:id_cliente>', methods=['PUT'])

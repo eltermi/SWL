@@ -59,6 +59,12 @@
                 <input type="number" id="numero_visitas_totales" min="0" placeholder="0">
                 <p class="modal-helper" id="numero_dias_resumen">Días calculados: 0</p>
             </div>
+            <div class="modal-field">
+                <label for="tarifa_contrato">Tarifa del contrato <span class="required">*</span></label>
+                <select id="tarifa_contrato" required>
+                    <option value="" disabled selected>Cargando tarifas...</option>
+                </select>
+            </div>
             <div class="modal-field modal-field-inline">
                 <div>
                     <label for="hora_manana">Hora mañana</label>
@@ -70,7 +76,7 @@
                 </div>
             </div>
             <div class="modal-field">
-                <label for="pago_adelantado">Pago adelantado (€) <span class="required">*</span></label>
+                <label for="pago_adelantado">Pago 1 (€) <span class="required">*</span></label>
                 <input type="text" id="pago_adelantado" placeholder="Ej: 100" required>
             </div>
             <div class="modal-field">
@@ -81,7 +87,7 @@
                 </select>
             </div>
             <div class="modal-field">
-                <label for="pago_final">Pago final (€) <span class="required">*</span></label>
+                <label for="pago_final">Pago 2 (€) <span class="required">*</span></label>
                 <input type="text" id="pago_final" placeholder="Ej: 150" required>
             </div>
             <div class="modal-field">
@@ -90,6 +96,11 @@
                     <option value="Pendiente" selected>Pendiente</option>
                     <option value="Pagado">Pagado</option>
                 </select>
+            </div>
+            <div class="modal-field">
+                <label for="pago_total">Pago Total (€)</label>
+                <input type="text" id="pago_total" placeholder="0" readonly>
+                <p class="modal-helper">Se calcula automáticamente con Pago 1 + Pago 2.</p>
             </div>
             <div class="modal-field">
                 <label for="observaciones">Observaciones</label>
