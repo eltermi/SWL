@@ -907,6 +907,13 @@ nav {
     letter-spacing: 0.06em;
 }
 
+.modal-subtitle {
+    margin: -8px 0 18px 0;
+    font-size: 0.95rem;
+    color: #5c0101;
+    font-weight: 600;
+}
+
 .modal-form {
     display: flex;
     flex-direction: column;

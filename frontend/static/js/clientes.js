@@ -1,6 +1,7 @@
 /* Contenido base para clientes.js */
 let contratoModal = null;
 let contratoForm = null;
+let contratoModalCliente = null;
 let idClienteContrato = null;
 let tarifasContrato = [];
 let tarifaSelect = null;
@@ -219,7 +220,7 @@ function obtenerDetallesCliente(id_cliente) {
                 </div>
                 <div class="cliente-actions">
                     <button class="btn-secundario" onclick="cargarClientes()">Volver a clientes</button>
-                    <button class="btn-principal" onclick="mostrarFormularioContrato(${id_cliente})">Nuevo contrato</button>
+                    <button class="btn-principal" data-nombre-cliente="${encodeURIComponent(nombreCompleto)}" onclick="mostrarFormularioContrato(${id_cliente}, decodeURIComponent(this.dataset.nombreCliente || ''))">Nuevo contrato</button>
                 </div>
             `;
 
@@ -457,7 +458,7 @@ function manejarCambioTarifa() {
     actualizarPagosDesdeVisitas(total);
 }
 
-function mostrarFormularioContrato(idCliente) {
+function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     if (!contratoModal || !contratoForm) {
         console.warn("Modal de contrato no disponible");
         return;
@@ -480,6 +481,10 @@ function mostrarFormularioContrato(idCliente) {
     if (estadoPagoAdelantado) estadoPagoAdelantado.value = "Pendiente";
     if (estadoPagoFinal) estadoPagoFinal.value = "Pendiente";
     if (pagoTotalInput) pagoTotalInput.value = "";
+    if (contratoModalCliente) {
+        contratoModalCliente.textContent = nombreCliente;
+        contratoModalCliente.hidden = !nombreCliente;
+    }
     restablecerTarifaContrato();
     abrirModalContrato();
 }
@@ -489,6 +494,7 @@ function inicializarModalContrato() {
     if (!contratoModal) return;
 
     contratoForm = document.getElementById("form-contrato");
+    contratoModalCliente = document.getElementById("contrato-modal-cliente");
     tarifaSelect = document.getElementById("tarifa_contrato");
     const closeTriggers = contratoModal.querySelectorAll("[data-close-modal]");
 
@@ -550,6 +556,10 @@ function cerrarModalContrato() {
     contratoModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
     idClienteContrato = null;
+    if (contratoModalCliente) {
+        contratoModalCliente.textContent = "";
+        contratoModalCliente.hidden = true;
+    }
 }
 
 function manejarInputContrato(event) {
