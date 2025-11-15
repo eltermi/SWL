@@ -3,6 +3,7 @@ let contratoModal = null;
 let contratoForm = null;
 let contratoModalCliente = null;
 let idClienteContrato = null;
+let clienteDetalleActual = null;
 let tarifasContrato = [];
 let tarifaSelect = null;
 
@@ -15,6 +16,15 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
     { id: "pago_final", nombre: "Pago 2 (€)" }
 ];
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
+
+function escaparHTML(texto = "") {
+    return String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
@@ -120,6 +130,7 @@ function cargarClientes(busqueda = "") {
     muestraCliente.style.display = "none";
     document.getElementById("form-crea-cliente").style.display = "block";
     container.style.display = "block";
+    clienteDetalleActual = null;
 
     fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
@@ -161,6 +172,8 @@ function obtenerDetallesCliente(id_cliente) {
             container.style.display = "none";
             muestraCliente.style.display = "block";
             document.getElementById("form-crea-cliente").style.display = "none";
+
+            clienteDetalleActual = cliente;
 
             const nombreCompleto = `${cliente.nombre ?? ""}${cliente.apellidos ? " " + cliente.apellidos : ""}`.trim();
             const emailHTML = cliente.email
@@ -220,6 +233,7 @@ function obtenerDetallesCliente(id_cliente) {
                 </div>
                 <div class="cliente-actions">
                     <button class="btn-secundario" onclick="cargarClientes()">Volver a clientes</button>
+                    <button class="btn-secundario" onclick="mostrarFormularioEdicionCliente()">Modificar</button>
                     <button class="btn-principal" data-nombre-cliente="${encodeURIComponent(nombreCompleto)}" onclick="mostrarFormularioContrato(${id_cliente}, decodeURIComponent(this.dataset.nombreCliente || ''))">Nuevo contrato</button>
                 </div>
             `;
@@ -487,6 +501,115 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     }
     restablecerTarifaContrato();
     abrirModalContrato();
+}
+
+function mostrarFormularioEdicionCliente() {
+    if (!clienteDetalleActual) return;
+    const muestraCliente = document.getElementById("muestra-cliente");
+    if (!muestraCliente) return;
+
+    const cliente = clienteDetalleActual;
+    const genero = cliente.genero ?? "";
+    const generoOptions = `
+        <option value="" ${!genero ? "selected" : ""}>Sin especificar</option>
+        <option value="M" ${genero === "M" ? "selected" : ""}>M</option>
+        <option value="F" ${genero === "F" ? "selected" : ""}>F</option>
+    `;
+
+    muestraCliente.innerHTML = `
+        <div class="cliente-detalle-card cliente-edit-card">
+            <div class="cliente-edit-header">
+                <h3 class="cliente-edit-title">Modificar cliente</h3>
+                <p class="cliente-id-info">ID Cliente: ${cliente.id_cliente}</p>
+            </div>
+            <form id="form-editar-cliente" class="cliente-edit-form" novalidate>
+                <div class="form-columns">
+                    <div class="form-column">
+                        <label for="edit_nombre">Nombre</label>
+                        <input type="text" id="edit_nombre" value="${escaparHTML(cliente.nombre ?? "")}" required>
+                        <label for="edit_apellidos">Apellidos</label>
+                        <input type="text" id="edit_apellidos" value="${escaparHTML(cliente.apellidos ?? "")}">
+                        <label for="edit_calle">Calle</label>
+                        <input type="text" id="edit_calle" value="${escaparHTML(cliente.calle ?? "")}">
+                        <label for="edit_piso">Piso</label>
+                        <input type="text" id="edit_piso" value="${escaparHTML(cliente.piso ?? "")}">
+                        <label for="edit_codigo_postal">Código Postal</label>
+                        <input type="text" id="edit_codigo_postal" value="${escaparHTML(cliente.codigo_postal ?? "")}">
+                        <label for="edit_municipio">Municipio / Barrio</label>
+                        <input type="text" id="edit_municipio" value="${escaparHTML(cliente.municipio ?? "")}">
+                        <label for="edit_pais">País</label>
+                        <input type="text" id="edit_pais" value="${escaparHTML(cliente.pais ?? "")}">
+                    </div>
+                    <div class="form-column">
+                        <label for="edit_telefono">Teléfono</label>
+                        <input type="text" id="edit_telefono" value="${escaparHTML(cliente.telefono ?? "")}">
+                        <label for="edit_email">Correo electrónico</label>
+                        <input type="email" id="edit_email" value="${escaparHTML(cliente.email ?? "")}">
+                        <label for="edit_nacionalidad">Nacionalidad</label>
+                        <input type="text" id="edit_nacionalidad" value="${escaparHTML(cliente.nacionalidad ?? "")}">
+                        <label for="edit_idioma">Idioma</label>
+                        <input type="text" id="edit_idioma" value="${escaparHTML(cliente.idioma ?? "")}">
+                        <label for="edit_genero">Género</label>
+                        <select id="edit_genero">
+                            ${generoOptions}
+                        </select>
+                        <label for="edit_referencia_origen">Referencia</label>
+                        <input type="text" id="edit_referencia_origen" value="${escaparHTML(cliente.referencia ?? "")}">
+                    </div>
+                </div>
+                <div class="cliente-edit-actions">
+                    <button class="btn-secundario" id="cancelar-edicion-cliente">Cancelar</button>
+                    <button type="submit" class="btn-principal">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.getElementById("form-editar-cliente")?.addEventListener("submit", guardarCambiosCliente);
+    document.getElementById("cancelar-edicion-cliente")?.addEventListener("click", event => {
+        event.preventDefault();
+        obtenerDetallesCliente(cliente.id_cliente);
+    });
+}
+
+function guardarCambiosCliente(event) {
+    event.preventDefault();
+    if (!clienteDetalleActual) return;
+    const form = event.target;
+
+    const obtenerValor = id => form.querySelector(id)?.value.trim() ?? "";
+    const valorOpcional = selector => {
+        const valor = obtenerValor(selector);
+        return valor.length ? valor : null;
+    };
+
+    const payload = {
+        nombre: obtenerValor("#edit_nombre"),
+        apellidos: valorOpcional("#edit_apellidos"),
+        calle: valorOpcional("#edit_calle"),
+        piso: valorOpcional("#edit_piso"),
+        codigo_postal: valorOpcional("#edit_codigo_postal"),
+        municipio: valorOpcional("#edit_municipio"),
+        pais: valorOpcional("#edit_pais"),
+        telefono: valorOpcional("#edit_telefono"),
+        email: valorOpcional("#edit_email"),
+        nacionalidad: valorOpcional("#edit_nacionalidad"),
+        idioma: valorOpcional("#edit_idioma"),
+        genero: (form.querySelector("#edit_genero")?.value || null),
+        referencia_origen: valorOpcional("#edit_referencia_origen")
+    };
+
+    fetchAPI(`/api/clientes/${clienteDetalleActual.id_cliente}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    })
+        .then(() => {
+            obtenerDetallesCliente(clienteDetalleActual.id_cliente);
+        })
+        .catch(error => {
+            console.error("🚨 Error al actualizar cliente:", error);
+            alert("No se pudo actualizar el cliente. Inténtalo de nuevo.");
+        });
 }
 
 function inicializarModalContrato() {

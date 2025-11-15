@@ -786,6 +786,55 @@ nav {
     flex-wrap: wrap;
 }
 
+.cliente-edit-card {
+    margin-bottom: 20px;
+}
+
+.cliente-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cliente-edit-title {
+    margin: 0;
+}
+
+.cliente-id-info {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #8c8c8c;
+}
+
+.cliente-edit-form label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8c8c8c;
+}
+
+.cliente-edit-form input,
+.cliente-edit-form select,
+.cliente-edit-form textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.cliente-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
 .cliente-actions button {
     padding: 10px 18px;
     border-radius: 6px;

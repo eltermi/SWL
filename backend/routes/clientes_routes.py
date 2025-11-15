@@ -90,8 +90,17 @@ def actualizar_cliente(id_cliente):
     datos = request.json
     cliente.nombre = datos.get('nombre', cliente.nombre)
     cliente.apellidos = datos.get('apellidos', cliente.apellidos)
-    cliente.email = datos.get('email', cliente.email)
+    cliente.calle = datos.get('calle', cliente.calle)
+    cliente.piso = datos.get('piso', cliente.piso)
+    cliente.codigo_postal = datos.get('codigo_postal', cliente.codigo_postal)
+    cliente.municipio = datos.get('municipio', cliente.municipio)
+    cliente.pais = datos.get('pais', cliente.pais)
     cliente.telefono = datos.get('telefono', cliente.telefono)
+    cliente.email = datos.get('email', cliente.email)
+    cliente.nacionalidad = datos.get('nacionalidad', cliente.nacionalidad)
+    cliente.idioma = datos.get('idioma', cliente.idioma)
+    cliente.genero = datos.get('genero', cliente.genero)
+    cliente.referencia_origen = datos.get('referencia_origen', cliente.referencia_origen)
     db.session.commit()
     return jsonify({'mensaje': 'Cliente actualizado exitosamente'})
 
