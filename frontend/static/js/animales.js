@@ -67,7 +67,7 @@ function cargarAnimales(busqueda = "") {
                     animalDiv.classList.add("animal");
                     animalDiv.setAttribute("data-id", animal.id_animal);
                     animalDiv.addEventListener("click", () => {
-                        obtenerDetallesAnimal(animal.id_animal);
+                        obtenerDetallesAnimal(animal);
                     });
 
                     animalDiv.innerHTML = `
@@ -147,7 +147,7 @@ function agregarAnimal1(event) {
 }
 
 function eliminarAnimal(id) {
-    fetchAPI(`/api/animales/${id}`, { method: 'DELETE' })
+    return fetchAPI(`/api/animales/${id}`, { method: 'DELETE' })
         .then(() => cargarAnimales());
 }
 
@@ -166,4 +166,82 @@ function editarAnimal(id) {
 function buscarAnimales(event) {
     const filtro = event.target.value;
     cargarAnimales(filtro);
+}
+
+function obtenerDetallesAnimal(animal) {
+    if (!animal) return;
+
+    const container = document.getElementById("lista-animales");
+    const muestraAnimal = document.getElementById("muestra-animal");
+    const formulario = document.getElementById("form-crea-animal");
+
+    container.style.display = "none";
+    formulario.style.display = "none";
+    muestraAnimal.style.display = "block";
+
+    const nombreAnimal = animal.nombre_animal ?? animal.nombre ?? "Sin nombre";
+    const nombreCliente = [animal.nombre_cliente, animal.apellidos_cliente]
+        .filter(part => part && part.trim().length > 0)
+        .join(" ");
+    const tipo = animal.tipo_animal ?? "Sin tipo";
+    const edad = animal.edad ?? "Sin edad";
+    const medicacion = animal.medicacion ?? "No hay medicación";
+    const fotoHTML = animal.foto
+        ? `<img src="${animal.foto}" alt="Foto de ${nombreAnimal}">`
+        : `<div class="animal-detalle-foto-placeholder">Sin foto disponible</div>`;
+
+    muestraAnimal.innerHTML = `
+        <div class="animal-detalle-card">
+            <div class="animal-detalle-header">
+                <div>
+                    <p class="animal-detalle-nombre">${nombreAnimal}</p>
+                    ${nombreCliente ? `<p class="animal-detalle-cliente">${nombreCliente}</p>` : ""}
+                </div>
+                <div class="animal-detalle-actions">
+                    <button type="button" class="btn-secundario" id="btn-volver-animales">Volver</button>
+                    <button type="button" class="btn-peligro" id="btn-eliminar-animal">Eliminar</button>
+                </div>
+            </div>
+            <div class="animal-detalle-body">
+                <div>
+                    <p><span class="cliente-label">Tipo</span>${tipo}</p>
+                    <p><span class="cliente-label">Edad</span>${edad}</p>
+                    <p><span class="cliente-label">Medicación</span>${medicacion}</p>
+                    <p><span class="cliente-label">Cliente</span>${nombreCliente || "-"}</p>
+                    <p><span class="cliente-label">ID cliente</span>${animal.id_cliente ?? "-"}</p>
+                </div>
+                <div class="animal-detalle-foto">
+                    ${fotoHTML}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("btn-volver-animales").addEventListener("click", () => volverAlListadoAnimales());
+    document.getElementById("btn-eliminar-animal").addEventListener("click", () => confirmarEliminacionAnimal(animal.id_animal));
+}
+
+function volverAlListadoAnimales(recargar = false) {
+    const container = document.getElementById("lista-animales");
+    const muestraAnimal = document.getElementById("muestra-animal");
+    const formulario = document.getElementById("form-crea-animal");
+
+    container.style.display = "block";
+    formulario.style.display = "block";
+    muestraAnimal.style.display = "none";
+    muestraAnimal.innerHTML = "";
+
+    if (recargar) {
+        cargarAnimales();
+    }
+}
+
+function confirmarEliminacionAnimal(idAnimal) {
+    if (!idAnimal) return;
+    const confirmar = window.confirm("¿Seguro que quieres eliminar este animal? Esta acción no se puede deshacer.");
+    if (!confirmar) return;
+
+    eliminarAnimal(idAnimal)
+        .then(() => volverAlListadoAnimales())
+        .catch(error => console.error("🚨 Error al eliminar el animal:", error));
 }

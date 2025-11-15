@@ -862,6 +862,89 @@ nav {
     background-color: rgba(208, 2, 27, 0.08);
 }
 
+.btn-peligro {
+    background-color: #b00020;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-peligro:hover {
+    background-color: #8c0018;
+}
+
+.animal-detalle-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e2e2;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    margin: 0 auto 25px;
+    max-width: 720px;
+}
+
+.animal-detalle-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.animal-detalle-nombre {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d0808;
+}
+
+.animal-detalle-cliente {
+    margin: 6px 0 0 0;
+    font-size: 15px;
+    color: #3f3f3f;
+}
+
+.animal-detalle-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.animal-detalle-body {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.animal-detalle-body>div {
+    flex: 1 1 260px;
+}
+
+.animal-detalle-body p {
+    margin: 8px 0;
+    font-size: 15px;
+}
+
+.animal-detalle-foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    min-height: 220px;
+    padding: 10px;
+}
+
+.animal-detalle-foto img {
+    max-width: 100%;
+    border-radius: 12px;
+}
+
+.animal-detalle-foto-placeholder {
+    color: #8a8a8a;
+    font-style: italic;
+}
+
 .cliente-animals {
     margin-bottom: 30px;
 }
