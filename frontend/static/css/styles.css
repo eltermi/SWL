@@ -1250,6 +1250,12 @@ body.modal-open {
         padding-bottom: 8px;
     }
 
+    .cliente-main-contact,
+    .cliente-alt-contact {
+        flex: 0 1 auto;
+        width: 100%;
+    }
+
     .cliente-info-grid {
         grid-template-columns: 1fr;
         gap: 10px;
