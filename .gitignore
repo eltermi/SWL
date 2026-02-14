@@ -6,3 +6,18 @@ salida.txt
 Animales agrupados.csv
 Animales.csv
 clientes.csv
+.DS_Store
+backend/.DS_Store
+backend/__pycache__/app.cpython-313.pyc
+backend/__pycache__/app.cpython-313.pyc
+backend/__pycache__/config.cpython-313.pyc
+backend/__pycache__/dividir_modelos.cpython-313.pyc
+backend/__pycache__/generar_hash.cpython-313.pyc
+backend/__pycache__/login_test.cpython-313.pyc
+backend/__pycache__/models.cpython-313.pyc
+backend/__pycache__/script_archivos.cpython-313.pyc
+backend/migrations/__pycache__/env.cpython-313.pyc
+backend/models/__pycache__/app.cpython-313.pyc
+backend/models/__pycache__/contratos.cpython-313.pyc
+backend/routes/__pycache__/contratos_routes.cpython-313.pyc
+frontend/.DS_Store

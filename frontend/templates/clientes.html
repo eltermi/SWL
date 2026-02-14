@@ -40,6 +40,7 @@
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="contrato-modal-title">
         <button type="button" class="modal-close" aria-label="Cerrar" data-close-modal>&times;</button>
         <h3 id="contrato-modal-title" class="modal-title">Nuevo contrato</h3>
+        <p class="modal-subtitle" id="numero_factura_resumen">Número de factura: Se asignará al guardar</p>
         <p id="contrato-modal-cliente" class="modal-subtitle" hidden></p>
         <div id="form-contrato-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
         <form id="form-contrato" class="modal-form" novalidate>
@@ -53,7 +54,7 @@
             </div>
             <div class="modal-field">
                 <label for="numero_visitas_diarias">Número de visitas diarias <span class="required">*</span></label>
-                <input type="text" id="numero_visitas_diarias" placeholder="Ej: 2" required>
+                <input type="number" id="numero_visitas_diarias" min="0" step="1" placeholder="Ej: 2" required>
             </div>
             <div class="modal-field">
                 <label for="numero_visitas_totales">Número de visitas totales</label>
@@ -77,31 +78,13 @@
                 </div>
             </div>
             <div class="modal-field">
-                <label for="pago_adelantado">Pago 1 (€) <span class="required">*</span></label>
-                <input type="text" id="pago_adelantado" placeholder="Ej: 100" required>
+                <label for="total_contrato">Total contrato (€)</label>
+                <input type="number" id="total_contrato" min="0" step="0.01" value="0">
+                <p class="modal-helper" id="mitad_total_resumen">50% del total: 0,00 €</p>
             </div>
             <div class="modal-field">
-                <label for="estado_pago_adelantado">Estado pago adelantado</label>
-                <select id="estado_pago_adelantado">
-                    <option value="Pendiente" selected>Pendiente</option>
-                    <option value="Pagado">Pagado</option>
-                </select>
-            </div>
-            <div class="modal-field">
-                <label for="pago_final">Pago 2 (€) <span class="required">*</span></label>
-                <input type="text" id="pago_final" placeholder="Ej: 150" required>
-            </div>
-            <div class="modal-field">
-                <label for="estado_pago_final">Estado pago final</label>
-                <select id="estado_pago_final">
-                    <option value="Pendiente" selected>Pendiente</option>
-                    <option value="Pagado">Pagado</option>
-                </select>
-            </div>
-            <div class="modal-field">
-                <label for="pago_total">Pago Total (€)</label>
-                <input type="text" id="pago_total" placeholder="0" readonly>
-                <p class="modal-helper">Se calcula automáticamente con Pago 1 + Pago 2.</p>
+                <label for="pagado">Pagado (€) <span class="required">*</span></label>
+                <input type="number" id="pagado" min="0" step="0.01" value="0" required>
             </div>
             <div class="modal-field">
                 <label for="observaciones">Observaciones</label>

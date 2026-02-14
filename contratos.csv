@@ -1,6 +1,6 @@
-id_contrato,id_cliente,fecha_inicio,fecha_fin,numero_visitas_diarias,horario_visitas,pago_adelantado,estado_pago_adelantado,pago_final,estado_pago_final,observaciones,factura
-1,17,2025-07-03,2025-07-06,1,"""",0.00,Pendiente,240.00,Pendiente,NULL,NULL
-2,23,2025-07-06,2025-07-12,1,"""",115.50,Pagado,115.50,Pendiente,NULL,NULL
-3,8,2025-07-06,2025-07-18,1,"[{"visita": "12:00"}]",143.00,Pagado,143.00,Pendiente,NULL,NULL
-4,3,2025-07-06,2025-07-06,1,"""",0.00,Pagado,24.00,Pagado,NULL,NULL
-5,1,2025-07-08,2025-07-20,1,"""",175.50,Pagado,175.50,Pendiente,NULL,NULL
+id_contrato,id_cliente,fecha_inicio,fecha_fin,numero_visitas_diarias,horario_visitas,Total,Pagado,observaciones,num_factura,num_total_visitas
+1,17,2025-07-03,2025-07-06,1,"{}",4.00,240.00,,1-17,4
+2,23,2025-07-06,2025-07-12,1,"{}",7.00,231.00,,2-23,7
+3,8,2025-07-06,2025-07-18,1,"{""visita"": ""12:00""}",13.00,286.00,,3-8,13
+4,3,2025-07-06,2025-07-06,1,"{}",1.00,24.00,,4-3,1
+5,1,2025-07-08,2025-07-20,1,"{}",13.00,351.00,,5-1,13

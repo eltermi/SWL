@@ -311,18 +311,18 @@
         "horario_visitas": {
           "type": "string"
         },
-        "pago_adelantado": {
+        "total": {
           "type": "number",
           "format": "float"
         },
-        "estado_pago_adelantado": {
+        "pagado": {
+          "type": "number",
+          "format": "float"
+        },
+        "num_factura": {
           "type": "string"
         },
-        "pago_final": {
-          "type": "number",
-          "format": "float"
-        },
-        "estado_pago_final": {
+        "num_total_visitas": {
           "type": "string"
         }
       }

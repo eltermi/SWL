@@ -352,6 +352,12 @@ nav {
     margin-bottom: 24px;
 }
 
+.dashboard-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
 .contratos-programados-card {
     background-color: #ffffff;
     border: 1px solid #f0f0f0;
@@ -503,7 +509,8 @@ nav {
 .contrato-payments {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
+    gap: 15px;
+    margin-top: 15px;
 }
 
 .pago-card {

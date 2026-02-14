@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
+    inicializarAccionesDashboard();
     getContratosActivos();
 });
+
+function inicializarAccionesDashboard() {
+    const botonNuevoContrato = document.getElementById("btn-nuevo-contrato-dashboard");
+    if (!botonNuevoContrato) return;
+    botonNuevoContrato.addEventListener("click", () => {
+        window.location.href = "/clientes";
+    });
+}
 
 function getNombreDia(fechaTexto) {
     if (fechaTexto === "HOY" || fechaTexto === "MAÑANA") return "";
@@ -65,6 +74,10 @@ function parseFechaContrato(fechaTexto) {
 
 function calcularTotalVisitas(contrato) {
     if (!contrato) return null;
+    const numTotalVisitas = Number(contrato.num_total_visitas);
+    if (Number.isFinite(numTotalVisitas) && numTotalVisitas >= 0) {
+        return numTotalVisitas;
+    }
     const inicio = parseFechaContrato(contrato.fecha_inicio);
     const fin = parseFechaContrato(contrato.fecha_fin);
     const visitasDiarias = Number(contrato.visitas);
@@ -132,9 +145,9 @@ function formatearImporte(valor) {
     return numero.toLocaleString("es-ES", { style: "currency", currency: "EUR" });
 }
 
-function crearPagoCard({ etiqueta, importe, estado, esTotal = false }) {
+function crearPagoCard({ etiqueta, importe, esTotal = false }) {
     const importeFormateado = formatearImporte(importe);
-    if (esTotal) {
+    if (esTotal || etiqueta === "Pendiente") {
         return `
             <div class="pago-card pago-card-total">
                 <span class="pago-label">${etiqueta}</span>
@@ -143,19 +156,10 @@ function crearPagoCard({ etiqueta, importe, estado, esTotal = false }) {
         `;
     }
 
-    const estadoTexto = estado ?? "Sin estado";
-    const estadoSlug = ((estadoTexto || "")
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-")) || "sin-estado";
-    const estadoClase = `pago-estado pago-estado--${estadoSlug}`;
-
     return `
         <div class="pago-card">
             <span class="pago-label">${etiqueta}</span>
             <strong>${importeFormateado}</strong>
-            <span class="${estadoClase.trim()}">${estadoTexto}</span>
         </div>
     `;
 }
@@ -254,6 +258,10 @@ function obtenerDetallesContrato(id_contrato) {
 
             const nombreAnimales = contrato.nombre_animales || "No hay animales asignados";
             const tarifaNombre = contrato.tarifa || "Tarifa no asignada";
+            const precioTarifa = Number(contrato.precio_tarifa);
+            const tarifaConImporte = contrato.tarifa
+                ? `${contrato.tarifa}${Number.isFinite(precioTarifa) ? ` (${precioTarifa.toFixed(2)} €)` : ""}`
+                : "Tarifa no asignada";
 
             const avisoAnimales = nombreAnimales === "No hay animales asignados"
                 ? `<p style="color: red; font-weight: bold;">⚠️ ${nombreAnimales}</p>`
@@ -273,16 +281,16 @@ function obtenerDetallesContrato(id_contrato) {
                 }
             }
             const horarioHTML = formatearHorario(horarioContrato);
-            const pago1 = contrato.pago_adelantado ?? 0;
-            const pago2 = contrato.pago_final ?? 0;
-            const pagoTotal = contrato.pago_total ?? (Number(pago1) + Number(pago2));
+            const totalContrato = contrato.total ?? 0;
+            const pagadoContrato = contrato.pagado ?? 0;
+            const pagoPendiente = contrato.pendiente ?? (Number(totalContrato) - Number(pagadoContrato));
             const totalVisitas = calcularTotalVisitas(contrato);
 
             const pagosHTML = `
                 <div class="contrato-payments">
-                    ${crearPagoCard({ etiqueta: "Pago 1", importe: pago1, estado: contrato.estado_pago_adelantado })}
-                    ${crearPagoCard({ etiqueta: "Pago 2", importe: pago2, estado: contrato.estado_pago_final })}
-                    ${crearPagoCard({ etiqueta: "Pago Total", importe: pagoTotal, esTotal: true })}
+                    ${crearPagoCard({ etiqueta: "Total", importe: totalContrato })}
+                    ${crearPagoCard({ etiqueta: "Pagado", importe: pagadoContrato })}
+                    ${crearPagoCard({ etiqueta: "Pendiente", importe: pagoPendiente, esTotal: true })}
                 </div>
             `;
             const visitasTotalesHTML = totalVisitas !== null ? `
@@ -319,7 +327,11 @@ function obtenerDetallesContrato(id_contrato) {
                                 </div>
                                 <div class="contrato-section">
                                     <p class="contrato-section-title">Tarifa</p>
-                                    <p>${tarifaNombre}</p>
+                                    <p>${tarifaConImporte}</p>
+                                </div>
+                                <div class="contrato-section">
+                                    <p class="contrato-section-title">Factura</p>
+                                    <p>${contrato.num_factura ?? "-"}</p>
                                 </div>
                             </div>
                             ${pagosHTML}
@@ -335,10 +347,22 @@ function obtenerDetallesContrato(id_contrato) {
                         </div>
                     </div>
                     <div class="contrato-detail-actions">
+                        <button onclick="editarContratoDesdeDashboard(${Number(contrato.id_contrato) || 0}, ${Number(contrato.id_cliente) || 0})">Modificar</button>
                         <button onclick="getContratosActivos()">Volver al dashboard</button>
                     </div>
                 </div>
             `;
         })
         .catch(error => console.error("🚨 Error al obtener detalles del contrato:", error));
+}
+
+function editarContratoDesdeDashboard(idContrato, idCliente) {
+    const contrato = Number(idContrato);
+    const cliente = Number(idCliente);
+    if (!Number.isFinite(contrato) || contrato <= 0 || !Number.isFinite(cliente) || cliente <= 0) {
+        alert("No se pudo identificar el cliente o contrato para modificar.");
+        return;
+    }
+    const url = `/clientes?id_cliente=${encodeURIComponent(String(cliente))}&editar_contrato=${encodeURIComponent(String(contrato))}`;
+    window.location.href = url;
 }

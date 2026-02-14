@@ -4,6 +4,8 @@ let contratoForm = null;
 let contratoModalCliente = null;
 let idClienteContrato = null;
 let clienteDetalleActual = null;
+let contratoEnEdicionId = null;
+let contratosClienteActuales = [];
 let tarifasContrato = [];
 let tarifaSelect = null;
 
@@ -11,9 +13,9 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
     { id: "fecha_inicio", nombre: "Fecha de inicio" },
     { id: "fecha_fin", nombre: "Fecha de fin" },
     { id: "numero_visitas_diarias", nombre: "Número de visitas diarias" },
+    { id: "numero_visitas_totales", nombre: "Número de visitas totales" },
     { id: "tarifa_contrato", nombre: "Tarifa del contrato" },
-    { id: "pago_adelantado", nombre: "Pago 1 (€)" },
-    { id: "pago_final", nombre: "Pago 2 (€)" }
+    { id: "pagado", nombre: "Pagado (€)" }
 ];
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
 
@@ -32,7 +34,25 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('buscar').addEventListener('input', buscarClientes);
     inicializarModalContrato();
     cargarTarifasContrato();
+    procesarAccesoDirectoContrato();
 });
+
+function procesarAccesoDirectoContrato() {
+    const params = new URLSearchParams(window.location.search);
+    const idCliente = Number(params.get("id_cliente"));
+    const idContrato = Number(params.get("editar_contrato"));
+    if (!Number.isFinite(idCliente) || idCliente <= 0) {
+        return;
+    }
+
+    obtenerDetallesCliente(idCliente).then(() => {
+        if (Number.isFinite(idContrato) && idContrato > 0) {
+            mostrarFormularioEdicionContrato(idContrato);
+        }
+    }).catch(error => {
+        console.error("No se pudo abrir el acceso directo al contrato:", error);
+    });
+}
 
 function fetchAPI(url, options = {}) {
     const token = sessionStorage.getItem("token");
@@ -62,9 +82,9 @@ function formatearImporte(valor) {
     return numero.toLocaleString("es-ES", { style: "currency", currency: "EUR" });
 }
 
-function crearPagoCard({ etiqueta, importe, estado, esTotal = false }) {
+function crearPagoCard({ etiqueta, importe, esTotal = false }) {
     const importeFormateado = formatearImporte(importe);
-    if (esTotal) {
+    if (esTotal || etiqueta === "Pendiente") {
         return `
             <div class="pago-card pago-card-total">
                 <span class="pago-label">${etiqueta}</span>
@@ -73,18 +93,10 @@ function crearPagoCard({ etiqueta, importe, estado, esTotal = false }) {
         `;
     }
 
-    const estadoTexto = estado ?? "Sin estado";
-    const estadoSlug = ((estadoTexto || "")
-        .toString()
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-")) || "sin-estado";
-
     return `
         <div class="pago-card">
             <span class="pago-label">${etiqueta}</span>
             <strong>${importeFormateado}</strong>
-            <span class="pago-estado pago-estado--${estadoSlug}">${estadoTexto}</span>
         </div>
     `;
 }
@@ -106,19 +118,64 @@ function normalizarHorarioContrato(horario) {
 function renderHorarioContrato(horario) {
     if (!horario || typeof horario !== "object") return "";
 
-    const manana = horario.Mañana ?? "-";
-    const tarde = horario.Tarde ?? "-";
+    const bloques = [];
+    const manana = typeof horario.Mañana === "string" ? horario.Mañana.trim() : "";
+    const tarde = typeof horario.Tarde === "string" ? horario.Tarde.trim() : "";
 
-    return `
-        <table class="tabla-horario">
-            <thead>
-                <tr><th>Mañana</th><th>Tarde</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>${manana}</td><td>${tarde}</td></tr>
-            </tbody>
-        </table>
-    `;
+    if (manana) {
+        bloques.push({ etiqueta: "Mañana", valor: manana });
+    }
+    if (tarde) {
+        bloques.push({ etiqueta: "Tarde", valor: tarde });
+    }
+
+    if (!bloques.length) return "";
+
+    const bloquesHTML = bloques.map(({ etiqueta, valor }) => `
+        <div class="horario-bloque">
+            <span class="horario-bloque-label">${etiqueta}</span>
+            <span>${valor}</span>
+        </div>
+    `).join("");
+
+    return `<div class="horario-bloques">${bloquesHTML}</div>`;
+}
+
+function parseFechaContrato(fechaTexto) {
+    if (!fechaTexto || typeof fechaTexto !== "string") return null;
+    const partes = fechaTexto.split("-");
+    if (partes.length !== 3) return null;
+    const [dia, mes, anio] = partes;
+    const fecha = new Date(Number(anio), Number(mes) - 1, Number(dia));
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+}
+
+function convertirFechaDisplayAInput(fechaTexto) {
+    if (!fechaTexto || typeof fechaTexto !== "string") return "";
+    const partes = fechaTexto.split("-");
+    if (partes.length !== 3) return "";
+    const [dia, mes, anio] = partes;
+    return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+}
+
+function calcularTotalVisitasContrato(contrato) {
+    if (!contrato) return null;
+    const numTotalVisitas = Number(contrato.num_total_visitas);
+    if (Number.isFinite(numTotalVisitas) && numTotalVisitas >= 0) {
+        return numTotalVisitas;
+    }
+    const inicio = parseFechaContrato(contrato.fecha_inicio);
+    const fin = parseFechaContrato(contrato.fecha_fin);
+    const visitasDiarias = Number(contrato.visitas);
+
+    if (!inicio || !fin || Number.isNaN(visitasDiarias) || visitasDiarias <= 0) {
+        return null;
+    }
+
+    const diferencia = fin.getTime() - inicio.getTime();
+    if (diferencia < 0) return null;
+    const dias = Math.floor(diferencia / MS_POR_DIA) + 1;
+    return dias > 0 ? dias * visitasDiarias : null;
 }
 
 function cargarClientes(busqueda = "") {
@@ -164,7 +221,7 @@ function cargarClientes(busqueda = "") {
         .catch(error => console.error("\uD83D\uDEA8 Error cargando clientes:", error));
 }
 function obtenerDetallesCliente(id_cliente) {
-    fetchAPI(`/api/clientes/${id_cliente}`)
+    return fetchAPI(`/api/clientes/${id_cliente}`)
         .then(cliente => {
             const container = document.getElementById("lista-clientes");
             const muestraCliente = document.getElementById("muestra-cliente");
@@ -252,6 +309,7 @@ function obtenerDetallesCliente(id_cliente) {
 
             return Promise.all([contratosPromise, animalesPromise])
                 .then(([contratos, animales]) => {
+                    contratosClienteActuales = Array.isArray(contratos) ? contratos : [];
                     contenidoHTML += construirContratosHTML(contratos);
                     contenidoHTML += construirAnimalesHTML(animales);
                     muestraCliente.innerHTML = contenidoHTML;
@@ -319,8 +377,9 @@ function construirContratosHTML(contratos) {
         return html;
     }
 
+    const contratosOrdenados = [...contratos].sort((a, b) => (Number(b.id_contrato) || 0) - (Number(a.id_contrato) || 0));
     html += `<div class="cliente-contracts-grid">`;
-    contratos.forEach(contrato => {
+    contratosOrdenados.forEach(contrato => {
         html += construirContratoCard(contrato);
     });
     html += `</div></div>`;
@@ -331,29 +390,70 @@ function construirContratoCard(contrato) {
     if (!contrato) return "";
     const horarioNormalizado = normalizarHorarioContrato(contrato.horario);
     const horarioHTML = renderHorarioContrato(horarioNormalizado);
+    const totalVisitas = calcularTotalVisitasContrato(contrato);
+    const visitasTotalesHTML = totalVisitas !== null ? `
+        <p class="contrato-visitas-row">
+            <span class="contrato-data-label">Totales</span>
+            <span class="contrato-visitas-value">${totalVisitas}</span>
+        </p>
+    ` : "";
+    const precioTarifa = Number(contrato.precio_tarifa);
+    const tarifaConImporte = contrato.tarifa
+        ? `${contrato.tarifa}${Number.isFinite(precioTarifa) ? ` (${precioTarifa.toFixed(2)} €)` : ""}`
+        : "-";
 
     return `
-        <div class="cliente-contract-card">
-            <div class="cliente-contract-header">
-                <p class="contrato-id">Contrato ${contrato.id_contrato ?? "-"}</p>
-                ${contrato.tarifa ? `<span class="cliente-chip">${contrato.tarifa}</span>` : ""}
-            </div>
-            <div class="cliente-contract-columns">
-                <div>
-                    <p><span class="cliente-label">Inicio</span>${contrato.fecha_inicio ?? "-"}</p>
-                    <p><span class="cliente-label">Fin</span>${contrato.fecha_fin ?? "-"}</p>
-                    <p><span class="cliente-label">Visitas/día</span>${contrato.visitas ?? "-"}</p>
+        <div class="cliente-contract-card contrato-detalle-card">
+            <div class="contrato-id">Contrato ${contrato.id_contrato ?? "-"}</div>
+            <div class="contrato-detail-layout">
+                <div class="contrato-detail-main">
+                    <div class="contrato-sections">
+                        <div class="contrato-section contrato-section-fechas">
+                            <p class="contrato-section-title">Fechas</p>
+                            <div class="contrato-fechas-pares">
+                                <p class="contrato-fecha-item"><span class="contrato-data-label">Inicio</span>${contrato.fecha_inicio ?? "-"}</p>
+                                <p class="contrato-fecha-item"><span class="contrato-data-label">Fin</span>${contrato.fecha_fin ?? "-"}</p>
+                            </div>
+                        </div>
+                        <div class="contrato-section contrato-section-visitas">
+                            <p class="contrato-section-title contrato-section-title--center">Visitas</p>
+                            <div class="contrato-visitas-metricas">
+                                ${visitasTotalesHTML}
+                                <p class="contrato-visitas-row">
+                                    <span class="contrato-data-label">Por día</span>
+                                    <span class="contrato-visitas-value">${contrato.visitas ?? "-"}</span>
+                                </p>
+                            </div>
+                            ${horarioHTML || `<p class="cliente-empty">Horario no definido</p>`}
+                        </div>
+                        <div class="contrato-section">
+                            <p class="contrato-section-title">Tarifa</p>
+                            <p>${tarifaConImporte}</p>
+                        </div>
+                        <div class="contrato-section">
+                            <p class="contrato-section-title">Factura</p>
+                            <p>${contrato.num_factura ?? "-"}</p>
+                        </div>
+                    </div>
+                    <div class="contrato-payments">
+                        ${crearPagoCard({ etiqueta: "Total", importe: contrato.total })}
+                        ${crearPagoCard({ etiqueta: "Pagado", importe: contrato.pagado })}
+                        ${crearPagoCard({ etiqueta: "Pendiente", importe: contrato.pendiente, esTotal: true })}
+                    </div>
+                    ${contrato.observaciones ? `
+                        <div class="contrato-section contrato-observaciones">
+                            <p class="contrato-section-title">Observaciones</p>
+                            <p>${contrato.observaciones}</p>
+                        </div>
+                    ` : ""}
                 </div>
-                <div>
-                    ${horarioHTML || `<p class="cliente-empty">Horario no definido</p>`}
+                <div class="contrato-detail-photo">
+                    <p class="contrato-empty">No hay foto disponible</p>
                 </div>
             </div>
-            <div class="contrato-payments">
-                ${crearPagoCard({ etiqueta: "Pago 1", importe: contrato.pago_adelantado, estado: contrato.estado_pago_adelantado })}
-                ${crearPagoCard({ etiqueta: "Pago 2", importe: contrato.pago_final, estado: contrato.estado_pago_final })}
-                ${crearPagoCard({ etiqueta: "Pago Total", importe: contrato.pago_total, esTotal: true })}
+            <div class="contrato-detail-actions">
+                <button type="button" onclick="mostrarFormularioEdicionContrato(${Number(contrato.id_contrato) || 0})">Modificar</button>
             </div>
-            ${contrato.observaciones ? `<p class="cliente-contract-notes">${contrato.observaciones}</p>` : ""}
         </div>
     `;
 }
@@ -463,13 +563,11 @@ function obtenerTarifaSeleccionada() {
 }
 
 function manejarCambioTarifa() {
-    const visitasTotalesInput = document.getElementById("numero_visitas_totales");
-    if (!visitasTotalesInput) return;
     if (tarifaSelect && tarifaSelect.classList.contains("campo-error") && tarifaSelect.value) {
         tarifaSelect.classList.remove("campo-error");
     }
-    const total = parseFloat(visitasTotalesInput.value);
-    actualizarPagosDesdeVisitas(total);
+    const totalVisitas = parseFloat(document.getElementById("numero_visitas_totales")?.value ?? "");
+    actualizarTotalContratoDesdeVisitas(totalVisitas);
 }
 
 function mostrarFormularioContrato(idCliente, nombreCliente = "") {
@@ -479,27 +577,115 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     }
 
     idClienteContrato = idCliente;
+    contratoEnEdicionId = null;
     contratoForm.reset();
     limpiarErroresContrato();
+    const modalTitle = document.getElementById("contrato-modal-title");
+    const submitBtn = contratoForm.querySelector("button[type='submit']");
     const resumenDias = document.getElementById("numero_dias_resumen");
     const totalVisitasInput = document.getElementById("numero_visitas_totales");
+    const numeroFacturaResumen = document.getElementById("numero_factura_resumen");
+    const mitadTotalResumen = document.getElementById("mitad_total_resumen");
     if (resumenDias) {
         resumenDias.textContent = "Días calculados: 0";
     }
     if (totalVisitasInput) {
         totalVisitasInput.value = "";
     }
-    const estadoPagoAdelantado = document.getElementById("estado_pago_adelantado");
-    const estadoPagoFinal = document.getElementById("estado_pago_final");
-    const pagoTotalInput = document.getElementById("pago_total");
-    if (estadoPagoAdelantado) estadoPagoAdelantado.value = "Pendiente";
-    if (estadoPagoFinal) estadoPagoFinal.value = "Pendiente";
-    if (pagoTotalInput) pagoTotalInput.value = "";
+    const totalContratoInput = document.getElementById("total_contrato");
+    const pagadoInput = document.getElementById("pagado");
+    if (numeroFacturaResumen) {
+        numeroFacturaResumen.textContent = `Número de factura: Se asignará al guardar (?-${idCliente})`;
+    }
+    if (modalTitle) modalTitle.textContent = "Nuevo contrato";
+    if (submitBtn) submitBtn.textContent = "Guardar contrato";
+    if (totalContratoInput) totalContratoInput.value = "0.00";
+    if (pagadoInput) pagadoInput.value = "0.00";
+    if (mitadTotalResumen) mitadTotalResumen.textContent = "50% del total: 0,00 €";
     if (contratoModalCliente) {
         contratoModalCliente.textContent = nombreCliente;
         contratoModalCliente.hidden = !nombreCliente;
     }
     restablecerTarifaContrato();
+    abrirModalContrato();
+}
+
+function mostrarFormularioEdicionContrato(idContrato) {
+    if (!contratoModal || !contratoForm) return;
+    const contrato = contratosClienteActuales.find(item => Number(item?.id_contrato) === Number(idContrato));
+    if (!contrato) {
+        alert("No se pudo cargar el contrato para editar.");
+        return;
+    }
+    if (!clienteDetalleActual?.id_cliente) {
+        alert("No hay cliente seleccionado.");
+        return;
+    }
+
+    idClienteContrato = clienteDetalleActual.id_cliente;
+    contratoEnEdicionId = Number(idContrato);
+    contratoForm.reset();
+    limpiarErroresContrato();
+
+    const modalTitle = document.getElementById("contrato-modal-title");
+    const submitBtn = contratoForm.querySelector("button[type='submit']");
+    const numeroFacturaResumen = document.getElementById("numero_factura_resumen");
+    const mitadTotalResumen = document.getElementById("mitad_total_resumen");
+    const resumenDias = document.getElementById("numero_dias_resumen");
+
+    const fechaInicioInput = document.getElementById("fecha_inicio");
+    const fechaFinInput = document.getElementById("fecha_fin");
+    const visitasDiariasInput = document.getElementById("numero_visitas_diarias");
+    const totalVisitasInput = document.getElementById("numero_visitas_totales");
+    const totalContratoInput = document.getElementById("total_contrato");
+    const pagadoInput = document.getElementById("pagado");
+    const horaMananaInput = document.getElementById("hora_manana");
+    const horaTardeInput = document.getElementById("hora_tarde");
+    const observacionesInput = document.getElementById("observaciones");
+
+    if (modalTitle) modalTitle.textContent = "Modificar contrato";
+    if (submitBtn) submitBtn.textContent = "Guardar cambios";
+    if (numeroFacturaResumen) {
+        numeroFacturaResumen.textContent = `Número de factura: ${contrato.num_factura ?? "-"}`;
+    }
+
+    const fechaInicio = convertirFechaDisplayAInput(contrato.fecha_inicio);
+    const fechaFin = convertirFechaDisplayAInput(contrato.fecha_fin);
+    if (fechaInicioInput) fechaInicioInput.value = fechaInicio;
+    if (fechaFinInput) fechaFinInput.value = fechaFin;
+    if (visitasDiariasInput) visitasDiariasInput.value = contrato.visitas ?? "";
+
+    const dias = calcularDiasEntre(fechaInicio, fechaFin);
+    if (resumenDias) resumenDias.textContent = `Días calculados: ${dias}`;
+    if (totalVisitasInput) {
+        if (contrato.num_total_visitas !== undefined && contrato.num_total_visitas !== null && String(contrato.num_total_visitas).trim() !== "") {
+            totalVisitasInput.value = String(contrato.num_total_visitas);
+        } else if (dias > 0 && Number(contrato.visitas) > 0) {
+            totalVisitasInput.value = Math.round(Number(contrato.visitas) * dias);
+        } else {
+            totalVisitasInput.value = "";
+        }
+    }
+
+    if (tarifaSelect && contrato.id_tarifa !== undefined && contrato.id_tarifa !== null) {
+        tarifaSelect.value = String(contrato.id_tarifa);
+    }
+
+    const horario = normalizarHorarioContrato(contrato.horario) || {};
+    if (horaMananaInput) horaMananaInput.value = horario.Mañana || "";
+    if (horaTardeInput) horaTardeInput.value = horario.Tarde || "";
+
+    if (totalContratoInput) totalContratoInput.value = Number(contrato.total || 0).toFixed(2);
+    if (pagadoInput) pagadoInput.value = Number(contrato.pagado || 0).toFixed(2);
+    if (observacionesInput) observacionesInput.value = contrato.observaciones || "";
+    if (mitadTotalResumen) actualizarMitadTotalContrato();
+
+    if (contratoModalCliente) {
+        const nombreCompleto = `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
+        contratoModalCliente.textContent = nombreCompleto;
+        contratoModalCliente.hidden = !nombreCompleto;
+    }
+
     abrirModalContrato();
 }
 
@@ -647,18 +833,16 @@ function inicializarModalContrato() {
     const fechaFinInput = document.getElementById("fecha_fin");
     const visitasDiariasInput = document.getElementById("numero_visitas_diarias");
     const visitasTotalesInput = document.getElementById("numero_visitas_totales");
-    const pagoAdelantadoInput = document.getElementById("pago_adelantado");
-    const pagoFinalInput = document.getElementById("pago_final");
+    const totalContratoInput = document.getElementById("total_contrato");
 
     fechaInicioInput?.addEventListener("change", actualizarNumeroVisitasTotales);
     fechaFinInput?.addEventListener("change", actualizarNumeroVisitasTotales);
     visitasDiariasInput?.addEventListener("input", actualizarNumeroVisitasTotales);
     visitasTotalesInput?.addEventListener("input", () => {
         const total = parseFloat(visitasTotalesInput.value);
-        actualizarPagosDesdeVisitas(total);
+        actualizarTotalContratoDesdeVisitas(total);
     });
-    pagoAdelantadoInput?.addEventListener("input", actualizarPagoTotal);
-    pagoFinalInput?.addEventListener("input", actualizarPagoTotal);
+    totalContratoInput?.addEventListener("input", actualizarMitadTotalContrato);
 }
 
 function abrirModalContrato() {
@@ -679,6 +863,7 @@ function cerrarModalContrato() {
     contratoModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
     idClienteContrato = null;
+    contratoEnEdicionId = null;
     if (contratoModalCliente) {
         contratoModalCliente.textContent = "";
         contratoModalCliente.hidden = true;
@@ -744,55 +929,43 @@ function actualizarNumeroVisitasTotales() {
         resumenDias.textContent = `Días calculados: ${dias}`;
     }
 
-    const visitasDiarias = parseFloat(visitasDiariasInput.value);
+    const visitasDiarias = parseFloat(String(visitasDiariasInput.value).replace(",", "."));
     if (!isNaN(visitasDiarias) && visitasDiarias > 0 && dias > 0) {
         const total = Math.round(visitasDiarias * dias);
         totalVisitasInput.value = total;
-        actualizarPagosDesdeVisitas(total);
+        actualizarTotalContratoDesdeVisitas(total);
+        return;
     }
+
+    totalVisitasInput.value = "";
+    actualizarTotalContratoDesdeVisitas(NaN);
 }
 
-function actualizarPagosDesdeVisitas(totalVisitas) {
-    const pagoAdelantadoInput = document.getElementById("pago_adelantado");
-    const pagoFinalInput = document.getElementById("pago_final");
-    if (!pagoAdelantadoInput || !pagoFinalInput) return;
-
+function actualizarTotalContratoDesdeVisitas(totalVisitas) {
+    const totalContratoInput = document.getElementById("total_contrato");
+    if (!totalContratoInput) return;
     const total = parseFloat(totalVisitas);
     const tarifaSeleccionada = obtenerTarifaSeleccionada();
     const precioTarifa = tarifaSeleccionada ? parseFloat(tarifaSeleccionada.precio_base) : NaN;
 
-    if (!isNaN(total) && total >= 0 && !isNaN(precioTarifa)) {
-        const importeTotal = total * precioTarifa;
-        const importeMitad = (importeTotal / 2).toFixed(2);
-        pagoAdelantadoInput.value = importeMitad;
-        pagoFinalInput.value = importeMitad;
-        actualizarPagoTotal();
+    if (!isNaN(total) && total >= 0 && !isNaN(precioTarifa) && precioTarifa >= 0) {
+        totalContratoInput.value = (total * precioTarifa).toFixed(2);
+        actualizarMitadTotalContrato();
         return;
     }
 
-    pagoAdelantadoInput.value = "";
-    pagoFinalInput.value = "";
-    actualizarPagoTotal();
+    totalContratoInput.value = "0.00";
+    actualizarMitadTotalContrato();
 }
 
-function actualizarPagoTotal() {
-    const pagoAdelantadoInput = document.getElementById("pago_adelantado");
-    const pagoFinalInput = document.getElementById("pago_final");
-    const pagoTotalInput = document.getElementById("pago_total");
-    if (!pagoTotalInput) return;
-
-    const valorPago1 = parseFloat(String(pagoAdelantadoInput?.value ?? "").replace(",", "."));
-    const valorPago2 = parseFloat(String(pagoFinalInput?.value ?? "").replace(",", "."));
-    const hayValorPago1 = Boolean(pagoAdelantadoInput?.value && pagoAdelantadoInput.value.trim().length);
-    const hayValorPago2 = Boolean(pagoFinalInput?.value && pagoFinalInput.value.trim().length);
-
-    if (!hayValorPago1 && !hayValorPago2) {
-        pagoTotalInput.value = "";
-        return;
+function actualizarMitadTotalContrato() {
+    const totalContratoInput = document.getElementById("total_contrato");
+    const total = parseFloat(String(totalContratoInput?.value ?? "").replace(",", "."));
+    const mitadTotal = Number.isNaN(total) ? 0 : total / 2;
+    const mitadTotalResumen = document.getElementById("mitad_total_resumen");
+    if (mitadTotalResumen) {
+        mitadTotalResumen.textContent = `50% del total: ${mitadTotal.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
     }
-
-    const importe = (Number.isNaN(valorPago1) ? 0 : valorPago1) + (Number.isNaN(valorPago2) ? 0 : valorPago2);
-    pagoTotalInput.value = importe.toFixed(2);
 }
 
 function gestionarEnvioContrato(event) {
@@ -829,12 +1002,11 @@ function gestionarEnvioContrato(event) {
     const fecha_inicio = document.getElementById("fecha_inicio").value;
     const fecha_fin = document.getElementById("fecha_fin").value;
     const numero_visitas_diarias = document.getElementById("numero_visitas_diarias").value.trim();
+    const num_total_visitas = document.getElementById("numero_visitas_totales").value.trim();
+    const total = document.getElementById("total_contrato").value.trim();
+    const pagado = document.getElementById("pagado").value.trim() || "0";
     const hora_manana = document.getElementById("hora_manana").value;
     const hora_tarde = document.getElementById("hora_tarde").value;
-    const pago_adelantado = document.getElementById("pago_adelantado").value.trim();
-    const estado_pago_adelantado = document.getElementById("estado_pago_adelantado").value;
-    const pago_final = document.getElementById("pago_final").value.trim();
-    const estado_pago_final = document.getElementById("estado_pago_final").value;
     const id_tarifa = parseInt(document.getElementById("tarifa_contrato").value, 10);
     const observaciones = document.getElementById("observaciones").value.trim();
 
@@ -844,27 +1016,39 @@ function gestionarEnvioContrato(event) {
 
     const clienteId = idClienteContrato;
 
-    fetchAPI('/api/contratos', {
-        method: 'POST',
-        body: JSON.stringify({
-            id_cliente: clienteId,
-            fecha_inicio,
-            fecha_fin,
-            numero_visitas_diarias,
-            horario_visitas,
-            pago_adelantado,
-            estado_pago_adelantado,
-            pago_final,
-            estado_pago_final,
-            id_tarifa,
-            observaciones
-        })
-    }).then(() => {
-        alert("Contrato creado correctamente");
+    const esEdicion = Number.isFinite(contratoEnEdicionId) && contratoEnEdicionId > 0;
+    const endpoint = esEdicion ? `/api/contratos/${contratoEnEdicionId}` : "/api/contratos";
+    const method = esEdicion ? "PUT" : "POST";
+    const payload = {
+        fecha_inicio,
+        fecha_fin,
+        numero_visitas_diarias,
+        num_total_visitas,
+        horario_visitas,
+        total,
+        pagado,
+        id_tarifa,
+        observaciones
+    };
+    if (!esEdicion) {
+        payload.id_cliente = clienteId;
+    }
+
+    fetchAPI(endpoint, {
+        method,
+        body: JSON.stringify(payload)
+    }).then((respuesta) => {
+        if (esEdicion) {
+            alert("Contrato actualizado correctamente.");
+        } else {
+            const numFactura = respuesta?.num_factura ? ` Factura: ${respuesta.num_factura}.` : "";
+            alert(`Contrato creado correctamente.${numFactura}`);
+        }
         cerrarModalContrato();
         obtenerDetallesCliente(clienteId);
     }).catch(error => {
-        console.error("🚨 Error al crear contrato:", error);
-        alert("Error al crear el contrato. Inténtalo de nuevo.");
+        const accion = esEdicion ? "actualizar" : "crear";
+        console.error(`🚨 Error al ${accion} contrato:`, error);
+        alert(`Error al ${accion} el contrato. Inténtalo de nuevo.`);
     });
 }
