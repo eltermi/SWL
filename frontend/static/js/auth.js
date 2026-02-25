@@ -89,6 +89,20 @@ function logout() {
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
     loginForm.addEventListener('submit', login);
+    loginForm.addEventListener('keydown', event => {
+        if (event.key !== 'Enter') return;
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (target.tagName === 'TEXTAREA') return;
+
+        event.preventDefault();
+        loginForm.requestSubmit();
+    });
+}
+
+const usuarioInput = document.getElementById('usuario');
+if (usuarioInput) {
+    requestAnimationFrame(() => usuarioInput.focus());
 }
 
 if (window.location.pathname !== LOGIN_PATH) {

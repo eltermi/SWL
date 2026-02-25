@@ -32,10 +32,17 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
+    enfocarBuscadorClientes();
     inicializarModalContrato();
     cargarTarifasContrato();
     procesarAccesoDirectoContrato();
 });
+
+function enfocarBuscadorClientes() {
+    const buscador = document.getElementById('buscar');
+    if (!buscador) return;
+    requestAnimationFrame(() => buscador.focus());
+}
 
 function procesarAccesoDirectoContrato() {
     const params = new URLSearchParams(window.location.search);
@@ -446,9 +453,6 @@ function construirContratoCard(contrato) {
                             <p>${contrato.observaciones}</p>
                         </div>
                     ` : ""}
-                </div>
-                <div class="contrato-detail-photo">
-                    <p class="contrato-empty">No hay foto disponible</p>
                 </div>
             </div>
             <div class="contrato-detail-actions">

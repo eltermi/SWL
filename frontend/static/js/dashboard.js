@@ -342,9 +342,6 @@ function obtenerDetallesContrato(id_contrato) {
                                 </div>
                             ` : ""}
                         </div>
-                        <div class="contrato-detail-photo">
-                            ${contrato.foto ? `<img src="${contrato.foto}" alt="Foto del contrato">` : `<p class="contrato-empty">No hay foto disponible</p>`}
-                        </div>
                     </div>
                     <div class="contrato-detail-actions">
                         <button onclick="editarContratoDesdeDashboard(${Number(contrato.id_contrato) || 0}, ${Number(contrato.id_cliente) || 0})">Modificar</button>

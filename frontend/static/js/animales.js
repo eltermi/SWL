@@ -4,7 +4,14 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarClientesEnFormulario();
     document.getElementById('animal-form').addEventListener('submit', agregarAnimal);
     document.getElementById('buscar').addEventListener('input', buscarAnimales);
+    enfocarBuscadorAnimales();
 });
+
+function enfocarBuscadorAnimales() {
+    const buscador = document.getElementById('buscar');
+    if (!buscador) return;
+    requestAnimationFrame(() => buscador.focus());
+}
 
 function fetchAPI(url, options = {}) {
     const token = sessionStorage.getItem("token");

@@ -737,6 +737,10 @@ nav {
     border-radius: 12px;
     padding: 15px;
     background-color: #ffffff;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .cliente-contract-header {
