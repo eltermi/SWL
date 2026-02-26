@@ -6,6 +6,7 @@ from utils.auth import requerir_autenticacion
 tarifas_bp = Blueprint('tarifas', __name__)
 
 @tarifas_bp.route('/tarifas', methods=['GET'])
+@requerir_autenticacion
 def obtener_tarifas():
     tarifas = Tarifas.query.order_by(Tarifas.id_tarifa).all()
     return jsonify([{

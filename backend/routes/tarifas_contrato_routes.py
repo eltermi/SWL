@@ -2,10 +2,12 @@
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import TarifasContrato
+from utils.auth import requerir_autenticacion
 
 tarifas_contrato_bp = Blueprint('tarifas_contrato', __name__)
 
 @tarifas_contrato_bp.route('/tarifas_contrato', methods=['GET'])
+@requerir_autenticacion
 def obtener_tarifas_contrato():
     tarifas_contrato = TarifasContrato.query.all()
     return jsonify([{
@@ -15,6 +17,7 @@ def obtener_tarifas_contrato():
     } for tc in tarifas_contrato])
 
 @tarifas_contrato_bp.route('/tarifas_contrato', methods=['POST'])
+@requerir_autenticacion
 def crear_tarifa_contrato():
     datos = request.json
     nueva_tarifa_contrato = TarifasContrato(**datos)

@@ -90,6 +90,7 @@ def calcular_total_desde_visitas_y_tarifa(num_total_visitas, id_tarifa):
 
 # Obtener todos los contratos
 @contratos_bp.route('/contratos', methods=['GET'])
+@requerir_autenticacion
 def obtener_contratos():
     contratos = Contratos.query.all()
     return jsonify([{
@@ -107,6 +108,7 @@ def obtener_contratos():
 
 # Crear un nuevo contrato
 @contratos_bp.route('/contratos', methods=['POST'])
+@requerir_autenticacion
 def crear_contrato():
     datos = request.json
     try:
@@ -150,6 +152,7 @@ def crear_contrato():
 
 # Obtener un contrato por ID
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['GET'])
+@requerir_autenticacion
 def obtener_contrato(id_contrato):
     contrato = Contratos.obtener_contrato(id_contrato)
     if contrato is None:
@@ -157,6 +160,7 @@ def obtener_contrato(id_contrato):
     return jsonify(contrato)
 
 @contratos_bp.route('/dashboard/contratos_activos', methods=['GET'])
+@requerir_autenticacion
 def obtener_contratos_activos():
     contratos = Contratos.obtener_contratos_activos()
 
@@ -182,12 +186,14 @@ def obtener_contratos_activos():
     return jsonify(contratos_json)
 
 @contratos_bp.route('/dashboard/contratos_programados', methods=['GET'])
+@requerir_autenticacion
 def obtener_contratos_programados():
     contratos = Contratos.obtener_contratos_programados()
     return jsonify(contratos)
 
 # Actualizar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['PUT'])
+@requerir_autenticacion
 def actualizar_contrato(id_contrato):
     contrato = Contratos.query.get_or_404(id_contrato)
     datos = request.json
@@ -250,6 +256,7 @@ def actualizar_contrato(id_contrato):
 
 # Eliminar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['DELETE'])
+@requerir_autenticacion
 def eliminar_contrato(id_contrato):
     contrato = Contratos.query.get_or_404(id_contrato)
     db.session.delete(contrato)
