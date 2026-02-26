@@ -28,6 +28,7 @@
 <body>
     <header>
         <h1>Sitters with Love</h1>
+        <div id="div-de-usuario" class="header-usuario" aria-live="polite"></div>
         <div class="hamburger" onclick="toggleMenu()">
             <div></div>
             <div></div>
@@ -38,10 +39,9 @@
                 <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
                 <li><a href="{{ url_for('clientes') }}">Clientes</a></li>
                 <li><a href="{{ url_for('animales') }}">Animales</a></li>
-                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('home') }}" onclick="if (typeof logout === 'function') { logout(); return false; }">Inicio</a></li>
             </ul>
         </nav>
-        <!--<div id="div-de-usuario"></div> -->
     </header>
 
     <main>

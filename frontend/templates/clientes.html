@@ -98,6 +98,42 @@
     </div>
 </div>
 
+<div id="animal-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-animal-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="animal-modal-title">
+        <button type="button" class="modal-close" aria-label="Cerrar" data-close-animal-modal>&times;</button>
+        <h3 id="animal-modal-title" class="modal-title">Nuevo animal</h3>
+        <p id="animal-modal-cliente" class="modal-subtitle" hidden></p>
+        <div id="form-animal-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
+        <form id="form-animal-cliente" class="modal-form" enctype="multipart/form-data" novalidate>
+            <div class="modal-field">
+                <label for="animal_nombre">Nombre <span class="required">*</span></label>
+                <input type="text" id="animal_nombre" required>
+            </div>
+            <div class="modal-field">
+                <label for="animal_tipo">Tipo de animal</label>
+                <input type="text" id="animal_tipo" placeholder="Perro, gato...">
+            </div>
+            <div class="modal-field">
+                <label for="animal_edad">Edad</label>
+                <input type="text" id="animal_edad" placeholder="Ej: 4 años">
+            </div>
+            <div class="modal-field">
+                <label for="animal_medicacion">Medicación</label>
+                <input type="text" id="animal_medicacion" placeholder="Opcional">
+            </div>
+            <div class="modal-field">
+                <label for="animal_foto">Foto</label>
+                <input type="file" id="animal_foto" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" data-close-animal-modal>Cancelar</button>
+                <button type="submit" class="btn-principal">Guardar animal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
 
 {% endblock %}

@@ -2,10 +2,16 @@
 let contratoModal = null;
 let contratoForm = null;
 let contratoModalCliente = null;
+let animalModal = null;
+let animalForm = null;
+let animalModalCliente = null;
+let animalEnEdicionId = null;
 let idClienteContrato = null;
+let idClienteAnimal = null;
 let clienteDetalleActual = null;
 let contratoEnEdicionId = null;
 let contratosClienteActuales = [];
+let animalesClienteActuales = [];
 let tarifasContrato = [];
 let tarifaSelect = null;
 
@@ -33,7 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
     enfocarBuscadorClientes();
+    inicializarEventosDetalleCliente();
     inicializarModalContrato();
+    inicializarModalAnimal();
     cargarTarifasContrato();
     procesarAccesoDirectoContrato();
 });
@@ -42,6 +50,27 @@ function enfocarBuscadorClientes() {
     const buscador = document.getElementById('buscar');
     if (!buscador) return;
     requestAnimationFrame(() => buscador.focus());
+}
+
+function inicializarEventosDetalleCliente() {
+    const contenedorDetalle = document.getElementById("muestra-cliente");
+    if (!contenedorDetalle) return;
+
+    contenedorDetalle.addEventListener("click", event => {
+        const target = event.target instanceof Element ? event.target : null;
+        const botonAnimal = target?.closest('[data-action="abrir-modal-animal"]');
+        if (botonAnimal) {
+            const idCliente = Number(botonAnimal.dataset.idCliente);
+            mostrarFormularioAnimal(idCliente);
+            return;
+        }
+
+        const botonEditarAnimal = target?.closest('[data-action="editar-animal"]');
+        if (botonEditarAnimal) {
+            const idAnimal = Number(botonEditarAnimal.dataset.idAnimal);
+            mostrarFormularioEdicionAnimal(idAnimal);
+        }
+    });
 }
 
 function procesarAccesoDirectoContrato() {
@@ -317,9 +346,22 @@ function obtenerDetallesCliente(id_cliente) {
             return Promise.all([contratosPromise, animalesPromise])
                 .then(([contratos, animales]) => {
                     contratosClienteActuales = Array.isArray(contratos) ? contratos : [];
+                    animalesClienteActuales = Array.isArray(animales) ? animales : [];
                     contenidoHTML += construirContratosHTML(contratos);
                     contenidoHTML += construirAnimalesHTML(animales);
                     muestraCliente.innerHTML = contenidoHTML;
+
+                    const botonNuevoAnimal = muestraCliente.querySelector('[data-action="abrir-modal-animal"]');
+                    botonNuevoAnimal?.addEventListener("click", () => {
+                        mostrarFormularioAnimal(id_cliente);
+                    });
+
+                    muestraCliente.querySelectorAll('[data-action="editar-animal"]').forEach(boton => {
+                        boton.addEventListener("click", () => {
+                            const idAnimal = Number(boton.dataset.idAnimal);
+                            mostrarFormularioEdicionAnimal(idAnimal);
+                        });
+                    });
                 });
         })
         .catch(error => console.error("🚨 Error al obtener detalles del cliente:", error));
@@ -463,9 +505,17 @@ function construirContratoCard(contrato) {
 }
 
 function construirAnimalesHTML(animales) {
+    const idCliente = Number(clienteDetalleActual?.id_cliente) || 0;
+    const botonNuevoAnimal = idCliente > 0
+        ? `<button type="button" class="btn-principal" data-action="abrir-modal-animal" data-id-cliente="${idCliente}">Añadir animal</button>`
+        : "";
+
     let html = `
         <div class="cliente-section cliente-animals">
-            <p class="cliente-section-title">Animales</p>
+            <div class="cliente-section-header">
+                <p class="cliente-section-title">Animales</p>
+                ${botonNuevoAnimal}
+            </div>
     `;
 
     if (Array.isArray(animales) && animales.length > 0) {
@@ -483,6 +533,9 @@ function construirAnimalesHTML(animales) {
                         <div class="contrato-foto">
                             ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre_animal}">` : "No hay foto disponible"}
                         </div>
+                    </div>
+                    <div class="contrato-detail-actions">
+                        <button type="button" data-action="editar-animal" data-id-animal="${Number(animal.id_animal) || 0}">Modificar</button>
                     </div>
                 </div>
             `;
@@ -801,6 +854,240 @@ function guardarCambiosCliente(event) {
             alert("No se pudo actualizar el cliente. Inténtalo de nuevo.");
         });
 }
+
+function inicializarModalAnimal() {
+    animalModal = document.getElementById("animal-modal");
+    if (!animalModal) return;
+
+    animalForm = document.getElementById("form-animal-cliente");
+    animalModalCliente = document.getElementById("animal-modal-cliente");
+    const closeTriggers = animalModal.querySelectorAll("[data-close-animal-modal]");
+
+    closeTriggers.forEach(trigger => {
+        trigger.addEventListener("click", cerrarModalAnimal);
+    });
+
+    animalModal.addEventListener("click", event => {
+        if (event.target === animalModal) {
+            cerrarModalAnimal();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && animalModal.classList.contains("is-active")) {
+            cerrarModalAnimal();
+        }
+    });
+
+    animalForm?.addEventListener("submit", gestionarEnvioAnimalCliente);
+    animalForm?.addEventListener("input", () => limpiarErrorAnimalModal());
+}
+
+function mostrarFormularioAnimal(idCliente, nombreCliente = "") {
+    if (!animalModal || !animalForm) {
+        console.warn("Modal de animal no disponible");
+        return;
+    }
+
+    const idNumerico = Number(idCliente);
+    if (!Number.isFinite(idNumerico) || idNumerico <= 0) {
+        alert("No se ha podido identificar el cliente para añadir el animal.");
+        return;
+    }
+
+    idClienteAnimal = idNumerico;
+    animalEnEdicionId = null;
+    animalForm.reset();
+    limpiarErrorAnimalModal();
+
+    const modalTitle = document.getElementById("animal-modal-title");
+    const submitBtn = animalForm.querySelector("button[type='submit']");
+    const fotoInput = document.getElementById("animal_foto");
+    if (modalTitle) modalTitle.textContent = "Nuevo animal";
+    if (submitBtn) submitBtn.textContent = "Guardar animal";
+    if (fotoInput) fotoInput.required = false;
+
+    const nombreClienteFinal = nombreCliente || `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
+
+    if (animalModalCliente) {
+        animalModalCliente.textContent = nombreClienteFinal;
+        animalModalCliente.hidden = !nombreClienteFinal;
+    }
+
+    abrirModalAnimal();
+}
+
+function mostrarFormularioEdicionAnimal(idAnimal) {
+    if (!animalModal || !animalForm) return;
+
+    const animal = animalesClienteActuales.find(item => Number(item?.id_animal) === Number(idAnimal));
+    if (!animal) {
+        alert("No se pudo cargar el animal para editar.");
+        return;
+    }
+
+    const clienteId = Number(clienteDetalleActual?.id_cliente);
+    if (!Number.isFinite(clienteId) || clienteId <= 0) {
+        alert("No se ha podido identificar el cliente.");
+        return;
+    }
+
+    idClienteAnimal = clienteId;
+    animalEnEdicionId = Number(idAnimal);
+    animalForm.reset();
+    limpiarErrorAnimalModal();
+
+    const modalTitle = document.getElementById("animal-modal-title");
+    const submitBtn = animalForm.querySelector("button[type='submit']");
+    if (modalTitle) modalTitle.textContent = "Modificar animal";
+    if (submitBtn) submitBtn.textContent = "Guardar cambios";
+
+    const nombreInput = document.getElementById("animal_nombre");
+    const tipoInput = document.getElementById("animal_tipo");
+    const edadInput = document.getElementById("animal_edad");
+    const medicacionInput = document.getElementById("animal_medicacion");
+
+    if (nombreInput) nombreInput.value = animal.nombre_animal ?? animal.nombre ?? "";
+    if (tipoInput) tipoInput.value = animal.tipo_animal ?? "";
+    if (edadInput) edadInput.value = animal.edad ?? "";
+    if (medicacionInput) medicacionInput.value = animal.medicacion ?? "";
+
+    const nombreCliente = `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
+    if (animalModalCliente) {
+        animalModalCliente.textContent = nombreCliente;
+        animalModalCliente.hidden = !nombreCliente;
+    }
+
+    abrirModalAnimal();
+}
+
+function abrirModalAnimal() {
+    if (!animalModal) return;
+    animalModal.classList.add("is-active");
+    animalModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+
+    const primerCampo = animalForm?.querySelector("input, select, textarea");
+    if (primerCampo) {
+        setTimeout(() => primerCampo.focus(), 50);
+    }
+}
+
+function cerrarModalAnimal() {
+    if (!animalModal) return;
+    animalModal.classList.remove("is-active");
+    animalModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    idClienteAnimal = null;
+    animalEnEdicionId = null;
+    limpiarErrorAnimalModal();
+    if (animalModalCliente) {
+        animalModalCliente.textContent = "";
+        animalModalCliente.hidden = true;
+    }
+}
+
+function limpiarErrorAnimalModal() {
+    const errorBox = document.getElementById("form-animal-error");
+    const nombreInput = document.getElementById("animal_nombre");
+    if (nombreInput) {
+        nombreInput.classList.remove("campo-error");
+    }
+    if (errorBox) {
+        errorBox.textContent = "";
+        errorBox.hidden = true;
+    }
+}
+
+function mostrarErrorAnimalModal(mensaje) {
+    const errorBox = document.getElementById("form-animal-error");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
+}
+
+async function gestionarEnvioAnimalCliente(event) {
+    event.preventDefault();
+
+    const clienteId = Number(idClienteAnimal);
+    if (!Number.isFinite(clienteId) || clienteId <= 0) {
+        mostrarErrorAnimalModal("No se ha seleccionado un cliente válido.");
+        return;
+    }
+
+    limpiarErrorAnimalModal();
+
+    const nombreInput = document.getElementById("animal_nombre");
+    const tipoInput = document.getElementById("animal_tipo");
+    const edadInput = document.getElementById("animal_edad");
+    const medicacionInput = document.getElementById("animal_medicacion");
+    const fotoInput = document.getElementById("animal_foto");
+    const nombre = nombreInput?.value.trim() ?? "";
+    const esEdicion = Number.isFinite(animalEnEdicionId) && animalEnEdicionId > 0;
+
+    if (!nombre) {
+        nombreInput?.classList.add("campo-error");
+        mostrarErrorAnimalModal("El nombre del animal es obligatorio.");
+        nombreInput?.focus();
+        return;
+    }
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/";
+        return;
+    }
+
+    try {
+        let response;
+        if (esEdicion) {
+            response = await fetchAPI(`/api/animales/${animalEnEdicionId}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    nombre,
+                    tipo_animal: tipoInput?.value.trim() ?? "",
+                    edad: edadInput?.value.trim() ?? "",
+                    medicacion: medicacionInput?.value.trim() ?? ""
+                })
+            });
+        } else {
+            const formData = new FormData();
+            formData.append("nombre", nombre);
+            formData.append("id_cliente", String(clienteId));
+            formData.append("tipo_animal", tipoInput?.value.trim() ?? "");
+            formData.append("edad", edadInput?.value.trim() ?? "");
+            formData.append("medicacion", medicacionInput?.value.trim() ?? "");
+            if (fotoInput?.files?.length) {
+                formData.append("foto", fotoInput.files[0]);
+            }
+
+            response = await fetch("/api/animales", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData?.message || errorData?.mensaje || "No se pudo crear el animal.");
+            }
+
+            await response.json().catch(() => ({}));
+        }
+
+        cerrarModalAnimal();
+        await obtenerDetallesCliente(clienteId);
+    } catch (error) {
+        const accion = esEdicion ? "actualizar" : "crear";
+        console.error(`🚨 Error al ${accion} animal:`, error);
+        mostrarErrorAnimalModal(error?.message || `No se pudo ${accion} el animal. Inténtalo de nuevo.`);
+    }
+}
+
+window.mostrarFormularioAnimal = mostrarFormularioAnimal;
+window.mostrarFormularioEdicionAnimal = mostrarFormularioEdicionAnimal;
 
 function inicializarModalContrato() {
     contratoModal = document.getElementById("contrato-modal");

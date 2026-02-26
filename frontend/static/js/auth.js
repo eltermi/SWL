@@ -22,6 +22,19 @@ function isAuthenticated() {
     return !!sessionStorage.getItem('token');
 }
 
+function inferPreviousInternalRouteFromReferrer() {
+    try {
+        if (!document.referrer) return '';
+        const refUrl = new URL(document.referrer);
+        if (refUrl.origin !== window.location.origin) return '';
+        const route = `${refUrl.pathname}${refUrl.search}${refUrl.hash}`;
+        if (!route || route === LOGIN_PATH) return '';
+        return route;
+    } catch (error) {
+        return '';
+    }
+}
+
 function checkAuthentication() {
     if (!isAuthenticated()) {
         sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());
@@ -62,6 +75,7 @@ async function login(event) {
         }
 
         sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('username', username);
 
         let redirectPage = sessionStorage.getItem('redirectAfterLogin');
         if (!redirectPage || redirectPage === LOGIN_PATH) {
@@ -78,6 +92,7 @@ async function login(event) {
 
 function logout() {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
     if (window.location.pathname !== LOGIN_PATH) {
         sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());
     } else {
@@ -103,6 +118,15 @@ if (loginForm) {
 const usuarioInput = document.getElementById('usuario');
 if (usuarioInput) {
     requestAnimationFrame(() => usuarioInput.focus());
+}
+
+if (window.location.pathname === LOGIN_PATH && isAuthenticated()) {
+    const previousRoute = inferPreviousInternalRouteFromReferrer();
+    if (!sessionStorage.getItem('redirectAfterLogin') && previousRoute) {
+        sessionStorage.setItem('redirectAfterLogin', previousRoute);
+    }
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
 }
 
 if (window.location.pathname !== LOGIN_PATH) {

@@ -58,6 +58,21 @@ h1 {
     margin: 10px 0;
 }
 
+.header-usuario {
+    min-height: 18px;
+    margin: -2px 0 6px;
+    color: #d0021b;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0.95;
+}
+
+.header-usuario:empty {
+    visibility: hidden;
+}
+
 nav {
     background: white;
     padding: 10px;
@@ -721,6 +736,24 @@ nav {
     font-weight: 700;
 }
 
+.cliente-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cliente-section-header .cliente-section-title {
+    margin-bottom: 0;
+}
+
+.cliente-section-header .btn-principal {
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
 .cliente-section p {
     margin: 0 0 8px 0;
     font-size: 15px;
@@ -1165,6 +1198,12 @@ body.modal-open {
 
     h1 {
         font-size: 24px;
+    }
+
+    .header-usuario {
+        min-height: 16px;
+        margin: -2px 0 4px;
+        font-size: 12px;
     }
 
     .menu {

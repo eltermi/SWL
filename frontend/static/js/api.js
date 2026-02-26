@@ -57,6 +57,7 @@ async function fetchAPI(url, options = {}) {
  */
 function logout() {
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("username");
     if (window.location.pathname !== LOGIN_PATH) {
         sessionStorage.setItem('redirectAfterLogin', getCurrentRoute());// Guardar la última página visitada antes de ser redirigido a login
     } else {
@@ -82,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (!isLoginPage) {
+        renderUsuarioCabecera(sessionStorage.getItem("username"));
         getUsuario();
     }
 });
@@ -104,9 +106,17 @@ function getUsuario() {
         },
         body: JSON.stringify({ token })
     }).then(data => {
-        const userContainer = document.getElementById('div-de-usuario');
-        if (userContainer && data && data.username) {
-            userContainer.innerHTML = `<p>${data.username}</p>`;
+        if (data && data.username) {
+            sessionStorage.setItem("username", data.username);
+            renderUsuarioCabecera(data.username);
         }
     }).catch(error => console.error("🚨 Error obteniendo el usuario:", error));
+}
+
+function renderUsuarioCabecera(username) {
+    const userContainer = document.getElementById('div-de-usuario');
+    if (!userContainer) return;
+
+    const nombre = String(username ?? "").trim();
+    userContainer.textContent = nombre ? nombre : "";
 }
