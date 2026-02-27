@@ -22,7 +22,7 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
     codigo_postal: Mapped[Optional[str]] = mapped_column(String(5))
     municipio: Mapped[Optional[str]] = mapped_column(String(50))
     pais: Mapped[Optional[str]] = mapped_column(String(50))
-    telefono: Mapped[Optional[str]] = mapped_column(String(15))
+    telefono: Mapped[Optional[str]] = mapped_column(String(32))
     email: Mapped[Optional[str]] = mapped_column(String(100))
     nacionalidad: Mapped[Optional[str]] = mapped_column(String(50))
     idioma: Mapped[Optional[str]] = mapped_column(String(50))

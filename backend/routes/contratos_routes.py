@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy.exc import DataError, IntegrityError
 from extensions import db
 from models import Contratos, TarifasContrato, Tarifas
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from utils.auth import requerir_autenticacion
+from utils.db_errors import mensaje_error_persistencia
 
 contratos_bp = Blueprint('contratos', __name__)
 
@@ -133,17 +135,22 @@ def crear_contrato():
         num_total_visitas=formatear_num_total_visitas(num_total_visitas),
         observaciones=datos.get('observaciones')
     )
-    db.session.add(nuevo_contrato)
-    db.session.flush()
+    try:
+        db.session.add(nuevo_contrato)
+        db.session.flush()
 
-    nuevo_contrato.num_factura = f"{nuevo_contrato.id_contrato}-{nuevo_contrato.id_cliente}"
+        nuevo_contrato.num_factura = f"{nuevo_contrato.id_contrato}-{nuevo_contrato.id_cliente}"
 
-    nueva_tarifa_contrato = TarifasContrato(
-        id_contrato=nuevo_contrato.id_contrato,
-        id_tarifa=id_tarifa
-    )
-    db.session.add(nueva_tarifa_contrato)
-    db.session.commit()
+        nueva_tarifa_contrato = TarifasContrato(
+            id_contrato=nuevo_contrato.id_contrato,
+            id_tarifa=id_tarifa
+        )
+        db.session.add(nueva_tarifa_contrato)
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({
         'mensaje': 'Contrato creado exitosamente',
         'id_contrato': nuevo_contrato.id_contrato,
@@ -209,6 +216,8 @@ def actualizar_contrato(id_contrato):
             id_tarifa_para_total = int(datos.get('id_tarifa'))
         except (TypeError, ValueError):
             return jsonify({'mensaje': 'La tarifa seleccionada no es válida'}), 400
+        if not Tarifas.query.get(id_tarifa_para_total):
+            return jsonify({'mensaje': 'La tarifa seleccionada no existe'}), 400
 
         tarifa_contrato = TarifasContrato.query.filter_by(id_contrato=id_contrato).first()
         if tarifa_contrato:
@@ -251,7 +260,12 @@ def actualizar_contrato(id_contrato):
     except ValueError as error:
         return jsonify({'mensaje': str(error)}), 400
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({'mensaje': 'Contrato actualizado exitosamente'})
 
 # Eliminar un contrato

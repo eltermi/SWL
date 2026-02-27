@@ -37,6 +37,7 @@ function escaparHTML(texto = "") {
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
+    document.getElementById('cliente-form').addEventListener('input', limpiarErrorClienteFormulario);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
     enfocarBuscadorClientes();
     inicializarEventosDetalleCliente();
@@ -97,18 +98,66 @@ function fetchAPI(url, options = {}) {
         return Promise.reject("No hay token");
     }
 
+    const headers = {
+        "Authorization": `Bearer ${token}`,
+        ...(options.headers || {})
+    };
+
+    if (!(options.body instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+    }
+
     return fetch(url, {
         ...options,
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+        headers
+    }).then(async response => {
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {
+            data = {};
         }
-    }).then(response => {
+
         if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message); });
+            const mensaje = data?.mensaje || data?.message || "Error en la API.";
+            throw new Error(mensaje);
         }
-        return response.json();
-    }).catch(error => console.error("Error en la API:", error));
+
+        return data;
+    });
+}
+
+function obtenerMensajeError(error, fallback = "No se pudo completar la operación.") {
+    const mensaje = String(error?.message || "").trim();
+    return mensaje || fallback;
+}
+
+function limpiarErrorClienteFormulario() {
+    const errorBox = document.getElementById("form-cliente-error");
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.hidden = true;
+}
+
+function mostrarErrorClienteFormulario(mensaje) {
+    const errorBox = document.getElementById("form-cliente-error");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
+}
+
+function limpiarErrorEdicionCliente() {
+    const errorBox = document.getElementById("form-editar-cliente-error");
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.hidden = true;
+}
+
+function mostrarErrorEdicionCliente(mensaje) {
+    const errorBox = document.getElementById("form-editar-cliente-error");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
 }
 
 function formatearImporte(valor) {
@@ -212,6 +261,16 @@ function calcularTotalVisitasContrato(contrato) {
     if (diferencia < 0) return null;
     const dias = Math.floor(diferencia / MS_POR_DIA) + 1;
     return dias > 0 ? dias * visitasDiarias : null;
+}
+
+function esContratoFinalizado(contrato) {
+    if (!contrato) return false;
+    const fechaFin = parseFechaContrato(contrato.fecha_fin);
+    if (!fechaFin) return false;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    return fechaFin < hoy;
 }
 
 function cargarClientes(busqueda = "") {
@@ -369,6 +428,7 @@ function obtenerDetallesCliente(id_cliente) {
 
 function agregarCliente(event) {
     event.preventDefault();
+    limpiarErrorClienteFormulario();
     const nombre = document.getElementById('nombre').value;
     const apellidos = document.getElementById('apellidos').value;
     const calle = document.getElementById('calle').value;
@@ -389,6 +449,9 @@ function agregarCliente(event) {
     }).then(() => {
         cargarClientes();
         document.getElementById('cliente-form').reset();
+    }).catch(error => {
+        console.error("🚨 Error al crear cliente:", error);
+        mostrarErrorClienteFormulario(obtenerMensajeError(error, "No se pudo crear el cliente."));
     });
 }
 
@@ -437,6 +500,7 @@ function construirContratosHTML(contratos) {
 
 function construirContratoCard(contrato) {
     if (!contrato) return "";
+    const contratoFinalizado = esContratoFinalizado(contrato);
     const horarioNormalizado = normalizarHorarioContrato(contrato.horario);
     const horarioHTML = renderHorarioContrato(horarioNormalizado);
     const totalVisitas = calcularTotalVisitasContrato(contrato);
@@ -453,7 +517,7 @@ function construirContratoCard(contrato) {
 
     return `
         <div class="cliente-contract-card contrato-detalle-card">
-            <div class="contrato-id">Contrato ${contrato.id_contrato ?? "-"}</div>
+            <div class="contrato-id ${contratoFinalizado ? "contrato-id--finalizado" : ""}">Contrato ${contrato.id_contrato ?? "-"}</div>
             <div class="contrato-detail-layout">
                 <div class="contrato-detail-main">
                     <div class="contrato-sections">
@@ -766,6 +830,7 @@ function mostrarFormularioEdicionCliente() {
                 <p class="cliente-id-info">ID Cliente: ${cliente.id_cliente}</p>
             </div>
             <form id="form-editar-cliente" class="cliente-edit-form" novalidate>
+                <div id="form-editar-cliente-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
                 <div class="form-columns">
                     <div class="form-column">
                         <label for="edit_nombre">Nombre</label>
@@ -809,6 +874,7 @@ function mostrarFormularioEdicionCliente() {
     `;
 
     document.getElementById("form-editar-cliente")?.addEventListener("submit", guardarCambiosCliente);
+    document.getElementById("form-editar-cliente")?.addEventListener("input", limpiarErrorEdicionCliente);
     document.getElementById("cancelar-edicion-cliente")?.addEventListener("click", event => {
         event.preventDefault();
         obtenerDetallesCliente(cliente.id_cliente);
@@ -818,6 +884,7 @@ function mostrarFormularioEdicionCliente() {
 function guardarCambiosCliente(event) {
     event.preventDefault();
     if (!clienteDetalleActual) return;
+    limpiarErrorEdicionCliente();
     const form = event.target;
 
     const obtenerValor = id => form.querySelector(id)?.value.trim() ?? "";
@@ -851,7 +918,7 @@ function guardarCambiosCliente(event) {
         })
         .catch(error => {
             console.error("🚨 Error al actualizar cliente:", error);
-            alert("No se pudo actualizar el cliente. Inténtalo de nuevo.");
+            mostrarErrorEdicionCliente(obtenerMensajeError(error, "No se pudo actualizar el cliente."));
         });
 }
 
@@ -1196,6 +1263,13 @@ function mostrarErroresContrato(errores) {
     errorBox.hidden = false;
 }
 
+function mostrarErrorContrato(mensaje) {
+    const errorBox = document.getElementById("form-contrato-error");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
+}
+
 function calcularDiasEntre(fechaInicio, fechaFin) {
     if (!fechaInicio || !fechaFin) return 0;
     const inicio = new Date(`${fechaInicio}T00:00:00`);
@@ -1340,6 +1414,6 @@ function gestionarEnvioContrato(event) {
     }).catch(error => {
         const accion = esEdicion ? "actualizar" : "crear";
         console.error(`🚨 Error al ${accion} contrato:`, error);
-        alert(`Error al ${accion} el contrato. Inténtalo de nuevo.`);
+        mostrarErrorContrato(obtenerMensajeError(error, `No se pudo ${accion} el contrato.`));
     });
 }

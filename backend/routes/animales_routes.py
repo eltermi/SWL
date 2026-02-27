@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy.exc import DataError, IntegrityError
 from extensions import db
 from models import Animales
 from utils.auth import requerir_autenticacion
+from utils.db_errors import mensaje_error_persistencia
 
 animales_bp = Blueprint('animales', __name__)
 
@@ -39,8 +41,13 @@ def crear_animal():
         medicacion=datos.get('medicacion'),
         foto=archivo.read() if archivo else None
     )
-    db.session.add(nuevo_animal)
-    db.session.commit()
+    try:
+        db.session.add(nuevo_animal)
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({'mensaje': 'Animal creado exitosamente'}), 201
 
 # Obtener un animal por ID
@@ -76,7 +83,12 @@ def actualizar_animal(id_animal):
     animal.nombre = datos.get('nombre', animal.nombre)
     animal.edad = datos.get('edad', animal.edad)
     animal.medicacion = datos.get('medicacion', animal.medicacion)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({'mensaje': 'Animal actualizado exitosamente'})
 
 # Eliminar un animal

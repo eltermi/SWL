@@ -20,8 +20,7 @@ class ContactosAdicionales(db.Model):
     nombre: Mapped[str] = mapped_column(String(50))
     apellidos: Mapped[str] = mapped_column(String(100))
     id_cliente: Mapped[Optional[int]] = mapped_column(Integer)
-    telefono: Mapped[Optional[str]] = mapped_column(String(15))
+    telefono: Mapped[Optional[str]] = mapped_column(String(32))
     email: Mapped[Optional[str]] = mapped_column(String(100))
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contactos_adicionales')
-

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     cargarAnimales();
     cargarClientesEnFormulario();
     document.getElementById('animal-form').addEventListener('submit', agregarAnimal);
+    document.getElementById('animal-form').addEventListener('input', limpiarErrorAnimalFormulario);
     document.getElementById('buscar').addEventListener('input', buscarAnimales);
     enfocarBuscadorAnimales();
 });
@@ -26,12 +27,33 @@ function fetchAPI(url, options = {}) {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         }
-    }).then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message); });
+    }).then(async response => {
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {
+            data = {};
         }
-        return response.json();
-    }).catch(error => console.error("Error en la API:", error));
+
+        if (!response.ok) {
+            throw new Error(data?.mensaje || data?.message || "Error en la API.");
+        }
+        return data;
+    });
+}
+
+function limpiarErrorAnimalFormulario() {
+    const errorBox = document.getElementById("form-animal-error-general");
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.hidden = true;
+}
+
+function mostrarErrorAnimalFormulario(mensaje) {
+    const errorBox = document.getElementById("form-animal-error-general");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
 }
 
 function cargarAnimales(busqueda = "") {
@@ -113,6 +135,7 @@ function cargarClientesEnFormulario() {
 
 function agregarAnimal(event) {
     event.preventDefault();
+    limpiarErrorAnimalFormulario();
     const formData = new FormData();
     formData.append("nombre", document.getElementById('form-nombre-animal').value);
     formData.append("id_cliente", document.getElementById('form-nombre-cliente').value);
@@ -129,10 +152,19 @@ function agregarAnimal(event) {
             "Authorization": `Bearer ${sessionStorage.getItem("token")}`
         },
         body: formData
+    }).then(async response => {
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData?.mensaje || errorData?.message || "No se pudo crear el animal.");
+        }
+        return response.json().catch(() => ({}));
     }).then(() => {
         cargarAnimales();
         document.getElementById('animal-form').reset();
-    }).catch(error => console.error("🚨 Error al agregar animal:", error));
+    }).catch(error => {
+        console.error("🚨 Error al agregar animal:", error);
+        mostrarErrorAnimalFormulario(error?.message || "No se pudo crear el animal.");
+    });
 }
 
 function agregarAnimal1(event) {
@@ -166,7 +198,11 @@ function editarAnimal(id) {
         fetchAPI(`/api/animales/${id}`, {
             method: 'PUT',
             body: JSON.stringify({ edad: nuevoEdad, medicacion: nuevoMedicacion })
-        }).then(() => cargarAnimales());
+        }).then(() => cargarAnimales())
+            .catch(error => {
+                console.error("🚨 Error al actualizar el animal:", error);
+                mostrarErrorAnimalFormulario(error?.message || "No se pudo actualizar el animal.");
+            });
     }
 }
 

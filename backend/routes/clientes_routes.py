@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify
+from sqlalchemy.exc import DataError, IntegrityError
 from extensions import db
 from models import Clientes, Contratos
 from utils.auth import requerir_autenticacion
+from utils.db_errors import mensaje_error_persistencia
+from utils.input_normalizers import normalizar_telefono
 
 clientes_bp = Blueprint('clientes', __name__)
 
@@ -31,6 +34,11 @@ def obtener_clientes():
 @requerir_autenticacion
 def crear_cliente():
     datos = request.json
+    try:
+        telefono = normalizar_telefono(datos.get('telefono'))
+    except ValueError as error:
+        return jsonify({'mensaje': str(error)}), 400
+
     nuevo_cliente = Clientes(
         nombre=datos['nombre'],
         apellidos=datos['apellidos'],
@@ -44,10 +52,15 @@ def crear_cliente():
         genero=datos['genero'],
         referencia_origen=datos.get('referencia_origen'),
         email=datos.get('email'),
-        telefono=datos.get('telefono')
+        telefono=telefono
     )
-    db.session.add(nuevo_cliente)
-    db.session.commit()
+    try:
+        db.session.add(nuevo_cliente)
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({'mensaje': 'Cliente creado exitosamente'}), 201
 
 # Obtener un cliente por ID
@@ -95,13 +108,22 @@ def actualizar_cliente(id_cliente):
     cliente.codigo_postal = datos.get('codigo_postal', cliente.codigo_postal)
     cliente.municipio = datos.get('municipio', cliente.municipio)
     cliente.pais = datos.get('pais', cliente.pais)
-    cliente.telefono = datos.get('telefono', cliente.telefono)
+    if 'telefono' in datos:
+        try:
+            cliente.telefono = normalizar_telefono(datos.get('telefono'))
+        except ValueError as error:
+            return jsonify({'mensaje': str(error)}), 400
     cliente.email = datos.get('email', cliente.email)
     cliente.nacionalidad = datos.get('nacionalidad', cliente.nacionalidad)
     cliente.idioma = datos.get('idioma', cliente.idioma)
     cliente.genero = datos.get('genero', cliente.genero)
     cliente.referencia_origen = datos.get('referencia_origen', cliente.referencia_origen)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except (DataError, IntegrityError) as error:
+        db.session.rollback()
+        return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
+
     return jsonify({'mensaje': 'Cliente actualizado exitosamente'})
 
 # Eliminar un cliente

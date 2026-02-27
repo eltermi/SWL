@@ -790,6 +790,12 @@ nav {
     margin: 0;
 }
 
+.cliente-contract-card .contrato-id.contrato-id--finalizado {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    opacity: 0.75;
+}
+
 .cliente-chip {
     background-color: rgba(208, 2, 27, 0.1);
     color: #d0021b;
@@ -1178,6 +1184,12 @@ body.modal-open {
     padding: 10px 12px;
     font-size: 14px;
     margin-bottom: 12px;
+}
+
+#form-cliente-error,
+#form-editar-cliente-error {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .campo-error {
