@@ -56,6 +56,19 @@ function mostrarErrorAnimalFormulario(mensaje) {
     errorBox.hidden = false;
 }
 
+function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
+    const anio = Number(anioNacimiento);
+    if (!Number.isInteger(anio) || anio <= 0) return null;
+    const anioActual = new Date().getFullYear();
+    const edad = anioActual - anio;
+    return edad >= 0 ? edad : null;
+}
+
+function formatearEdadDesdeAnioNacimiento(anioNacimiento) {
+    const edad = calcularEdadDesdeAnioNacimiento(anioNacimiento);
+    return edad === null ? "Sin edad" : `${edad} años`;
+}
+
 function cargarAnimales(busqueda = "") {
     const container = document.getElementById("lista-animales");
     const muestraAnimal = document.getElementById("muestra-animal");
@@ -103,7 +116,7 @@ function cargarAnimales(busqueda = "") {
                         <div class="animal-content">
                             <div class="detalles">
                                 <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
-                                <p><span class="encabezado">Edad:</span> ${animal.edad}</p>
+                                <p><span class="encabezado">Edad:</span> ${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
                                 <p><span class="encabezado">Medicación:</span> ${animal.medicacion ?? "No hay medicación"}</p>
                             </div>
                             <div class="contrato-foto">
@@ -227,7 +240,7 @@ function obtenerDetallesAnimal(animal) {
         .filter(part => part && part.trim().length > 0)
         .join(" ");
     const tipo = animal.tipo_animal ?? "Sin tipo";
-    const edad = animal.edad ?? "Sin edad";
+    const edad = formatearEdadDesdeAnioNacimiento(animal.edad);
     const medicacion = animal.medicacion ?? "No hay medicación";
     const fotoHTML = animal.foto
         ? `<img src="${animal.foto}" alt="Foto de ${nombreAnimal}">`
@@ -242,6 +255,7 @@ function obtenerDetallesAnimal(animal) {
                 </div>
                 <div class="animal-detalle-actions">
                     <button type="button" class="btn-secundario" id="btn-volver-animales">Volver</button>
+                    <button type="button" class="btn-principal" id="btn-modificar-animal">Modificar</button>
                     <button type="button" class="btn-peligro" id="btn-eliminar-animal">Eliminar</button>
                 </div>
             </div>
@@ -260,8 +274,116 @@ function obtenerDetallesAnimal(animal) {
         </div>
     `;
 
-    document.getElementById("btn-volver-animales").addEventListener("click", () => volverAlListadoAnimales());
+    document.getElementById("btn-volver-animales").addEventListener("click", () => volverAlListadoAnimales(true));
+    document.getElementById("btn-modificar-animal").addEventListener("click", () => mostrarFormularioEdicionAnimalDetalle(animal));
     document.getElementById("btn-eliminar-animal").addEventListener("click", () => confirmarEliminacionAnimal(animal.id_animal));
+}
+
+function mostrarFormularioEdicionAnimalDetalle(animal) {
+    if (!animal) return;
+    const muestraAnimal = document.getElementById("muestra-animal");
+    const nombreAnimal = animal.nombre_animal ?? animal.nombre ?? "";
+    const tipoAnimal = animal.tipo_animal ?? "";
+    const anioNacimiento = animal.edad ?? "";
+    const medicacion = animal.medicacion ?? "";
+
+    muestraAnimal.innerHTML = `
+        <div class="animal-detalle-card">
+            <div class="animal-detalle-header">
+                <div>
+                    <p class="animal-detalle-nombre">Modificar animal</p>
+                    <p class="animal-detalle-cliente">${nombreAnimal}</p>
+                </div>
+            </div>
+            <form id="form-editar-animal-detalle" class="cliente-edit-form" novalidate>
+                <div id="form-editar-animal-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
+                <div class="form-columns">
+                    <div class="form-column">
+                        <label for="edit_animal_nombre">Nombre</label>
+                        <input type="text" id="edit_animal_nombre" value="${escaparHTML(nombreAnimal)}" required>
+                        <label for="edit_animal_tipo">Tipo</label>
+                        <input type="text" id="edit_animal_tipo" value="${escaparHTML(tipoAnimal)}">
+                    </div>
+                    <div class="form-column">
+                        <label for="edit_animal_edad">Año de nacimiento (opcional)</label>
+                        <input type="number" id="edit_animal_edad" min="1900" max="2999" step="1" value="${escaparHTML(String(anioNacimiento))}" placeholder="Ej: 2019">
+                        <label for="edit_animal_medicacion">Medicación</label>
+                        <input type="text" id="edit_animal_medicacion" value="${escaparHTML(medicacion)}">
+                    </div>
+                </div>
+                <div class="cliente-edit-actions">
+                    <button type="button" class="btn-secundario" id="cancelar-edicion-animal">Cancelar</button>
+                    <button type="submit" class="btn-principal">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.getElementById("cancelar-edicion-animal")?.addEventListener("click", () => obtenerDetallesAnimal(animal));
+    document.getElementById("form-editar-animal-detalle")?.addEventListener("submit", event => {
+        guardarCambiosAnimalDesdeDetalle(event, animal);
+    });
+}
+
+function mostrarErrorEdicionAnimalDetalle(mensaje) {
+    const errorBox = document.getElementById("form-editar-animal-error");
+    if (!errorBox) return;
+    errorBox.textContent = mensaje;
+    errorBox.hidden = false;
+}
+
+function limpiarErrorEdicionAnimalDetalle() {
+    const errorBox = document.getElementById("form-editar-animal-error");
+    if (!errorBox) return;
+    errorBox.textContent = "";
+    errorBox.hidden = true;
+}
+
+function escaparHTML(texto) {
+    return String(texto ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
+    event.preventDefault();
+    limpiarErrorEdicionAnimalDetalle();
+    const nombre = document.getElementById("edit_animal_nombre")?.value.trim() ?? "";
+
+    if (!nombre) {
+        mostrarErrorEdicionAnimalDetalle("El nombre del animal es obligatorio.");
+        return;
+    }
+
+    const payload = {
+        nombre,
+        tipo_animal: document.getElementById("edit_animal_tipo")?.value.trim() ?? "",
+        edad: document.getElementById("edit_animal_edad")?.value.trim() ?? "",
+        medicacion: document.getElementById("edit_animal_medicacion")?.value.trim() ?? ""
+    };
+
+    fetchAPI(`/api/animales/${animalOriginal.id_animal}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    })
+        .then(() => {
+            const animalActualizado = {
+                ...animalOriginal,
+                nombre_animal: payload.nombre,
+                nombre: payload.nombre,
+                tipo_animal: payload.tipo_animal,
+                edad: payload.edad === "" ? null : Number(payload.edad),
+                medicacion: payload.medicacion
+            };
+            obtenerDetallesAnimal(animalActualizado);
+        })
+        .catch(error => {
+            console.error("🚨 Error al actualizar el animal:", error);
+            mostrarErrorEdicionAnimalDetalle(error?.message || "No se pudo actualizar el animal.");
+        });
 }
 
 function volverAlListadoAnimales(recargar = false) {

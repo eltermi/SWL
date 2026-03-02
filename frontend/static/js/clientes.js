@@ -34,6 +34,19 @@ function escaparHTML(texto = "") {
         .replace(/'/g, "&#39;");
 }
 
+function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
+    const anio = Number(anioNacimiento);
+    if (!Number.isInteger(anio) || anio <= 0) return null;
+    const anioActual = new Date().getFullYear();
+    const edad = anioActual - anio;
+    return edad >= 0 ? edad : null;
+}
+
+function formatearEdadDesdeAnioNacimiento(anioNacimiento) {
+    const edad = calcularEdadDesdeAnioNacimiento(anioNacimiento);
+    return edad === null ? "Sin edad" : `${edad} años`;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
@@ -591,7 +604,7 @@ function construirAnimalesHTML(animales) {
                         <div class="detalles">
                             <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
                             <p><span class="cliente-label">Tipo</span>${animal.tipo_animal ?? "Sin tipo"}</p>
-                            <p><span class="cliente-label">Edad</span>${animal.edad ?? "Sin edad"}</p>
+                            <p><span class="cliente-label">Edad</span>${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
                             <p><span class="cliente-label">Medicación</span>${animal.medicacion ?? "No hay medicación"}</p>
                         </div>
                         <div class="contrato-foto">
@@ -728,6 +741,7 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
         contratoModalCliente.hidden = !nombreCliente;
     }
     restablecerTarifaContrato();
+    sincronizarFechaFinConInicio();
     abrirModalContrato();
 }
 
@@ -774,6 +788,7 @@ function mostrarFormularioEdicionContrato(idContrato) {
     const fechaFin = convertirFechaDisplayAInput(contrato.fecha_fin);
     if (fechaInicioInput) fechaInicioInput.value = fechaInicio;
     if (fechaFinInput) fechaFinInput.value = fechaFin;
+    sincronizarFechaFinConInicio();
     if (visitasDiariasInput) visitasDiariasInput.value = contrato.visitas ?? "";
 
     const dias = calcularDiasEntre(fechaInicio, fechaFin);
@@ -1193,7 +1208,10 @@ function inicializarModalContrato() {
     const visitasTotalesInput = document.getElementById("numero_visitas_totales");
     const totalContratoInput = document.getElementById("total_contrato");
 
-    fechaInicioInput?.addEventListener("change", actualizarNumeroVisitasTotales);
+    fechaInicioInput?.addEventListener("change", () => {
+        sincronizarFechaFinConInicio();
+        actualizarNumeroVisitasTotales();
+    });
     fechaFinInput?.addEventListener("change", actualizarNumeroVisitasTotales);
     visitasDiariasInput?.addEventListener("input", actualizarNumeroVisitasTotales);
     visitasTotalesInput?.addEventListener("input", () => {
@@ -1201,6 +1219,23 @@ function inicializarModalContrato() {
         actualizarTotalContratoDesdeVisitas(total);
     });
     totalContratoInput?.addEventListener("input", actualizarMitadTotalContrato);
+}
+
+function sincronizarFechaFinConInicio() {
+    const fechaInicioInput = document.getElementById("fecha_inicio");
+    const fechaFinInput = document.getElementById("fecha_fin");
+    if (!fechaInicioInput || !fechaFinInput) return;
+
+    const fechaInicio = fechaInicioInput.value;
+    if (!fechaInicio) {
+        fechaFinInput.removeAttribute("min");
+        return;
+    }
+
+    fechaFinInput.min = fechaInicio;
+    if (!fechaFinInput.value || fechaFinInput.value < fechaInicio) {
+        fechaFinInput.value = fechaInicio;
+    }
 }
 
 function abrirModalContrato() {

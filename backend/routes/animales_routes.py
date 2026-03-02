@@ -7,6 +7,23 @@ from utils.db_errors import mensaje_error_persistencia
 
 animales_bp = Blueprint('animales', __name__)
 
+
+def _normalizar_anio_nacimiento(valor):
+    if valor is None:
+        return None
+
+    if isinstance(valor, int):
+        return valor
+
+    valor_texto = str(valor).strip()
+    if valor_texto == "":
+        return None
+
+    try:
+        return int(valor_texto)
+    except ValueError:
+        raise ValueError("El año de nacimiento debe ser un número entero o vacío.")
+
 # Obtener todos los animales
 @animales_bp.route('/animales', methods=['GET'])
 @requerir_autenticacion
@@ -32,12 +49,16 @@ def obtener_animales():
 def crear_animal(): 
     datos = request.form
     archivo = request.files.get('foto')
+    try:
+        anio_nacimiento = _normalizar_anio_nacimiento(datos.get('edad'))
+    except ValueError as error:
+        return jsonify({'mensaje': str(error)}), 400
 
     nuevo_animal = Animales(
         id_cliente=datos['id_cliente'],
         tipo_animal=datos['tipo_animal'],
         nombre=datos['nombre'],
-        edad=datos.get('edad'),
+        edad=anio_nacimiento,
         medicacion=datos.get('medicacion'),
         foto=archivo.read() if archivo else None
     )
@@ -78,10 +99,15 @@ def obtener_animal_cliente(id_cliente):
 @requerir_autenticacion
 def actualizar_animal(id_animal):
     animal = Animales.query.get_or_404(id_animal)
-    datos = request.json
+    datos = request.get_json(silent=True) or {}
+    try:
+        anio_nacimiento = _normalizar_anio_nacimiento(datos.get('edad', animal.edad))
+    except ValueError as error:
+        return jsonify({'mensaje': str(error)}), 400
+
     animal.tipo_animal = datos.get('tipo_animal', animal.tipo_animal)
     animal.nombre = datos.get('nombre', animal.nombre)
-    animal.edad = datos.get('edad', animal.edad)
+    animal.edad = anio_nacimiento
     animal.medicacion = datos.get('medicacion', animal.medicacion)
     try:
         db.session.commit()
