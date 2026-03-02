@@ -175,20 +175,23 @@ def obtener_contratos_activos():
     contratos_json = {}
     for dia, lista_contratos in contratos.items():
         contratos_json[dia] = []
-        for c in lista_contratos:contratos_json[dia].append({
-        'id_contrato': int(c['id_contrato']),
-        'id_cliente': int(c['id_cliente']),
-        'fecha_inicio': str(c['fecha_inicio']),
-        'fecha_fin': str(c['fecha_fin']),
-        'visitas': int(c['visitas']),
-        'horario': c['horario'],
-        'tarifa': c['tarifa'],
-        'nombre_animales': c['nombre_animales'],
-        'total': c['total'],
-        'pagado': c['pagado'],
-        'num_factura': c['num_factura'],
-        'num_total_visitas': c['num_total_visitas']
-    })
+        for c in lista_contratos:
+            id_cliente = c.get('id_cliente')
+            visitas = c.get('visitas')
+            contratos_json[dia].append({
+                'id_contrato': int(c['id_contrato']) if c.get('id_contrato') is not None else None,
+                'id_cliente': int(id_cliente) if id_cliente is not None else None,
+                'fecha_inicio': str(c['fecha_inicio']),
+                'fecha_fin': str(c['fecha_fin']),
+                'visitas': int(visitas) if visitas is not None else 0,
+                'horario': c['horario'],
+                'tarifa': c['tarifa'],
+                'nombre_animales': c['nombre_animales'],
+                'total': c['total'],
+                'pagado': c['pagado'],
+                'num_factura': c['num_factura'],
+                'num_total_visitas': c['num_total_visitas']
+            })
 
     return jsonify(contratos_json)
 
