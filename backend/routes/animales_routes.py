@@ -24,6 +24,18 @@ def _normalizar_anio_nacimiento(valor):
     except ValueError:
         raise ValueError("El año de nacimiento debe ser un número entero o vacío.")
 
+
+def _obtener_datos_animal_request():
+    if request.is_json:
+        datos_json = request.get_json(silent=True)
+        if isinstance(datos_json, dict):
+            return datos_json
+    return request.form.to_dict()
+
+
+def _es_true(valor):
+    return str(valor or '').strip().lower() in ('1', 'true', 'si', 'sí', 'on')
+
 # Obtener todos los animales
 @animales_bp.route('/animales', methods=['GET'])
 @requerir_autenticacion
@@ -99,7 +111,10 @@ def obtener_animal_cliente(id_cliente):
 @requerir_autenticacion
 def actualizar_animal(id_animal):
     animal = Animales.query.get_or_404(id_animal)
-    datos = request.get_json(silent=True) or {}
+    datos = _obtener_datos_animal_request()
+    if not isinstance(datos, dict):
+        return jsonify({'mensaje': 'Formato de datos no válido para actualizar animal.'}), 400
+
     try:
         anio_nacimiento = _normalizar_anio_nacimiento(datos.get('edad', animal.edad))
     except ValueError as error:
@@ -109,13 +124,33 @@ def actualizar_animal(id_animal):
     animal.nombre = datos.get('nombre', animal.nombre)
     animal.edad = anio_nacimiento
     animal.medicacion = datos.get('medicacion', animal.medicacion)
+
+    eliminar_foto = _es_true(datos.get('eliminar_foto'))
+    foto_actualizada = False
+    foto_eliminada = False
+    foto_archivo_recibido = False
+    if eliminar_foto:
+        animal.foto = None
+        foto_eliminada = True
+    else:
+        archivo = request.files.get('foto')
+        if archivo and archivo.filename:
+            animal.foto = archivo.read()
+            foto_actualizada = True
+            foto_archivo_recibido = True
+
     try:
         db.session.commit()
     except (DataError, IntegrityError) as error:
         db.session.rollback()
         return jsonify({'mensaje': mensaje_error_persistencia(error)}), 400
 
-    return jsonify({'mensaje': 'Animal actualizado exitosamente'})
+    return jsonify({
+        'mensaje': 'Animal actualizado exitosamente',
+        'foto_actualizada': foto_actualizada,
+        'foto_eliminada': foto_eliminada,
+        'foto_archivo_recibido': foto_archivo_recibido
+    })
 
 # Eliminar un animal
 @animales_bp.route('/animales/<int:id_animal>', methods=['DELETE'])

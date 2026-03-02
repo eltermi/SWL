@@ -69,6 +69,17 @@ function validarArchivoAvatar(archivo) {
     return null;
 }
 
+function validarArchivoFotoAnimal(archivo) {
+    if (!archivo) return null;
+    if (archivo.size === 0) {
+        return "La foto seleccionada está vacía.";
+    }
+    if (archivo.type && !archivo.type.startsWith("image/")) {
+        return "La foto del animal debe ser una imagen.";
+    }
+    return null;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
     document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
@@ -445,8 +456,8 @@ function obtenerDetallesCliente(id_cliente) {
                 .then(([contratos, animales]) => {
                     contratosClienteActuales = Array.isArray(contratos) ? contratos : [];
                     animalesClienteActuales = Array.isArray(animales) ? animales : [];
-                    contenidoHTML += construirContratosHTML(contratos);
                     contenidoHTML += construirAnimalesHTML(animales);
+                    contenidoHTML += construirContratosHTML(contratos);
                     muestraCliente.innerHTML = contenidoHTML;
 
                     const botonNuevoAnimal = muestraCliente.querySelector('[data-action="abrir-modal-animal"]');
@@ -1234,6 +1245,7 @@ async function gestionarEnvioAnimalCliente(event) {
     const edadInput = document.getElementById("animal_edad");
     const medicacionInput = document.getElementById("animal_medicacion");
     const fotoInput = document.getElementById("animal_foto");
+    const fotoArchivo = fotoInput?.files?.[0] ?? null;
     const nombre = nombreInput?.value.trim() ?? "";
     const esEdicion = Number.isFinite(animalEnEdicionId) && animalEnEdicionId > 0;
 
@@ -1244,6 +1256,12 @@ async function gestionarEnvioAnimalCliente(event) {
         return;
     }
 
+    const errorFoto = validarArchivoFotoAnimal(fotoArchivo);
+    if (errorFoto) {
+        mostrarErrorAnimalModal(errorFoto);
+        return;
+    }
+
     const token = sessionStorage.getItem("token");
     if (!token) {
         window.location.href = "/";
@@ -1251,29 +1269,32 @@ async function gestionarEnvioAnimalCliente(event) {
     }
 
     try {
-        let response;
-        if (esEdicion) {
-            response = await fetchAPI(`/api/animales/${animalEnEdicionId}`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    nombre,
-                    tipo_animal: tipoInput?.value.trim() ?? "",
-                    edad: edadInput?.value.trim() ?? "",
-                    medicacion: medicacionInput?.value.trim() ?? ""
-                })
-            });
-        } else {
-            const formData = new FormData();
-            formData.append("nombre", nombre);
-            formData.append("id_cliente", String(clienteId));
-            formData.append("tipo_animal", tipoInput?.value.trim() ?? "");
-            formData.append("edad", edadInput?.value.trim() ?? "");
-            formData.append("medicacion", medicacionInput?.value.trim() ?? "");
-            if (fotoInput?.files?.length) {
-                formData.append("foto", fotoInput.files[0]);
-            }
+        const formData = new FormData();
+        formData.append("nombre", nombre);
+        formData.append("tipo_animal", tipoInput?.value.trim() ?? "");
+        formData.append("edad", edadInput?.value.trim() ?? "");
+        formData.append("medicacion", medicacionInput?.value.trim() ?? "");
+        if (fotoArchivo) {
+            formData.append("foto", fotoArchivo);
+        }
 
-            response = await fetch("/api/animales", {
+        if (esEdicion) {
+            formData.append("eliminar_foto", "false");
+            const response = await fetch(`/api/animales/${animalEnEdicionId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+                body: formData
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData?.message || errorData?.mensaje || "No se pudo actualizar el animal.");
+            }
+            await response.json().catch(() => ({}));
+        } else {
+            formData.append("id_cliente", String(clienteId));
+            const response = await fetch("/api/animales", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`

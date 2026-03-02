@@ -56,6 +56,23 @@ function mostrarErrorAnimalFormulario(mensaje) {
     errorBox.hidden = false;
 }
 
+function validarArchivoFotoAnimal(archivo) {
+    if (!archivo) return null;
+    if (!archivo.type.startsWith("image/")) {
+        return "La foto del animal debe ser una imagen válida.";
+    }
+    return null;
+}
+
+function leerArchivoComoDataURL(archivo) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("No se pudo leer la imagen seleccionada."));
+        reader.readAsDataURL(archivo);
+    });
+}
+
 function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
     const anio = Number(anioNacimiento);
     if (!Number.isInteger(anio) || anio <= 0) return null;
@@ -286,6 +303,13 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
     const tipoAnimal = animal.tipo_animal ?? "";
     const anioNacimiento = animal.edad ?? "";
     const medicacion = animal.medicacion ?? "";
+    const fotoActualHTML = animal.foto
+        ? `
+            <div class="cliente-whatsapp-avatar-preview">
+                <img src="${animal.foto}" alt="Foto actual de ${escaparHTML(nombreAnimal)}">
+            </div>
+        `
+        : `<p class="cliente-empty">Sin foto cargada.</p>`;
 
     muestraAnimal.innerHTML = `
         <div class="animal-detalle-card">
@@ -309,6 +333,13 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
                         <input type="number" id="edit_animal_edad" min="1900" max="2999" step="1" value="${escaparHTML(String(anioNacimiento))}" placeholder="Ej: 2019">
                         <label for="edit_animal_medicacion">Medicación</label>
                         <input type="text" id="edit_animal_medicacion" value="${escaparHTML(medicacion)}">
+                        <label for="edit_animal_foto">Foto</label>
+                        <input type="file" id="edit_animal_foto" accept="image/*">
+                        ${fotoActualHTML}
+                        <label class="cliente-edit-checkbox">
+                            <input type="checkbox" id="edit_animal_eliminar_foto">
+                            Eliminar foto actual
+                        </label>
                     </div>
                 </div>
                 <div class="cliente-edit-actions">
@@ -323,6 +354,20 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
     document.getElementById("form-editar-animal-detalle")?.addEventListener("submit", event => {
         guardarCambiosAnimalDesdeDetalle(event, animal);
     });
+    const fotoInput = document.getElementById("edit_animal_foto");
+    const eliminarFotoInput = document.getElementById("edit_animal_eliminar_foto");
+    if (fotoInput && eliminarFotoInput) {
+        fotoInput.addEventListener("change", () => {
+            if (fotoInput.files?.length) {
+                eliminarFotoInput.checked = false;
+            }
+        });
+        eliminarFotoInput.addEventListener("change", () => {
+            if (eliminarFotoInput.checked) {
+                fotoInput.value = "";
+            }
+        });
+    }
 }
 
 function mostrarErrorEdicionAnimalDetalle(mensaje) {
@@ -358,27 +403,60 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
         return;
     }
 
-    const payload = {
-        nombre,
-        tipo_animal: document.getElementById("edit_animal_tipo")?.value.trim() ?? "",
-        edad: document.getElementById("edit_animal_edad")?.value.trim() ?? "",
-        medicacion: document.getElementById("edit_animal_medicacion")?.value.trim() ?? ""
-    };
+    const tipoAnimal = document.getElementById("edit_animal_tipo")?.value.trim() ?? "";
+    const edad = document.getElementById("edit_animal_edad")?.value.trim() ?? "";
+    const medicacion = document.getElementById("edit_animal_medicacion")?.value.trim() ?? "";
+    const fotoArchivo = document.getElementById("edit_animal_foto")?.files?.[0] ?? null;
+    const eliminarFoto = Boolean(document.getElementById("edit_animal_eliminar_foto")?.checked);
+    const errorFoto = validarArchivoFotoAnimal(fotoArchivo);
+    if (errorFoto) {
+        mostrarErrorEdicionAnimalDetalle(errorFoto);
+        return;
+    }
 
-    fetchAPI(`/api/animales/${animalOriginal.id_animal}`, {
+    const formData = new FormData();
+    formData.append("nombre", nombre);
+    formData.append("tipo_animal", tipoAnimal);
+    formData.append("edad", edad);
+    formData.append("medicacion", medicacion);
+    formData.append("eliminar_foto", eliminarFoto ? "true" : "false");
+    if (fotoArchivo && !eliminarFoto) {
+        formData.append("foto", fotoArchivo);
+    }
+
+    fetch(`/api/animales/${animalOriginal.id_animal}`, {
         method: "PUT",
-        body: JSON.stringify(payload)
+        headers: {
+            "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        },
+        body: formData
     })
-        .then(() => {
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data?.mensaje || data?.message || "No se pudo actualizar el animal.");
+            }
+            return data;
+        })
+        .then(async () => {
+            let fotoActualizada = animalOriginal.foto ?? null;
+            if (eliminarFoto) {
+                fotoActualizada = null;
+            } else if (fotoArchivo) {
+                fotoActualizada = await leerArchivoComoDataURL(fotoArchivo);
+            }
+
             const animalActualizado = {
                 ...animalOriginal,
-                nombre_animal: payload.nombre,
-                nombre: payload.nombre,
-                tipo_animal: payload.tipo_animal,
-                edad: payload.edad === "" ? null : Number(payload.edad),
-                medicacion: payload.medicacion
+                nombre_animal: nombre,
+                nombre: nombre,
+                tipo_animal: tipoAnimal,
+                edad: edad === "" ? null : Number(edad),
+                medicacion: medicacion,
+                foto: fotoActualizada
             };
             obtenerDetallesAnimal(animalActualizado);
+            cargarAnimales(document.getElementById("buscar")?.value ?? "");
         })
         .catch(error => {
             console.error("🚨 Error al actualizar el animal:", error);

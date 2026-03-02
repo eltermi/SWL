@@ -25,6 +25,26 @@ class Animales(db.Model):
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='animales')
 
+    @staticmethod
+    def _detectar_mime_imagen(contenido):
+        if not contenido:
+            return "image/jpeg"
+        if contenido.startswith(b"\x89PNG\r\n\x1a\n"):
+            return "image/png"
+        if contenido.startswith(b"\xff\xd8\xff"):
+            return "image/jpeg"
+        if contenido.startswith(b"GIF87a") or contenido.startswith(b"GIF89a"):
+            return "image/gif"
+        if contenido.startswith(b"RIFF") and contenido[8:12] == b"WEBP":
+            return "image/webp"
+        if len(contenido) > 12 and contenido[4:8] == b"ftyp":
+            marca = contenido[8:12]
+            if marca in (b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1"):
+                return "image/heic"
+            if marca == b"avif":
+                return "image/avif"
+        return "image/jpeg"
+
     @classmethod
     def obtener_animal_cliente(cls, id_cliente):
         sql_query_cliente = text("""
@@ -37,8 +57,10 @@ class Animales(db.Model):
         animales = []
         for row in result:
             foto_base64 = None
+            mime = "image/jpeg"
             if row.foto:  # Si hay una imagen, la convertimos a Base64
                 foto_base64 = base64.b64encode(row.foto).decode("utf-8")
+                mime = cls._detectar_mime_imagen(row.foto)
 
             animales.append({
                 "id_animal": row.id_animal,
@@ -47,7 +69,7 @@ class Animales(db.Model):
                 "tipo_animal": row.tipo_animal,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
-                "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
+                "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
             })
 
         return animales  # Retorna la lista de diccionarios
@@ -84,8 +106,10 @@ class Animales(db.Model):
         animales = []
         for row in result:
             foto_base64 = None
+            mime = "image/jpeg"
             if row.foto:  # Si hay una imagen, la convertimos a Base64
                 foto_base64 = base64.b64encode(row.foto).decode("utf-8")
+                mime = cls._detectar_mime_imagen(row.foto)
 
             animales.append({
                 "id_animal": row.id_animal,
@@ -96,7 +120,7 @@ class Animales(db.Model):
                 "tipo_animal": row.tipo_animal,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
-                "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
+                "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
             })
 
         return animales
