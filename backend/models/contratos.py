@@ -32,6 +32,20 @@ class Contratos(db.Model):
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contratos')
     tarifas_contrato: Mapped[List['TarifasContrato']] = relationship('TarifasContrato', back_populates='contratos')
+
+    @staticmethod
+    def _detectar_mime_imagen(contenido):
+        if not contenido:
+            return "image/jpeg"
+        if contenido.startswith(b"\x89PNG\r\n\x1a\n"):
+            return "image/png"
+        if contenido.startswith(b"\xff\xd8\xff"):
+            return "image/jpeg"
+        if contenido.startswith(b"GIF87a") or contenido.startswith(b"GIF89a"):
+            return "image/gif"
+        if contenido.startswith(b"RIFF") and contenido[8:12] == b"WEBP":
+            return "image/webp"
+        return "image/jpeg"
     
     @classmethod
     def obtener_contratos_activos(cls):
@@ -105,6 +119,7 @@ class Contratos(db.Model):
             SELECT  c.id_contrato,
                     c.fecha_inicio,
                     c.fecha_fin,
+                    MAX(cl.whatsapp_avatar) AS whatsapp_avatar,
                 CASE 
                     WHEN COUNT(a.nombre) > 1 
                     THEN CONCAT(
@@ -130,7 +145,11 @@ class Contratos(db.Model):
                 "id_contrato": row.id_contrato,
                 "nombre_animales": row.nombre_animales or "Sin animales asignados",
                 "fecha_inicio": row.fecha_inicio.strftime("%d-%m-%Y") if row.fecha_inicio else None,
-                "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None
+                "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None,
+                "whatsapp_avatar": (
+                    f"data:{cls._detectar_mime_imagen(row.whatsapp_avatar)};base64,"
+                    f"{base64.b64encode(row.whatsapp_avatar).decode('utf-8')}"
+                ) if row.whatsapp_avatar else None
             })
 
         return contratos
@@ -142,6 +161,7 @@ class Contratos(db.Model):
             SELECT  contratos.id_contrato, 
                     contratos.id_cliente, 
                     MAX(animales.foto) AS foto,
+                    MAX(clientes.whatsapp_avatar) AS whatsapp_avatar,
                 CASE 
                     WHEN COUNT(animales.nombre) > 1 
                     THEN CONCAT(
@@ -180,7 +200,11 @@ class Contratos(db.Model):
 
         foto_base64 = None
         if result.foto:  # Si hay una imagen, la convertimos a Base64
-                foto_base64 = base64.b64encode(result.foto).decode("utf-8")
+            foto_base64 = base64.b64encode(result.foto).decode("utf-8")
+        whatsapp_avatar_base64 = None
+        if result.whatsapp_avatar:
+            whatsapp_avatar_base64 = base64.b64encode(result.whatsapp_avatar).decode("utf-8")
+        mime_whatsapp_avatar = cls._detectar_mime_imagen(result.whatsapp_avatar)
 
         total = float(result.total or 0)
         pagado = float(result.pagado or 0)
@@ -202,7 +226,8 @@ class Contratos(db.Model):
             "num_factura": result.num_factura,
             "num_total_visitas": result.num_total_visitas,
             "observaciones": result.observaciones,
-            "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
+            "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None,
+            "whatsapp_avatar": f"data:{mime_whatsapp_avatar};base64,{whatsapp_avatar_base64}" if whatsapp_avatar_base64 else None
         }
 
         return contrato

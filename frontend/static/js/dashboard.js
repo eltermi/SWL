@@ -110,10 +110,20 @@ function renderContratosProgramados(contratos, container) {
         const nombre = contrato.nombre_animales || "Sin animales asignados";
         const fechaInicio = contrato.fecha_inicio ?? "-";
         const fechaFin = contrato.fecha_fin ?? "-";
+        const avatarHTML = contrato.whatsapp_avatar
+            ? `
+                <div class="contratos-programados-avatar">
+                    <img src="${contrato.whatsapp_avatar}" alt="Avatar del cliente">
+                </div>
+            `
+            : "";
         return `
             <div class="contratos-programados-item" data-id="${contrato.id_contrato}">
-                <span class="contratos-programados-nombre">${nombre}</span>
-                <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
+                <div class="contratos-programados-item-info">
+                    <span class="contratos-programados-nombre">${nombre}</span>
+                    <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
+                </div>
+                ${avatarHTML}
             </div>
         `;
     }).join("");
@@ -293,6 +303,13 @@ function obtenerDetallesContrato(id_contrato) {
                     ${crearPagoCard({ etiqueta: "Pendiente", importe: pagoPendiente, esTotal: true })}
                 </div>
             `;
+            const avatarWhatsappHTML = contrato.whatsapp_avatar
+                ? `
+                    <div class="cliente-whatsapp-avatar cliente-whatsapp-avatar--contrato">
+                        <img src="${contrato.whatsapp_avatar}" alt="Avatar de WhatsApp del cliente">
+                    </div>
+                `
+                : "";
             const visitasTotalesHTML = totalVisitas !== null ? `
                 <p class="contrato-visitas-row">
                     <span class="contrato-data-label">Totales</span>
@@ -305,6 +322,7 @@ function obtenerDetallesContrato(id_contrato) {
                     <div class="contrato-id">Contrato ${contrato.id_contrato ?? ""}</div>
                     ${avisoAnimales}
                     <div class="contrato-detail-layout">
+                        ${avatarWhatsappHTML}
                         <div class="contrato-detail-main">
                             <div class="contrato-sections">
                                 <div class="contrato-section contrato-section-fechas">

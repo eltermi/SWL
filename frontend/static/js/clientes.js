@@ -24,6 +24,7 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
     { id: "pagado", nombre: "Pagado (€)" }
 ];
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
+const MAX_WHATSAPP_AVATAR_BYTES = 2 * 1024 * 1024;
 
 function escaparHTML(texto = "") {
     return String(texto ?? "")
@@ -45,6 +46,27 @@ function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
 function formatearEdadDesdeAnioNacimiento(anioNacimiento) {
     const edad = calcularEdadDesdeAnioNacimiento(anioNacimiento);
     return edad === null ? "Sin edad" : `${edad} años`;
+}
+
+function construirAvatarClienteHTML(avatar, nombreCompleto, clase = "") {
+    if (!avatar) return "";
+    const claseFinal = clase ? ` ${clase}` : "";
+    return `
+        <div class="cliente-whatsapp-avatar${claseFinal}">
+            <img src="${avatar}" alt="Avatar de WhatsApp de ${escaparHTML(nombreCompleto || "cliente")}">
+        </div>
+    `;
+}
+
+function validarArchivoAvatar(archivo) {
+    if (!archivo) return null;
+    if (!archivo.type.startsWith("image/")) {
+        return "El avatar de WhatsApp debe ser una imagen.";
+    }
+    if (archivo.size > MAX_WHATSAPP_AVATAR_BYTES) {
+        return "La imagen del avatar supera el máximo de 2 MB.";
+    }
+    return null;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -341,6 +363,7 @@ function obtenerDetallesCliente(id_cliente) {
             clienteDetalleActual = cliente;
 
             const nombreCompleto = `${cliente.nombre ?? ""}${cliente.apellidos ? " " + cliente.apellidos : ""}`.trim();
+            const avatarClienteHTML = construirAvatarClienteHTML(cliente.whatsapp_avatar, nombreCompleto);
             const emailHTML = cliente.email
                 ? `<p class="cliente-email"><a href="mailto:${cliente.email}">${cliente.email}</a></p>`
                 : "";
@@ -378,10 +401,13 @@ function obtenerDetallesCliente(id_cliente) {
             let contenidoHTML = `
                 <div class="cliente-detalle-card">
                     <div class="cliente-header">
-                        <div class="cliente-main-contact">
-                            <p class="cliente-nombre">${nombreCompleto}</p>
-                            ${cliente.telefono ? `<p class="cliente-telefono">${cliente.telefono}</p>` : ""}
-                            ${emailHTML}
+                        <div class="cliente-main-block">
+                            <div class="cliente-main-contact">
+                                <p class="cliente-nombre">${nombreCompleto}</p>
+                                ${cliente.telefono ? `<p class="cliente-telefono">${cliente.telefono}</p>` : ""}
+                                ${emailHTML}
+                            </div>
+                            ${avatarClienteHTML}
                         </div>
                         ${contactoAlternativo}
                     </div>
@@ -455,11 +481,55 @@ function agregarCliente(event) {
     const idioma = document.getElementById('idioma').value;
     const genero = document.getElementById('genero').value;
     const referencia_origen = document.getElementById('referencia_origen').value;
+    const whatsappAvatarInput = document.getElementById('whatsapp_avatar');
+    const avatarArchivo = whatsappAvatarInput?.files?.[0] ?? null;
 
-    fetchAPI('/api/clientes', {
+    const errorAvatar = validarArchivoAvatar(avatarArchivo);
+    if (errorAvatar) {
+        mostrarErrorClienteFormulario(errorAvatar);
+        return;
+    }
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("nombre", nombre);
+    formData.append("apellidos", apellidos);
+    formData.append("calle", calle);
+    formData.append("piso", piso);
+    formData.append("codigo_postal", codigo_postal);
+    formData.append("municipio", municipio);
+    formData.append("pais", pais);
+    formData.append("telefono", telefono);
+    formData.append("email", email);
+    formData.append("nacionalidad", nacionalidad);
+    formData.append("idioma", idioma);
+    formData.append("genero", genero);
+    formData.append("referencia_origen", referencia_origen);
+    if (avatarArchivo) {
+        formData.append("whatsapp_avatar", avatarArchivo);
+    }
+
+    fetch('/api/clientes', {
         method: 'POST',
-        body: JSON.stringify({ nombre, apellidos, calle, piso, codigo_postal, municipio, pais, telefono, email, nacionalidad, idioma, genero, referencia_origen })
-    }).then(() => {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        body: formData
+    }).then(async response => {
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {
+            data = {};
+        }
+        if (!response.ok) {
+            throw new Error(data?.mensaje || data?.message || "No se pudo crear el cliente.");
+        }
         cargarClientes();
         document.getElementById('cliente-form').reset();
     }).catch(error => {
@@ -513,6 +583,11 @@ function construirContratosHTML(contratos) {
 
 function construirContratoCard(contrato) {
     if (!contrato) return "";
+    const avatarCliente = clienteDetalleActual?.whatsapp_avatar || null;
+    const nombreCliente = `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
+    const avatarClienteHTML = avatarCliente
+        ? construirAvatarClienteHTML(avatarCliente, nombreCliente, "cliente-whatsapp-avatar--contrato")
+        : "";
     const contratoFinalizado = esContratoFinalizado(contrato);
     const horarioNormalizado = normalizarHorarioContrato(contrato.horario);
     const horarioHTML = renderHorarioContrato(horarioNormalizado);
@@ -532,6 +607,7 @@ function construirContratoCard(contrato) {
         <div class="cliente-contract-card contrato-detalle-card">
             <div class="contrato-id ${contratoFinalizado ? "contrato-id--finalizado" : ""}">Contrato ${contrato.id_contrato ?? "-"}</div>
             <div class="contrato-detail-layout">
+                ${avatarClienteHTML}
                 <div class="contrato-detail-main">
                     <div class="contrato-sections">
                         <div class="contrato-section contrato-section-fechas">
@@ -878,6 +954,17 @@ function mostrarFormularioEdicionCliente() {
                         </select>
                         <label for="edit_referencia_origen">Referencia</label>
                         <input type="text" id="edit_referencia_origen" value="${escaparHTML(cliente.referencia ?? "")}">
+                        <label for="edit_whatsapp_avatar">Avatar grupo WhatsApp</label>
+                        <input type="file" id="edit_whatsapp_avatar" accept="image/*">
+                        ${cliente.whatsapp_avatar ? `
+                            <div class="cliente-whatsapp-avatar-preview">
+                                <img src="${cliente.whatsapp_avatar}" alt="Avatar actual de WhatsApp">
+                            </div>
+                        ` : `<p class="cliente-empty">Sin avatar cargado.</p>`}
+                        <label class="cliente-checkbox">
+                            <input type="checkbox" id="edit_eliminar_whatsapp_avatar">
+                            Eliminar avatar actual
+                        </label>
                     </div>
                 </div>
                 <div class="cliente-edit-actions">
@@ -923,13 +1010,56 @@ function guardarCambiosCliente(event) {
         genero: (form.querySelector("#edit_genero")?.value || null),
         referencia_origen: valorOpcional("#edit_referencia_origen")
     };
+    const avatarArchivo = form.querySelector("#edit_whatsapp_avatar")?.files?.[0] ?? null;
+    const eliminarAvatar = Boolean(form.querySelector("#edit_eliminar_whatsapp_avatar")?.checked);
 
-    fetchAPI(`/api/clientes/${clienteDetalleActual.id_cliente}`, {
+    const errorAvatar = validarArchivoAvatar(avatarArchivo);
+    if (errorAvatar) {
+        mostrarErrorEdicionCliente(errorAvatar);
+        return;
+    }
+
+    const idCliente = Number(clienteDetalleActual.id_cliente);
+    if (!Number.isFinite(idCliente) || idCliente <= 0) {
+        mostrarErrorEdicionCliente("No se pudo identificar el cliente.");
+        return;
+    }
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/";
+        return;
+    }
+
+    fetchAPI(`/api/clientes/${idCliente}`, {
         method: "PUT",
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            ...payload,
+            eliminar_whatsapp_avatar: eliminarAvatar
+        })
     })
-        .then(() => {
-            obtenerDetallesCliente(clienteDetalleActual.id_cliente);
+        .then(async () => {
+            if (avatarArchivo) {
+                const formDataAvatar = new FormData();
+                formDataAvatar.append("whatsapp_avatar", avatarArchivo);
+                const responseAvatar = await fetch(`/api/clientes/${idCliente}/whatsapp_avatar`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formDataAvatar
+                });
+                let dataAvatar = {};
+                try {
+                    dataAvatar = await responseAvatar.json();
+                } catch (_) {
+                    dataAvatar = {};
+                }
+                if (!responseAvatar.ok) {
+                    throw new Error(dataAvatar?.mensaje || dataAvatar?.message || "No se pudo guardar el avatar.");
+                }
+            }
+            obtenerDetallesCliente(idCliente);
         })
         .catch(error => {
             console.error("🚨 Error al actualizar cliente:", error);

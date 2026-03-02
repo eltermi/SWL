@@ -28,6 +28,7 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
     idioma: Mapped[Optional[str]] = mapped_column(String(50))
     genero: Mapped[Optional[str]] = mapped_column(Enum('M', 'F'))
     referencia_origen: Mapped[Optional[str]] = mapped_column(String(50))
+    whatsapp_avatar: Mapped[Optional[bytes]] = mapped_column(LONGBLOB)
 
     animales: Mapped[List['Animales']] = relationship('Animales', back_populates='clientes')
     contactos_adicionales: Mapped[List['ContactosAdicionales']] = relationship('ContactosAdicionales', back_populates='clientes')
@@ -108,6 +109,7 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
                             clientes.idioma,
                             clientes.genero,
                             clientes.referencia_origen as referencia,
+                            clientes.whatsapp_avatar,
                             contactos_adicionales.nombre as ad_nombre,
                             contactos_adicionales.apellidos as ad_apellidos,
                             contactos_adicionales.telefono as ad_telefono,

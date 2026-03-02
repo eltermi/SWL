@@ -417,6 +417,30 @@ nav {
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+.contratos-programados-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.contratos-programados-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    border: 1px solid #ececec;
+    flex: 0 0 auto;
+}
+
+.contratos-programados-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .contratos-programados-item:hover {
     background-color: #ffffff;
     border-color: #d0021b;
@@ -613,8 +637,12 @@ nav {
     }
 
     .contratos-programados-item {
-        flex-direction: column;
         align-items: flex-start;
+    }
+
+    .contratos-programados-avatar {
+        width: 46px;
+        height: 46px;
     }
 }
 
@@ -668,6 +696,41 @@ nav {
 .cliente-main-contact,
 .cliente-alt-contact {
     flex: 1 1 220px;
+}
+
+.cliente-main-block {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    flex: 1 1 320px;
+}
+
+.cliente-main-block .cliente-main-contact {
+    flex: 1 1 auto;
+}
+
+.cliente-whatsapp-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 16px;
+    overflow: hidden;
+    flex: 0 0 auto;
+    border: 1px solid #ececec;
+    background-color: #f7f7f7;
+}
+
+.cliente-whatsapp-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cliente-whatsapp-avatar--contrato {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
 }
 
 .cliente-nombre {
@@ -883,6 +946,37 @@ nav {
     justify-content: flex-end;
     gap: 12px;
     margin-top: 10px;
+}
+
+.cliente-whatsapp-avatar-preview {
+    width: 92px;
+    height: 92px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 6px 0 8px;
+    border: 1px solid #ececec;
+    background-color: #f7f7f7;
+}
+
+.cliente-whatsapp-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cliente-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #5a5a5a;
+    margin-bottom: 8px;
+}
+
+.cliente-checkbox input[type="checkbox"] {
+    width: auto;
+    margin: 0;
 }
 
 .cliente-actions button {
@@ -1316,6 +1410,22 @@ body.modal-open {
     .cliente-alt-contact {
         flex: 0 1 auto;
         width: 100%;
+    }
+
+    .cliente-main-block {
+        width: 100%;
+        flex: 0 1 auto;
+        align-items: flex-start;
+    }
+
+    .cliente-whatsapp-avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .cliente-whatsapp-avatar--contrato {
+        width: 68px;
+        height: 68px;
     }
 
     .cliente-info-grid {
