@@ -72,23 +72,38 @@ function parseFechaContrato(fechaTexto) {
     return Number.isNaN(fecha.getTime()) ? null : fecha;
 }
 
+function crearFechaUTCDesdeDisplay(fechaTexto) {
+    if (!fechaTexto || typeof fechaTexto !== "string") return null;
+    const partes = fechaTexto.split("-");
+    if (partes.length !== 3) return null;
+    const [dia, mes, anio] = partes;
+    const fechaUTC = new Date(Date.UTC(Number(anio), Number(mes) - 1, Number(dia)));
+    return Number.isNaN(fechaUTC.getTime()) ? null : fechaUTC;
+}
+
+function calcularDiasCalendario(inicio, fin) {
+    if (!(inicio instanceof Date) || Number.isNaN(inicio.getTime())) return 0;
+    if (!(fin instanceof Date) || Number.isNaN(fin.getTime())) return 0;
+    const diferencia = fin.getTime() - inicio.getTime();
+    if (diferencia < 0) return 0;
+    return Math.round(diferencia / MS_POR_DIA) + 1;
+}
+
 function calcularTotalVisitas(contrato) {
     if (!contrato) return null;
     const numTotalVisitas = Number(contrato.num_total_visitas);
     if (Number.isFinite(numTotalVisitas) && numTotalVisitas >= 0) {
         return numTotalVisitas;
     }
-    const inicio = parseFechaContrato(contrato.fecha_inicio);
-    const fin = parseFechaContrato(contrato.fecha_fin);
+    const inicio = crearFechaUTCDesdeDisplay(contrato.fecha_inicio);
+    const fin = crearFechaUTCDesdeDisplay(contrato.fecha_fin);
     const visitasDiarias = Number(contrato.visitas);
 
     if (!inicio || !fin || Number.isNaN(visitasDiarias) || visitasDiarias <= 0) {
         return null;
     }
 
-    const diferencia = fin.getTime() - inicio.getTime();
-    if (diferencia < 0) return null;
-    const dias = Math.floor(diferencia / MS_POR_DIA) + 1;
+    const dias = calcularDiasCalendario(inicio, fin);
     return dias > 0 ? dias * visitasDiarias : null;
 }
 
