@@ -6,36 +6,44 @@
 
 <h2 id="cabecera" class="day-header">Clientes</h2>
 <input type="text" id="buscar" class="buscar" placeholder="Buscar clientes">
+<div class="cliente-actions">
+    <button type="button" id="abrir-cliente-modal" class="btn-principal">Añadir cliente</button>
+</div>
 <div id="lista-clientes"></div>
 <div id="muestra-cliente"></div>
 
-<div id="form-crea-cliente"> 
-    <h2 style="text-align:center">AÑADIR CLIENTE</h2>
-    <form id="cliente-form" class="form-columns">
-        <div id="form-cliente-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
-        <div class="form-column">
-            <input type="text" id="nombre" placeholder="Nombre" required>
-            <input type="text" id="apellidos" placeholder="Apellidos">
-            <input type="text" id="calle" placeholder="Calle" required>
-            <input type="text" id="piso" placeholder="Piso">
-            <input type="text" id="codigo_postal" placeholder="Código Postal" required>
-            <input type="text" id="municipio" placeholder="Municipio / Barrio" required>
-            <input type="text" id="pais" placeholder="País">
-        </div>
-        <div class="form-column">
-            <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222" required>
-            <input type="email" id="email" placeholder="Correo Electrónico">
-            <input type="text" id="nacionalidad" placeholder="País de origen">
-            <input type="text" id="idioma" placeholder="Idioma">
-            <input type="text" id="genero" placeholder="Género M/F">
-            <input type="text" id="referencia_origen" placeholder="Referencia">
-            <label for="whatsapp_avatar">Avatar grupo WhatsApp</label>
-            <input type="file" id="whatsapp_avatar" accept="image/*">
-        </div>
-        <div class="form-button">
-            <button type="submit">Añadir Cliente</button>
-        </div>
-    </form>
+<div id="cliente-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-cliente-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-title">
+        <button type="button" class="modal-close" aria-label="Cerrar" data-close-cliente-modal>&times;</button>
+        <h3 id="cliente-modal-title" class="modal-title">Añadir cliente</h3>
+        <form id="cliente-form" class="modal-form form-columns" novalidate>
+            <div id="form-cliente-error" class="modal-error" role="alert" aria-live="assertive" hidden></div>
+            <div class="form-column">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="text" id="apellidos" placeholder="Apellidos (opcional)">
+                <input type="text" id="calle" placeholder="Calle" required>
+                <input type="text" id="piso" placeholder="Piso">
+                <input type="text" id="codigo_postal" placeholder="Código Postal" required>
+                <input type="text" id="municipio" placeholder="Municipio / Barrio" required>
+                <input type="text" id="pais" placeholder="País">
+            </div>
+            <div class="form-column">
+                <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222" required>
+                <input type="email" id="email" placeholder="Correo Electrónico">
+                <input type="text" id="nacionalidad" placeholder="País de origen">
+                <input type="text" id="idioma" placeholder="Idioma">
+                <input type="text" id="genero" placeholder="Género M/F">
+                <input type="text" id="referencia_origen" placeholder="Referencia">
+                <label for="whatsapp_avatar">Avatar grupo WhatsApp</label>
+                <input type="file" id="whatsapp_avatar" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" data-close-cliente-modal>Cancelar</button>
+                <button type="submit" class="btn-principal">Guardar cliente</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div id="contrato-modal" class="modal" aria-hidden="true">
@@ -137,6 +145,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260302-animales-foto-2') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260317-clientes-modal') }}"></script>
 
 {% endblock %}
