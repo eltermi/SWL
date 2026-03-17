@@ -93,7 +93,7 @@ def crear_cliente():
     if not isinstance(datos, dict):
         return jsonify({'mensaje': 'Formato de datos no válido para crear cliente.'}), 400
 
-    campos_obligatorios = ['nombre', 'apellidos', 'calle', 'codigo_postal', 'municipio', 'pais', 'genero']
+    campos_obligatorios = ['nombre', 'calle', 'codigo_postal', 'municipio', 'pais', 'genero']
     for campo in campos_obligatorios:
         valor = datos.get(campo)
         if valor is None or str(valor).strip() == "":
@@ -110,7 +110,7 @@ def crear_cliente():
 
     nuevo_cliente = Clientes(
         nombre=datos['nombre'],
-        apellidos=datos['apellidos'],
+        apellidos=(datos.get('apellidos') or '').strip() or None,
         calle=datos['calle'],
         piso=datos.get('piso'),
         codigo_postal=datos['codigo_postal'],

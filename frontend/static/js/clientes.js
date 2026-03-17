@@ -2,6 +2,8 @@
 let contratoModal = null;
 let contratoForm = null;
 let contratoModalCliente = null;
+let clienteModal = null;
+let clienteForm = null;
 let animalModal = null;
 let animalForm = null;
 let animalModalCliente = null;
@@ -82,10 +84,9 @@ function validarArchivoFotoAnimal(archivo) {
 
 document.addEventListener('DOMContentLoaded', function () {
     cargarClientes();
-    document.getElementById('cliente-form').addEventListener('submit', agregarCliente);
-    document.getElementById('cliente-form').addEventListener('input', limpiarErrorClienteFormulario);
     document.getElementById('buscar').addEventListener('input', buscarClientes);
     enfocarBuscadorClientes();
+    inicializarModalCliente();
     inicializarEventosDetalleCliente();
     inicializarModalContrato();
     inicializarModalAnimal();
@@ -190,6 +191,49 @@ function mostrarErrorClienteFormulario(mensaje) {
     if (!errorBox) return;
     errorBox.textContent = mensaje;
     errorBox.hidden = false;
+}
+
+function inicializarModalCliente() {
+    clienteModal = document.getElementById("cliente-modal");
+    clienteForm = document.getElementById("cliente-form");
+    const abrirClienteModalBtn = document.getElementById("abrir-cliente-modal");
+    if (!clienteModal || !clienteForm) return;
+
+    abrirClienteModalBtn?.addEventListener("click", abrirModalCliente);
+    clienteForm.addEventListener("submit", agregarCliente);
+    clienteForm.addEventListener("input", limpiarErrorClienteFormulario);
+
+    const closeTriggers = clienteModal.querySelectorAll("[data-close-cliente-modal]");
+    closeTriggers.forEach(trigger => {
+        trigger.addEventListener("click", cerrarModalCliente);
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && clienteModal.classList.contains("is-active")) {
+            cerrarModalCliente();
+        }
+    });
+}
+
+function abrirModalCliente() {
+    if (!clienteModal || !clienteForm) return;
+    clienteModal.classList.add("is-active");
+    clienteModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    limpiarErrorClienteFormulario();
+    const primerCampo = clienteForm.querySelector("input, select, textarea");
+    if (primerCampo) {
+        setTimeout(() => primerCampo.focus(), 50);
+    }
+}
+
+function cerrarModalCliente() {
+    if (!clienteModal || !clienteForm) return;
+    clienteModal.classList.remove("is-active");
+    clienteModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    limpiarErrorClienteFormulario();
+    clienteForm.reset();
 }
 
 function limpiarErrorEdicionCliente() {
@@ -350,7 +394,6 @@ function cargarClientes(busqueda = "") {
     container.innerHTML = "";
     muestraCliente.innerHTML = "";
     muestraCliente.style.display = "none";
-    document.getElementById("form-crea-cliente").style.display = "block";
     container.style.display = "block";
     clienteDetalleActual = null;
 
@@ -393,7 +436,6 @@ function obtenerDetallesCliente(id_cliente) {
 
             container.style.display = "none";
             muestraCliente.style.display = "block";
-            document.getElementById("form-crea-cliente").style.display = "none";
 
             clienteDetalleActual = cliente;
 
@@ -504,7 +546,7 @@ function agregarCliente(event) {
     event.preventDefault();
     limpiarErrorClienteFormulario();
     const nombre = document.getElementById('nombre').value;
-    const apellidos = document.getElementById('apellidos').value;
+    const apellidos = document.getElementById('apellidos').value.trim();
     const calle = document.getElementById('calle').value;
     const piso = document.getElementById('piso').value;
     const codigo_postal = document.getElementById('codigo_postal').value;
@@ -566,7 +608,7 @@ function agregarCliente(event) {
             throw new Error(data?.mensaje || data?.message || "No se pudo crear el cliente.");
         }
         cargarClientes();
-        document.getElementById('cliente-form').reset();
+        cerrarModalCliente();
     }).catch(error => {
         console.error("🚨 Error al crear cliente:", error);
         mostrarErrorClienteFormulario(obtenerMensajeError(error, "No se pudo crear el cliente."));

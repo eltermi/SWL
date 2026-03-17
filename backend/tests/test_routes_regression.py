@@ -18,9 +18,13 @@ def test_crear_cliente_normaliza_telefono(monkeypatch):
     class DummyClientes:
         def __init__(self, **kwargs):
             capturado.update(kwargs)
+            self.id_cliente = 1
 
     class DummySession:
         def add(self, _):
+            return None
+
+        def flush(self):
             return None
 
         def commit(self):
@@ -82,6 +86,46 @@ def test_actualizar_cliente_valida_telefono_demasiado_largo(monkeypatch):
 
     assert status == 400
     assert "máximo" in response.get_json()["mensaje"]
+
+
+def test_crear_cliente_permite_apellidos_nulos(monkeypatch):
+    app = _app()
+    capturado = {}
+
+    class DummyClientes:
+        def __init__(self, **kwargs):
+            capturado.update(kwargs)
+            self.id_cliente = 2
+
+    class DummySession:
+        def add(self, _):
+            return None
+
+        def flush(self):
+            return None
+
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(clientes_routes, "Clientes", DummyClientes)
+    monkeypatch.setattr(clientes_routes.db, "session", DummySession())
+
+    payload = {
+        "nombre": "QA",
+        "calle": "Rue",
+        "codigo_postal": "1234",
+        "municipio": "Lux",
+        "pais": "Lux",
+        "telefono": "+352661280008",
+        "genero": "F",
+    }
+
+    with app.test_request_context(json=payload):
+        response, status = clientes_routes.crear_cliente.__wrapped__()
+
+    assert status == 201
+    assert response.get_json()["mensaje"] == "Cliente creado exitosamente"
+    assert capturado["apellidos"] is None
 
 
 def test_actualizar_contrato_con_tarifa_inexistente_devuelve_400(monkeypatch):
