@@ -22,18 +22,22 @@
             <div class="form-column">
                 <input type="text" id="nombre" placeholder="Nombre" required>
                 <input type="text" id="apellidos" placeholder="Apellidos (opcional)">
-                <input type="text" id="calle" placeholder="Calle" required>
+                <input type="text" id="calle" placeholder="Calle">
                 <input type="text" id="piso" placeholder="Piso">
-                <input type="text" id="codigo_postal" placeholder="Código Postal" required>
-                <input type="text" id="municipio" placeholder="Municipio / Barrio" required>
-                <input type="text" id="pais" placeholder="País">
+                <input type="text" id="codigo_postal" placeholder="Código Postal">
+                <input type="text" id="municipio" placeholder="Municipio / Barrio">
+                <input type="text" id="pais" placeholder="País" value="Luxembourg">
             </div>
             <div class="form-column">
-                <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222" required>
+                <input type="text" id="telefono" placeholder="Teléfono +352 661 222 222">
                 <input type="email" id="email" placeholder="Correo Electrónico">
                 <input type="text" id="nacionalidad" placeholder="País de origen">
                 <input type="text" id="idioma" placeholder="Idioma">
-                <input type="text" id="genero" placeholder="Género M/F">
+                <select id="genero">
+                    <option value="">Género</option>
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                </select>
                 <input type="text" id="referencia_origen" placeholder="Referencia">
                 <label for="whatsapp_avatar">Avatar grupo WhatsApp</label>
                 <input type="file" id="whatsapp_avatar" accept="image/*">
@@ -145,6 +149,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260317-clientes-modal') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260318-clientes-lista-null') }}"></script>
 
 {% endblock %}

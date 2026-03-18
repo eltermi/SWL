@@ -9,6 +9,7 @@ from utils.input_normalizers import normalizar_telefono
 
 clientes_bp = Blueprint('clientes', __name__)
 MAX_WHATSAPP_AVATAR_BYTES = 2 * 1024 * 1024
+PAIS_CLIENTE_DEFAULT = "Luxembourg"
 
 
 def _detectar_mime_imagen(contenido):
@@ -64,6 +65,22 @@ def _leer_whatsapp_avatar_opcional():
         return None, False
     return _leer_whatsapp_avatar_desde_form(), True
 
+
+def _valor_texto_o_none(valor):
+    if valor is None:
+        return None
+    valor_normalizado = str(valor).strip()
+    return valor_normalizado or None
+
+
+def _validar_genero(valor):
+    genero = _valor_texto_o_none(valor)
+    if genero is None:
+        return None
+    if genero not in ('M', 'F'):
+        raise ValueError("El campo 'genero' solo puede estar vacío o tener el valor 'M' o 'F'.")
+    return genero
+
 @clientes_bp.route('/clientes', methods=['GET'])
 @requerir_autenticacion
 def obtener_clientes():
@@ -93,14 +110,13 @@ def crear_cliente():
     if not isinstance(datos, dict):
         return jsonify({'mensaje': 'Formato de datos no válido para crear cliente.'}), 400
 
-    campos_obligatorios = ['nombre', 'calle', 'codigo_postal', 'municipio', 'pais', 'genero']
-    for campo in campos_obligatorios:
-        valor = datos.get(campo)
-        if valor is None or str(valor).strip() == "":
-            return jsonify({'mensaje': f"El campo '{campo}' es obligatorio."}), 400
+    nombre = _valor_texto_o_none(datos.get('nombre'))
+    if nombre is None:
+        return jsonify({'mensaje': "El campo 'nombre' es obligatorio."}), 400
 
     try:
         telefono = normalizar_telefono(datos.get('telefono'))
+        genero = _validar_genero(datos.get('genero'))
     except ValueError as error:
         return jsonify({'mensaje': str(error)}), 400
     try:
@@ -109,18 +125,18 @@ def crear_cliente():
         return jsonify({'mensaje': str(error)}), 400
 
     nuevo_cliente = Clientes(
-        nombre=datos['nombre'],
-        apellidos=(datos.get('apellidos') or '').strip() or None,
-        calle=datos['calle'],
-        piso=datos.get('piso'),
-        codigo_postal=datos['codigo_postal'],
-        municipio=datos['municipio'],
-        pais=datos['pais'],
-        nacionalidad=datos.get('nacionalidad'),
-        idioma=datos.get('idioma'),
-        genero=datos['genero'],
-        referencia_origen=datos.get('referencia_origen'),
-        email=datos.get('email'),
+        nombre=nombre,
+        apellidos=_valor_texto_o_none(datos.get('apellidos')),
+        calle=_valor_texto_o_none(datos.get('calle')),
+        piso=_valor_texto_o_none(datos.get('piso')),
+        codigo_postal=_valor_texto_o_none(datos.get('codigo_postal')),
+        municipio=_valor_texto_o_none(datos.get('municipio')),
+        pais=_valor_texto_o_none(datos.get('pais')) or PAIS_CLIENTE_DEFAULT,
+        nacionalidad=_valor_texto_o_none(datos.get('nacionalidad')),
+        idioma=_valor_texto_o_none(datos.get('idioma')),
+        genero=genero,
+        referencia_origen=_valor_texto_o_none(datos.get('referencia_origen')),
+        email=_valor_texto_o_none(datos.get('email')),
         telefono=telefono,
         whatsapp_avatar=avatar
     )
@@ -179,23 +195,41 @@ def actualizar_cliente(id_cliente):
     datos = _obtener_datos_cliente_request()
     if not isinstance(datos, dict):
         return jsonify({'mensaje': 'Formato de datos no válido para actualizar cliente.'}), 400
-    cliente.nombre = datos.get('nombre', cliente.nombre)
-    cliente.apellidos = datos.get('apellidos', cliente.apellidos)
-    cliente.calle = datos.get('calle', cliente.calle)
-    cliente.piso = datos.get('piso', cliente.piso)
-    cliente.codigo_postal = datos.get('codigo_postal', cliente.codigo_postal)
-    cliente.municipio = datos.get('municipio', cliente.municipio)
-    cliente.pais = datos.get('pais', cliente.pais)
+    if 'nombre' in datos:
+        nombre = _valor_texto_o_none(datos.get('nombre'))
+        if nombre is None:
+            return jsonify({'mensaje': "El campo 'nombre' es obligatorio."}), 400
+        cliente.nombre = nombre
+    if 'apellidos' in datos:
+        cliente.apellidos = _valor_texto_o_none(datos.get('apellidos'))
+    if 'calle' in datos:
+        cliente.calle = _valor_texto_o_none(datos.get('calle'))
+    if 'piso' in datos:
+        cliente.piso = _valor_texto_o_none(datos.get('piso'))
+    if 'codigo_postal' in datos:
+        cliente.codigo_postal = _valor_texto_o_none(datos.get('codigo_postal'))
+    if 'municipio' in datos:
+        cliente.municipio = _valor_texto_o_none(datos.get('municipio'))
+    if 'pais' in datos:
+        cliente.pais = _valor_texto_o_none(datos.get('pais'))
     if 'telefono' in datos:
         try:
             cliente.telefono = normalizar_telefono(datos.get('telefono'))
         except ValueError as error:
             return jsonify({'mensaje': str(error)}), 400
-    cliente.email = datos.get('email', cliente.email)
-    cliente.nacionalidad = datos.get('nacionalidad', cliente.nacionalidad)
-    cliente.idioma = datos.get('idioma', cliente.idioma)
-    cliente.genero = datos.get('genero', cliente.genero)
-    cliente.referencia_origen = datos.get('referencia_origen', cliente.referencia_origen)
+    if 'email' in datos:
+        cliente.email = _valor_texto_o_none(datos.get('email'))
+    if 'nacionalidad' in datos:
+        cliente.nacionalidad = _valor_texto_o_none(datos.get('nacionalidad'))
+    if 'idioma' in datos:
+        cliente.idioma = _valor_texto_o_none(datos.get('idioma'))
+    if 'genero' in datos:
+        try:
+            cliente.genero = _validar_genero(datos.get('genero'))
+        except ValueError as error:
+            return jsonify({'mensaje': str(error)}), 400
+    if 'referencia_origen' in datos:
+        cliente.referencia_origen = _valor_texto_o_none(datos.get('referencia_origen'))
     eliminar_avatar = str(datos.get('eliminar_whatsapp_avatar', '')).strip().lower() in ('1', 'true', 'si', 'sí', 'on')
     avatar_actualizado = False
     avatar_eliminado = False

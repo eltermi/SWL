@@ -36,10 +36,6 @@ def test_crear_cliente_normaliza_telefono(monkeypatch):
     payload = {
         "nombre": "QA",
         "apellidos": "Test",
-        "calle": "Rue",
-        "codigo_postal": "1234",
-        "municipio": "Lux",
-        "pais": "Lux",
         "telefono": "\u202a+352\xa0661\xa0280\xa0008\u202c",
         "genero": "F",
     }
@@ -112,12 +108,7 @@ def test_crear_cliente_permite_apellidos_nulos(monkeypatch):
 
     payload = {
         "nombre": "QA",
-        "calle": "Rue",
-        "codigo_postal": "1234",
-        "municipio": "Lux",
-        "pais": "Lux",
         "telefono": "+352661280008",
-        "genero": "F",
     }
 
     with app.test_request_context(json=payload):
@@ -126,6 +117,23 @@ def test_crear_cliente_permite_apellidos_nulos(monkeypatch):
     assert status == 201
     assert response.get_json()["mensaje"] == "Cliente creado exitosamente"
     assert capturado["apellidos"] is None
+    assert capturado["pais"] == "Luxembourg"
+    assert capturado["genero"] is None
+
+
+def test_crear_cliente_rechaza_genero_invalido(monkeypatch):
+    app = _app()
+
+    payload = {
+        "nombre": "QA",
+        "genero": "X",
+    }
+
+    with app.test_request_context(json=payload):
+        response, status = clientes_routes.crear_cliente.__wrapped__()
+
+    assert status == 400
+    assert "genero" in response.get_json()["mensaje"]
 
 
 def test_actualizar_contrato_con_tarifa_inexistente_devuelve_400(monkeypatch):

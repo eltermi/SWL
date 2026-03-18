@@ -400,6 +400,20 @@ function cargarClientes(busqueda = "") {
     fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
             clientes.forEach(cliente => {
+                const textoLista = valor => {
+                    const texto = typeof valor === "string" ? valor.trim() : valor;
+                    return texto ? escaparHTML(String(texto)) : "...";
+                };
+                const nombreCompleto = [cliente.nombre, cliente.apellidos]
+                    .map(valor => typeof valor === "string" ? valor.trim() : "")
+                    .filter(Boolean)
+                    .join(" ");
+                const calle = textoLista(cliente.calle);
+                const ubicacion = (cliente.codigo_postal || cliente.municipio)
+                    ? `L-${textoLista(cliente.codigo_postal)}, ${textoLista(cliente.municipio)}`
+                    : "...";
+                const telefono = textoLista(cliente.telefono);
+                const gatos = textoLista(cliente.gatos);
                 const clienteDiv = document.createElement("div");
                 clienteDiv.classList.add("cliente");
                 clienteDiv.setAttribute("data-id", cliente.id_cliente);
@@ -410,13 +424,13 @@ function cargarClientes(busqueda = "") {
                 clienteDiv.innerHTML = `
                     <div class="cliente-content">
                         <div class="detalles">
-                            <p class="nombreCliente">${cliente.nombre}${cliente.apellidos ? " " + cliente.apellidos : ""}</p>
-                            <p>${cliente.calle}</p>
-                            <p>L-${cliente.codigo_postal}, ${cliente.municipio}</p>
-                            <p>${cliente.telefono}</p>
+                            <p class="nombreCliente">${textoLista(nombreCompleto)}</p>
+                            <p>${calle}</p>
+                            <p>${ubicacion}</p>
+                            <p>${telefono}</p>
                         </div>
                         <div class="detalles">
-                            <p class="nombreAnimal">${cliente.gatos ?? ""}</p>
+                            <p class="nombreAnimal">${gatos}</p>
                             <p>&nbsp;</p>
                             <p>&nbsp;</p>
                             <p>&nbsp;</p>
@@ -545,19 +559,30 @@ function obtenerDetallesCliente(id_cliente) {
 function agregarCliente(event) {
     event.preventDefault();
     limpiarErrorClienteFormulario();
-    const nombre = document.getElementById('nombre').value;
-    const apellidos = document.getElementById('apellidos').value.trim();
-    const calle = document.getElementById('calle').value;
-    const piso = document.getElementById('piso').value;
-    const codigo_postal = document.getElementById('codigo_postal').value;
-    const municipio = document.getElementById('municipio').value;
-    const pais = document.getElementById('pais').value;
-    const telefono = document.getElementById('telefono').value;
-    const email = document.getElementById('email').value;
-    const nacionalidad = document.getElementById('nacionalidad').value;
-    const idioma = document.getElementById('idioma').value;
-    const genero = document.getElementById('genero').value;
-    const referencia_origen = document.getElementById('referencia_origen').value;
+    const valorCampo = id => document.getElementById(id)?.value.trim() ?? "";
+    const valorOpcional = id => {
+        const valor = valorCampo(id);
+        return valor.length ? valor : null;
+    };
+
+    const nombre = valorCampo("nombre");
+    if (!nombre) {
+        mostrarErrorClienteFormulario("El campo 'nombre' es obligatorio.");
+        return;
+    }
+
+    const apellidos = valorOpcional("apellidos");
+    const calle = valorOpcional("calle");
+    const piso = valorOpcional("piso");
+    const codigo_postal = valorOpcional("codigo_postal");
+    const municipio = valorOpcional("municipio");
+    const pais = valorOpcional("pais");
+    const telefono = valorOpcional("telefono");
+    const email = valorOpcional("email");
+    const nacionalidad = valorOpcional("nacionalidad");
+    const idioma = valorOpcional("idioma");
+    const genero = valorOpcional("genero");
+    const referencia_origen = valorOpcional("referencia_origen");
     const whatsappAvatarInput = document.getElementById('whatsapp_avatar');
     const avatarArchivo = whatsappAvatarInput?.files?.[0] ?? null;
 
@@ -575,18 +600,18 @@ function agregarCliente(event) {
 
     const formData = new FormData();
     formData.append("nombre", nombre);
-    formData.append("apellidos", apellidos);
-    formData.append("calle", calle);
-    formData.append("piso", piso);
-    formData.append("codigo_postal", codigo_postal);
-    formData.append("municipio", municipio);
-    formData.append("pais", pais);
-    formData.append("telefono", telefono);
-    formData.append("email", email);
-    formData.append("nacionalidad", nacionalidad);
-    formData.append("idioma", idioma);
-    formData.append("genero", genero);
-    formData.append("referencia_origen", referencia_origen);
+    if (apellidos !== null) formData.append("apellidos", apellidos);
+    if (calle !== null) formData.append("calle", calle);
+    if (piso !== null) formData.append("piso", piso);
+    if (codigo_postal !== null) formData.append("codigo_postal", codigo_postal);
+    if (municipio !== null) formData.append("municipio", municipio);
+    if (pais !== null) formData.append("pais", pais);
+    if (telefono !== null) formData.append("telefono", telefono);
+    if (email !== null) formData.append("email", email);
+    if (nacionalidad !== null) formData.append("nacionalidad", nacionalidad);
+    if (idioma !== null) formData.append("idioma", idioma);
+    if (genero !== null) formData.append("genero", genero);
+    if (referencia_origen !== null) formData.append("referencia_origen", referencia_origen);
     if (avatarArchivo) {
         formData.append("whatsapp_avatar", avatarArchivo);
     }
