@@ -48,7 +48,14 @@
             </div>
             <div class="modal-field">
                 <label for="form-medicacion">Medicación</label>
-                <input type="text" id="form-medicacion" placeholder="Opcional">
+                <div class="rich-editor">
+                    <div class="rich-editor-toolbar" aria-label="Formato de medicación">
+                        <button type="button" class="rich-editor-button" data-editor-target="form-medicacion" data-command="formatBlock" data-value="p">Párrafo</button>
+                        <button type="button" class="rich-editor-button" data-editor-target="form-medicacion" data-command="insertUnorderedList">Lista</button>
+                        <button type="button" class="rich-editor-button" data-editor-target="form-medicacion" data-command="insertOrderedList">Numerada</button>
+                    </div>
+                    <div id="form-medicacion" class="rich-editor-input" contenteditable="true" data-placeholder="Añade medicación, instrucciones o pautas"></div>
+                </div>
             </div>
             <div class="modal-field">
                 <label for="form-foto">Foto</label>

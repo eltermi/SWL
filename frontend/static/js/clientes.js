@@ -16,6 +16,7 @@ let contratosClienteActuales = [];
 let animalesClienteActuales = [];
 let tarifasContrato = [];
 let tarifaSelect = null;
+const MEDICACION_ALLOWED_TAGS = new Set(["P", "BR", "UL", "OL", "LI", "STRONG", "EM", "B", "I", "DIV"]);
 
 const CAMPOS_OBLIGATORIOS_CONTRATO = [
     { id: "fecha_inicio", nombre: "Fecha de inicio" },
@@ -56,6 +57,128 @@ function formatearSexoAnimal(sexo) {
     return "Sin especificar";
 }
 
+function convertirTextoPlanoAMedicacionHTML(texto) {
+    const contenido = String(texto ?? "").replace(/\r/g, "").trim();
+    if (!contenido) return "";
+
+    return contenido
+        .split(/\n{2,}/)
+        .map(parrafo => `<p>${parrafo.split("\n").map(escaparHTML).join("<br>")}</p>`)
+        .join("");
+}
+
+function sanitizarMedicacionHTML(valor) {
+    const contenido = String(valor ?? "").trim();
+    if (!contenido) return "";
+
+    const htmlInicial = /<\/?[a-z][\s\S]*>/i.test(contenido)
+        ? contenido
+        : convertirTextoPlanoAMedicacionHTML(contenido);
+
+    const template = document.createElement("template");
+    template.innerHTML = htmlInicial;
+
+    const limpiarNodo = nodo => {
+        Array.from(nodo.childNodes).forEach(child => {
+            if (child.nodeType === Node.COMMENT_NODE) {
+                child.remove();
+                return;
+            }
+
+            if (child.nodeType !== Node.ELEMENT_NODE) {
+                return;
+            }
+
+            const tag = child.tagName.toUpperCase();
+
+            if (tag === "SCRIPT" || tag === "STYLE") {
+                child.remove();
+                return;
+            }
+
+            limpiarNodo(child);
+
+            if (!MEDICACION_ALLOWED_TAGS.has(tag)) {
+                const fragment = document.createDocumentFragment();
+                while (child.firstChild) {
+                    fragment.appendChild(child.firstChild);
+                }
+                child.replaceWith(fragment);
+                return;
+            }
+
+            Array.from(child.attributes).forEach(attr => {
+                child.removeAttribute(attr.name);
+            });
+        });
+    };
+
+    limpiarNodo(template.content);
+    return template.innerHTML.trim();
+}
+
+function actualizarEstadoEditorMedicacion(editor) {
+    if (!editor) return;
+    const texto = editor.textContent.replace(/\u00a0/g, " ").trim();
+    editor.classList.toggle("is-empty", texto.length === 0);
+}
+
+function inicializarEditoresMedicacion(root = document) {
+    root.querySelectorAll(".rich-editor-button").forEach(button => {
+        if (button.dataset.editorBound === "true") return;
+        button.dataset.editorBound = "true";
+        button.addEventListener("click", () => ejecutarComandoEditorMedicacion(button));
+    });
+
+    root.querySelectorAll(".rich-editor-input").forEach(editor => {
+        if (editor.dataset.editorBound === "true") {
+            actualizarEstadoEditorMedicacion(editor);
+            return;
+        }
+        editor.dataset.editorBound = "true";
+        editor.addEventListener("input", () => actualizarEstadoEditorMedicacion(editor));
+        editor.addEventListener("blur", () => actualizarEstadoEditorMedicacion(editor));
+        actualizarEstadoEditorMedicacion(editor);
+    });
+}
+
+function ejecutarComandoEditorMedicacion(button) {
+    const editorId = button.dataset.editorTarget;
+    const command = button.dataset.command;
+    const value = button.dataset.value || null;
+    const editor = document.getElementById(editorId);
+    if (!editor || !command) return;
+
+    editor.focus();
+    if (command === "formatBlock" && value) {
+        document.execCommand(command, false, value);
+    } else {
+        document.execCommand(command, false, null);
+    }
+    actualizarEstadoEditorMedicacion(editor);
+}
+
+function establecerContenidoEditorMedicacion(editorId, valor) {
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+    editor.innerHTML = sanitizarMedicacionHTML(valor);
+    actualizarEstadoEditorMedicacion(editor);
+}
+
+function obtenerContenidoEditorMedicacion(editorId) {
+    const editor = document.getElementById(editorId);
+    if (!editor) return "";
+
+    const html = sanitizarMedicacionHTML(editor.innerHTML);
+    const texto = editor.textContent.replace(/\u00a0/g, " ").trim();
+    return texto ? html : "";
+}
+
+function renderizarMedicacionAnimal(valor) {
+    const html = sanitizarMedicacionHTML(valor);
+    return html || '<p class="medicacion-vacia">No hay medicación</p>';
+}
+
 function construirAvatarClienteHTML(avatar, nombreCompleto, clase = "") {
     if (!avatar) return "";
     const claseFinal = clase ? ` ${clase}` : "";
@@ -89,6 +212,7 @@ function validarArchivoFotoAnimal(archivo) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    inicializarEditoresMedicacion();
     cargarClientes();
     document.getElementById('buscar').addEventListener('input', buscarClientes);
     enfocarBuscadorClientes();
@@ -790,7 +914,10 @@ function construirAnimalesHTML(animales) {
                             <p><span class="cliente-label">Tipo</span>${animal.tipo_animal ?? "Sin tipo"}</p>
                             <p><span class="cliente-label">Sexo</span>${formatearSexoAnimal(animal.sexo)}</p>
                             <p><span class="cliente-label">Edad</span>${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
-                            <p><span class="cliente-label">Medicación</span>${animal.medicacion ?? "No hay medicación"}</p>
+                            <div>
+                                <span class="cliente-label">Medicación</span>
+                                <div class="medicacion-render">${renderizarMedicacionAnimal(animal.medicacion)}</div>
+                            </div>
                         </div>
                         <div class="contrato-foto">
                             ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre_animal}">` : "No hay foto disponible"}
@@ -1235,6 +1362,7 @@ function mostrarFormularioAnimal(idCliente, nombreCliente = "") {
         animalModalCliente.hidden = !nombreClienteFinal;
     }
 
+    establecerContenidoEditorMedicacion("animal_medicacion", "");
     abrirModalAnimal();
 }
 
@@ -1273,7 +1401,9 @@ function mostrarFormularioEdicionAnimal(idAnimal) {
     if (tipoInput) tipoInput.value = animal.tipo_animal ?? "";
     if (sexoInput) sexoInput.value = animal.sexo ?? "";
     if (edadInput) edadInput.value = animal.edad ?? "";
-    if (medicacionInput) medicacionInput.value = animal.medicacion ?? "";
+    if (medicacionInput) {
+        establecerContenidoEditorMedicacion("animal_medicacion", animal.medicacion ?? "");
+    }
 
     const nombreCliente = `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
     if (animalModalCliente) {
@@ -1290,7 +1420,7 @@ function abrirModalAnimal() {
     animalModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
 
-    const primerCampo = animalForm?.querySelector("input, select, textarea");
+    const primerCampo = animalForm?.querySelector("input, select, textarea, [contenteditable='true']");
     if (primerCampo) {
         setTimeout(() => primerCampo.focus(), 50);
     }
@@ -1304,6 +1434,7 @@ function cerrarModalAnimal() {
     idClienteAnimal = null;
     animalEnEdicionId = null;
     limpiarErrorAnimalModal();
+    establecerContenidoEditorMedicacion("animal_medicacion", "");
     if (animalModalCliente) {
         animalModalCliente.textContent = "";
         animalModalCliente.hidden = true;
@@ -1375,7 +1506,7 @@ async function gestionarEnvioAnimalCliente(event) {
         formData.append("tipo_animal", tipoInput?.value.trim() ?? "");
         formData.append("sexo", sexoInput?.value ?? "");
         formData.append("edad", edadInput?.value.trim() ?? "");
-        formData.append("medicacion", medicacionInput?.value.trim() ?? "");
+        formData.append("medicacion", obtenerContenidoEditorMedicacion("animal_medicacion"));
         if (fotoArchivo) {
             formData.append("foto", fotoArchivo);
         }

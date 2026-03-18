@@ -1006,6 +1006,90 @@ nav {
     box-sizing: border-box;
 }
 
+.rich-editor {
+    margin-bottom: 10px;
+}
+
+.rich-editor-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.rich-editor-button {
+    border: 1px solid #d6d6d6;
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #505050;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.rich-editor-button:hover {
+    border-color: #d0021b;
+    color: #d0021b;
+}
+
+.rich-editor-input {
+    width: 100%;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    white-space: normal;
+}
+
+.rich-editor-input:focus {
+    outline: 2px solid rgba(208, 2, 27, 0.25);
+    border-color: #d0021b;
+}
+
+.rich-editor-input.is-empty::before {
+    content: attr(data-placeholder);
+    color: #8c8c8c;
+}
+
+.rich-editor-input p,
+.rich-editor-input ul,
+.rich-editor-input ol {
+    margin: 0 0 8px;
+}
+
+.rich-editor-input ul,
+.rich-editor-input ol {
+    padding-left: 22px;
+}
+
+.medicacion-render {
+    margin-top: 4px;
+    color: #333333;
+}
+
+.medicacion-render p,
+.medicacion-render ul,
+.medicacion-render ol {
+    margin: 0 0 8px;
+}
+
+.medicacion-render ul,
+.medicacion-render ol {
+    padding-left: 22px;
+}
+
+.medicacion-render > :last-child {
+    margin-bottom: 0;
+}
+
+.medicacion-vacia {
+    color: #666666;
+}
+
 .cliente-edit-actions {
     display: flex;
     justify-content: flex-end;
@@ -1312,6 +1396,10 @@ nav {
 
 .modal-field textarea {
     resize: vertical;
+}
+
+.modal-field .rich-editor {
+    margin-bottom: 0;
 }
 
 .modal-helper {

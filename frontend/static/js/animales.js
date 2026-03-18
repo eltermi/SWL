@@ -1,9 +1,11 @@
 /* Contenido base para animales.js */
 let animalModal = null;
 let animalForm = null;
+const MEDICACION_ALLOWED_TAGS = new Set(["P", "BR", "UL", "OL", "LI", "STRONG", "EM", "B", "I", "DIV"]);
 
 document.addEventListener('DOMContentLoaded', function () {
     inicializarModalAnimal();
+    inicializarEditoresMedicacion();
     cargarAnimales();
     cargarClientesEnFormulario();
     document.getElementById('animal-form').addEventListener('submit', agregarAnimal);
@@ -77,6 +79,128 @@ function leerArchivoComoDataURL(archivo) {
     });
 }
 
+function convertirTextoPlanoAMedicacionHTML(texto) {
+    const contenido = String(texto ?? "").replace(/\r/g, "").trim();
+    if (!contenido) return "";
+
+    return contenido
+        .split(/\n{2,}/)
+        .map(parrafo => `<p>${parrafo.split("\n").map(escaparHTML).join("<br>")}</p>`)
+        .join("");
+}
+
+function sanitizarMedicacionHTML(valor) {
+    const contenido = String(valor ?? "").trim();
+    if (!contenido) return "";
+
+    const htmlInicial = /<\/?[a-z][\s\S]*>/i.test(contenido)
+        ? contenido
+        : convertirTextoPlanoAMedicacionHTML(contenido);
+
+    const template = document.createElement("template");
+    template.innerHTML = htmlInicial;
+
+    const limpiarNodo = nodo => {
+        Array.from(nodo.childNodes).forEach(child => {
+            if (child.nodeType === Node.COMMENT_NODE) {
+                child.remove();
+                return;
+            }
+
+            if (child.nodeType !== Node.ELEMENT_NODE) {
+                return;
+            }
+
+            const tag = child.tagName.toUpperCase();
+
+            if (tag === "SCRIPT" || tag === "STYLE") {
+                child.remove();
+                return;
+            }
+
+            limpiarNodo(child);
+
+            if (!MEDICACION_ALLOWED_TAGS.has(tag)) {
+                const fragment = document.createDocumentFragment();
+                while (child.firstChild) {
+                    fragment.appendChild(child.firstChild);
+                }
+                child.replaceWith(fragment);
+                return;
+            }
+
+            Array.from(child.attributes).forEach(attr => {
+                child.removeAttribute(attr.name);
+            });
+        });
+    };
+
+    limpiarNodo(template.content);
+    return template.innerHTML.trim();
+}
+
+function actualizarEstadoEditorMedicacion(editor) {
+    if (!editor) return;
+    const texto = editor.textContent.replace(/\u00a0/g, " ").trim();
+    editor.classList.toggle("is-empty", texto.length === 0);
+}
+
+function inicializarEditoresMedicacion(root = document) {
+    root.querySelectorAll(".rich-editor-button").forEach(button => {
+        if (button.dataset.editorBound === "true") return;
+        button.dataset.editorBound = "true";
+        button.addEventListener("click", () => ejecutarComandoEditorMedicacion(button));
+    });
+
+    root.querySelectorAll(".rich-editor-input").forEach(editor => {
+        if (editor.dataset.editorBound === "true") {
+            actualizarEstadoEditorMedicacion(editor);
+            return;
+        }
+        editor.dataset.editorBound = "true";
+        editor.addEventListener("input", () => actualizarEstadoEditorMedicacion(editor));
+        editor.addEventListener("blur", () => actualizarEstadoEditorMedicacion(editor));
+        actualizarEstadoEditorMedicacion(editor);
+    });
+}
+
+function ejecutarComandoEditorMedicacion(button) {
+    const editorId = button.dataset.editorTarget;
+    const command = button.dataset.command;
+    const value = button.dataset.value || null;
+    const editor = document.getElementById(editorId);
+    if (!editor || !command) return;
+
+    editor.focus();
+    if (command === "formatBlock" && value) {
+        document.execCommand(command, false, value);
+    } else {
+        document.execCommand(command, false, null);
+    }
+    actualizarEstadoEditorMedicacion(editor);
+}
+
+function establecerContenidoEditorMedicacion(editorId, valor) {
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+    editor.innerHTML = sanitizarMedicacionHTML(valor);
+    actualizarEstadoEditorMedicacion(editor);
+}
+
+function obtenerContenidoEditorMedicacion(editorId) {
+    const editor = document.getElementById(editorId);
+    if (!editor) return "";
+
+    const html = sanitizarMedicacionHTML(editor.innerHTML);
+    const texto = editor.textContent.replace(/\u00a0/g, " ").trim();
+    return texto ? html : "";
+}
+
+function renderizarMedicacionAnimal(valor) {
+    const html = sanitizarMedicacionHTML(valor);
+    return html || '<p class="medicacion-vacia">No hay medicación</p>';
+}
+
 function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
     const anio = Number(anioNacimiento);
     if (!Number.isInteger(anio) || anio <= 0) return null;
@@ -115,11 +239,12 @@ function abrirModalAnimal() {
     if (!animalModal) return;
     limpiarErrorAnimalFormulario();
     animalForm?.reset();
+    establecerContenidoEditorMedicacion("form-medicacion", "");
     animalModal.classList.add("is-active");
     animalModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
 
-    const primerCampo = animalForm?.querySelector("input, select, textarea");
+    const primerCampo = animalForm?.querySelector("input, select, textarea, [contenteditable='true']");
     if (primerCampo) {
         setTimeout(() => primerCampo.focus(), 50);
     }
@@ -132,6 +257,7 @@ function cerrarModalAnimal() {
     document.body.classList.remove("modal-open");
     limpiarErrorAnimalFormulario();
     animalForm?.reset();
+    establecerContenidoEditorMedicacion("form-medicacion", "");
 }
 
 function cargarAnimales(busqueda = "") {
@@ -183,7 +309,10 @@ function cargarAnimales(busqueda = "") {
                                 <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
                                 <p><span class="encabezado">Sexo:</span> ${formatearSexoAnimal(animal.sexo)}</p>
                                 <p><span class="encabezado">Edad:</span> ${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
-                                <p><span class="encabezado">Medicación:</span> ${animal.medicacion ?? "No hay medicación"}</p>
+                                <div>
+                                    <span class="encabezado">Medicación:</span>
+                                    <div class="medicacion-render">${renderizarMedicacionAnimal(animal.medicacion)}</div>
+                                </div>
                             </div>
                             <div class="contrato-foto">
                                 ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre}">` : "No hay foto disponible"}
@@ -221,7 +350,7 @@ function agregarAnimal(event) {
     formData.append("tipo_animal", document.getElementById('form-tipo-animal').value);
     formData.append("sexo", document.getElementById('form-sexo-animal').value);
     formData.append("edad", document.getElementById('form-edad').value);
-    formData.append("medicacion", document.getElementById('form-medicacion').value);
+    formData.append("medicacion", obtenerContenidoEditorMedicacion("form-medicacion"));
     const fotoInput = document.getElementById("form-foto");
     if (fotoInput.files.length > 0) {
         formData.append("foto", fotoInput.files[0]);
@@ -253,7 +382,7 @@ function agregarAnimal1(event) {
     const id_cliente = document.getElementById('form-nombre-cliente').value;
     const tipo_animal = document.getElementById('form-tipo_animal').value;
     const edad = document.getElementById('form-edad').value;
-    const medicacion = document.getElementById('form-medicacion').value;
+    const medicacion = obtenerContenidoEditorMedicacion("form-medicacion");
     const foto = document.getElementById('form-foto').value;
 
     fetchAPI('/api/animales', {
@@ -307,7 +436,7 @@ function obtenerDetallesAnimal(animal) {
     const tipo = animal.tipo_animal ?? "Sin tipo";
     const sexo = formatearSexoAnimal(animal.sexo);
     const edad = formatearEdadDesdeAnioNacimiento(animal.edad);
-    const medicacion = animal.medicacion ?? "No hay medicación";
+    const medicacionHTML = renderizarMedicacionAnimal(animal.medicacion);
     const fotoHTML = animal.foto
         ? `<img src="${animal.foto}" alt="Foto de ${nombreAnimal}">`
         : `<div class="animal-detalle-foto-placeholder">Sin foto disponible</div>`;
@@ -330,7 +459,10 @@ function obtenerDetallesAnimal(animal) {
                     <p><span class="cliente-label">Tipo</span>${tipo}</p>
                     <p><span class="cliente-label">Sexo</span>${sexo}</p>
                     <p><span class="cliente-label">Edad</span>${edad}</p>
-                    <p><span class="cliente-label">Medicación</span>${medicacion}</p>
+                    <div>
+                        <span class="cliente-label">Medicación</span>
+                        <div class="medicacion-render">${medicacionHTML}</div>
+                    </div>
                     <p><span class="cliente-label">Cliente</span>${nombreCliente || "-"}</p>
                     <p><span class="cliente-label">ID cliente</span>${animal.id_cliente ?? "-"}</p>
                 </div>
@@ -389,7 +521,14 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
                         <label for="edit_animal_edad">Año de nacimiento (opcional)</label>
                         <input type="number" id="edit_animal_edad" min="1900" max="2999" step="1" value="${escaparHTML(String(anioNacimiento))}" placeholder="Ej: 2019">
                         <label for="edit_animal_medicacion">Medicación</label>
-                        <input type="text" id="edit_animal_medicacion" value="${escaparHTML(medicacion)}">
+                        <div class="rich-editor">
+                            <div class="rich-editor-toolbar" aria-label="Formato de medicación">
+                                <button type="button" class="rich-editor-button" data-editor-target="edit_animal_medicacion" data-command="formatBlock" data-value="p">Párrafo</button>
+                                <button type="button" class="rich-editor-button" data-editor-target="edit_animal_medicacion" data-command="insertUnorderedList">Lista</button>
+                                <button type="button" class="rich-editor-button" data-editor-target="edit_animal_medicacion" data-command="insertOrderedList">Numerada</button>
+                            </div>
+                            <div id="edit_animal_medicacion" class="rich-editor-input" contenteditable="true" data-placeholder="Añade medicación, instrucciones o pautas"></div>
+                        </div>
                         <label for="edit_animal_foto">Foto</label>
                         <input type="file" id="edit_animal_foto" accept="image/*">
                         ${fotoActualHTML}
@@ -411,6 +550,8 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
     document.getElementById("form-editar-animal-detalle")?.addEventListener("submit", event => {
         guardarCambiosAnimalDesdeDetalle(event, animal);
     });
+    inicializarEditoresMedicacion(muestraAnimal);
+    establecerContenidoEditorMedicacion("edit_animal_medicacion", medicacion);
     const fotoInput = document.getElementById("edit_animal_foto");
     const eliminarFotoInput = document.getElementById("edit_animal_eliminar_foto");
     if (fotoInput && eliminarFotoInput) {
@@ -463,7 +604,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
     const tipoAnimal = document.getElementById("edit_animal_tipo")?.value.trim() ?? "";
     const sexoAnimal = document.getElementById("edit_animal_sexo")?.value ?? "";
     const edad = document.getElementById("edit_animal_edad")?.value.trim() ?? "";
-    const medicacion = document.getElementById("edit_animal_medicacion")?.value.trim() ?? "";
+    const medicacion = obtenerContenidoEditorMedicacion("edit_animal_medicacion");
     const fotoArchivo = document.getElementById("edit_animal_foto")?.files?.[0] ?? null;
     const eliminarFoto = Boolean(document.getElementById("edit_animal_eliminar_foto")?.checked);
     const errorFoto = validarArchivoFotoAnimal(fotoArchivo);
