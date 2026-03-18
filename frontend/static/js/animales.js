@@ -240,7 +240,31 @@ function obtenerContenidoEditorMedicacion(editorId) {
 
 function renderizarMedicacionAnimal(valor) {
     const html = sanitizarMedicacionHTML(valor);
-    return html || '<p class="medicacion-vacia">No hay medicación</p>';
+    return html || "";
+}
+
+function construirBloqueMedicacionAnimal(valor, etiquetaClass = "encabezado") {
+    const medicacionHTML = renderizarMedicacionAnimal(valor);
+    if (!medicacionHTML) return "";
+
+    return `
+        <div>
+            <span class="${etiquetaClass}">Medicación:</span>
+            <div class="medicacion-render">${medicacionHTML}</div>
+        </div>
+    `;
+}
+
+function construirBloqueMedicacionDetalle(valor) {
+    const medicacionHTML = renderizarMedicacionAnimal(valor);
+    if (!medicacionHTML) return "";
+
+    return `
+        <div>
+            <span class="cliente-label">Medicación</span>
+            <div class="medicacion-render">${medicacionHTML}</div>
+        </div>
+    `;
 }
 
 function calcularEdadDesdeAnioNacimiento(anioNacimiento) {
@@ -357,10 +381,7 @@ function cargarAnimales(busqueda = "") {
                                 <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
                                 <p><span class="encabezado">Sexo:</span> ${formatearSexoAnimal(animal.sexo)}</p>
                                 <p><span class="encabezado">Edad:</span> ${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
-                                <div>
-                                    <span class="encabezado">Medicación:</span>
-                                    <div class="medicacion-render">${renderizarMedicacionAnimal(animal.medicacion)}</div>
-                                </div>
+                                ${construirBloqueMedicacionAnimal(animal.medicacion)}
                             </div>
                             <div class="contrato-foto">
                                 ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre}">` : "No hay foto disponible"}
@@ -488,7 +509,6 @@ function obtenerDetallesAnimal(animal) {
     const tipo = animal.tipo_animal ?? "Sin tipo";
     const sexo = formatearSexoAnimal(animal.sexo);
     const edad = formatearEdadDesdeAnioNacimiento(animal.edad);
-    const medicacionHTML = renderizarMedicacionAnimal(animal.medicacion);
     const fotoHTML = animal.foto
         ? `<img src="${animal.foto}" alt="Foto de ${nombreAnimal}">`
         : `<div class="animal-detalle-foto-placeholder">Sin foto disponible</div>`;
@@ -511,10 +531,7 @@ function obtenerDetallesAnimal(animal) {
                     <p><span class="cliente-label">Tipo</span>${tipo}</p>
                     <p><span class="cliente-label">Sexo</span>${sexo}</p>
                     <p><span class="cliente-label">Edad</span>${edad}</p>
-                    <div>
-                        <span class="cliente-label">Medicación</span>
-                        <div class="medicacion-render">${medicacionHTML}</div>
-                    </div>
+                    ${construirBloqueMedicacionDetalle(animal.medicacion)}
                     <p><span class="cliente-label">Cliente</span>${nombreCliente || "-"}</p>
                     <p><span class="cliente-label">ID cliente</span>${animal.id_cliente ?? "-"}</p>
                 </div>

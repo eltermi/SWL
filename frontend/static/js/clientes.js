@@ -218,7 +218,19 @@ function obtenerContenidoEditorMedicacion(editorId) {
 
 function renderizarMedicacionAnimal(valor) {
     const html = sanitizarMedicacionHTML(valor);
-    return html || '<p class="medicacion-vacia">No hay medicación</p>';
+    return html || "";
+}
+
+function construirBloqueMedicacionAnimal(valor) {
+    const medicacionHTML = renderizarMedicacionAnimal(valor);
+    if (!medicacionHTML) return "";
+
+    return `
+        <div>
+            <span class="cliente-label">Medicación</span>
+            <div class="medicacion-render">${medicacionHTML}</div>
+        </div>
+    `;
 }
 
 function construirAvatarClienteHTML(avatar, nombreCompleto, clase = "") {
@@ -966,10 +978,7 @@ function construirAnimalesHTML(animales) {
                             <p><span class="cliente-label">Tipo</span>${animal.tipo_animal ?? "Sin tipo"}</p>
                             <p><span class="cliente-label">Sexo</span>${formatearSexoAnimal(animal.sexo)}</p>
                             <p><span class="cliente-label">Edad</span>${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
-                            <div>
-                                <span class="cliente-label">Medicación</span>
-                                <div class="medicacion-render">${renderizarMedicacionAnimal(animal.medicacion)}</div>
-                            </div>
+                            ${construirBloqueMedicacionAnimal(animal.medicacion)}
                         </div>
                         <div class="contrato-foto">
                             ${animal.foto ? `<img src="${animal.foto}" alt="Foto de ${animal.nombre_animal}">` : "No hay foto disponible"}
