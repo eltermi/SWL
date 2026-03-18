@@ -27,13 +27,23 @@
 </head>
 <body>
     <header>
-        <h1>Sitters with Love</h1>
-        <div id="div-de-usuario" class="header-usuario" aria-live="polite"></div>
-        <div class="hamburger" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
+        <div class="header-topbar">
+            <span class="header-topbar-spacer" aria-hidden="true"></span>
+            <div class="brand-block">
+                <img
+                    src="{{ url_for('static', filename='img/branding/logo.png') }}"
+                    alt="Logo Sitters with Love"
+                    class="brand-logo"
+                >
+                <h1>Sitters with <span class="brand-love">Love</span></h1>
+            </div>
+            <div class="hamburger" onclick="toggleMenu()" aria-label="Abrir menu" role="button" tabindex="0">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
         </div>
+        <div id="div-de-usuario" class="header-usuario" aria-live="polite"></div>
         <nav>
             <ul class="menu" id="menu">
                 <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>

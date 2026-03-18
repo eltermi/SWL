@@ -58,6 +58,34 @@ h1 {
     margin: 10px 0;
 }
 
+.header-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-topbar-spacer {
+    display: none;
+}
+
+.brand-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-logo {
+    width: 188px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.brand-love {
+    color: #12b3f0;
+}
+
 .header-usuario {
     min-height: 18px;
     margin: -2px 0 6px;
@@ -105,6 +133,11 @@ nav {
 .hamburger {
     display: none;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     position: absolute;
     top: 20px;
@@ -113,9 +146,9 @@ nav {
 
 .hamburger div {
     width: 30px;
-    height: 4px;
+    height: 3px;
     background: black;
-    margin: 5px 0;
+    border-radius: 999px;
 }
 
 .day-header,
@@ -129,6 +162,10 @@ nav {
 .day-header {
     color: #d0021b;
     font-size: 20px;
+}
+
+.day-header.section-header-brand {
+    color: #12b3f0;
 }
 
 .entityHeader {
@@ -1332,18 +1369,58 @@ body.modal-open {
 
     h1 {
         font-size: 24px;
+        margin: 0;
     }
 
     .header-usuario {
-        min-height: 16px;
-        margin: -2px 0 4px;
+        min-height: 0;
+        margin: 2px 0 0;
         font-size: 12px;
+    }
+
+    .header-topbar {
+        display: grid;
+        grid-template-columns: 60px minmax(0, 1fr) 60px;
+        align-items: center;
+        gap: 10px;
+    }
+
+    header {
+        padding-top: 12px;
+        padding-bottom: 10px;
+    }
+
+    nav {
+        padding: 4px 0 0;
+    }
+
+    .header-topbar-spacer {
+        display: none;
+    }
+
+    .brand-block {
+        display: contents;
+    }
+
+    .brand-logo {
+        grid-column: 1;
+        width: 60px;
+        height: auto;
+        flex-shrink: 0;
+        justify-self: start;
+    }
+
+    .brand-block h1 {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: center;
+        text-align: center;
     }
 
     .menu {
         flex-direction: column;
         position: absolute;
-        top: 60px;
+        top: 72px;
         right: 0;
         background: white;
         width: 95%;
@@ -1354,6 +1431,12 @@ body.modal-open {
 
     .hamburger {
         display: flex;
+        grid-column: 3;
+        grid-row: 1;
+        position: static;
+        justify-self: end;
+        width: 60px;
+        height: 60px;
     }
 
     .menu.show {
