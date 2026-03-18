@@ -50,6 +50,12 @@ function formatearEdadDesdeAnioNacimiento(anioNacimiento) {
     return edad === null ? "Sin edad" : `${edad} años`;
 }
 
+function formatearSexoAnimal(sexo) {
+    if (sexo === "M") return "Macho";
+    if (sexo === "F") return "Hembra";
+    return "Sin especificar";
+}
+
 function construirAvatarClienteHTML(avatar, nombreCompleto, clase = "") {
     if (!avatar) return "";
     const claseFinal = clase ? ` ${clase}` : "";
@@ -782,6 +788,7 @@ function construirAnimalesHTML(animales) {
                         <div class="detalles">
                             <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
                             <p><span class="cliente-label">Tipo</span>${animal.tipo_animal ?? "Sin tipo"}</p>
+                            <p><span class="cliente-label">Sexo</span>${formatearSexoAnimal(animal.sexo)}</p>
                             <p><span class="cliente-label">Edad</span>${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
                             <p><span class="cliente-label">Medicación</span>${animal.medicacion ?? "No hay medicación"}</p>
                         </div>
@@ -1258,11 +1265,13 @@ function mostrarFormularioEdicionAnimal(idAnimal) {
 
     const nombreInput = document.getElementById("animal_nombre");
     const tipoInput = document.getElementById("animal_tipo");
+    const sexoInput = document.getElementById("animal_sexo");
     const edadInput = document.getElementById("animal_edad");
     const medicacionInput = document.getElementById("animal_medicacion");
 
     if (nombreInput) nombreInput.value = animal.nombre_animal ?? animal.nombre ?? "";
     if (tipoInput) tipoInput.value = animal.tipo_animal ?? "";
+    if (sexoInput) sexoInput.value = animal.sexo ?? "";
     if (edadInput) edadInput.value = animal.edad ?? "";
     if (medicacionInput) medicacionInput.value = animal.medicacion ?? "";
 
@@ -1333,6 +1342,7 @@ async function gestionarEnvioAnimalCliente(event) {
 
     const nombreInput = document.getElementById("animal_nombre");
     const tipoInput = document.getElementById("animal_tipo");
+    const sexoInput = document.getElementById("animal_sexo");
     const edadInput = document.getElementById("animal_edad");
     const medicacionInput = document.getElementById("animal_medicacion");
     const fotoInput = document.getElementById("animal_foto");
@@ -1363,6 +1373,7 @@ async function gestionarEnvioAnimalCliente(event) {
         const formData = new FormData();
         formData.append("nombre", nombre);
         formData.append("tipo_animal", tipoInput?.value.trim() ?? "");
+        formData.append("sexo", sexoInput?.value ?? "");
         formData.append("edad", edadInput?.value.trim() ?? "");
         formData.append("medicacion", medicacionInput?.value.trim() ?? "");
         if (fotoArchivo) {

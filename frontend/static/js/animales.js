@@ -1,5 +1,9 @@
 /* Contenido base para animales.js */
+let animalModal = null;
+let animalForm = null;
+
 document.addEventListener('DOMContentLoaded', function () {
+    inicializarModalAnimal();
     cargarAnimales();
     cargarClientesEnFormulario();
     document.getElementById('animal-form').addEventListener('submit', agregarAnimal);
@@ -86,6 +90,50 @@ function formatearEdadDesdeAnioNacimiento(anioNacimiento) {
     return edad === null ? "Sin edad" : `${edad} años`;
 }
 
+function formatearSexoAnimal(sexo) {
+    if (sexo === "M") return "Macho";
+    if (sexo === "F") return "Hembra";
+    return "Sin especificar";
+}
+
+function inicializarModalAnimal() {
+    animalModal = document.getElementById("animal-modal");
+    animalForm = document.getElementById("animal-form");
+
+    const abrirModalBtn = document.getElementById("abrir-animal-modal");
+    abrirModalBtn?.addEventListener("click", () => abrirModalAnimal());
+
+    if (!animalModal) return;
+
+    const closeTriggers = animalModal.querySelectorAll("[data-close-animal-modal]");
+    closeTriggers.forEach(trigger => {
+        trigger.addEventListener("click", () => cerrarModalAnimal());
+    });
+}
+
+function abrirModalAnimal() {
+    if (!animalModal) return;
+    limpiarErrorAnimalFormulario();
+    animalForm?.reset();
+    animalModal.classList.add("is-active");
+    animalModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+
+    const primerCampo = animalForm?.querySelector("input, select, textarea");
+    if (primerCampo) {
+        setTimeout(() => primerCampo.focus(), 50);
+    }
+}
+
+function cerrarModalAnimal() {
+    if (!animalModal) return;
+    animalModal.classList.remove("is-active");
+    animalModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    limpiarErrorAnimalFormulario();
+    animalForm?.reset();
+}
+
 function cargarAnimales(busqueda = "") {
     const container = document.getElementById("lista-animales");
     const muestraAnimal = document.getElementById("muestra-animal");
@@ -133,6 +181,7 @@ function cargarAnimales(busqueda = "") {
                         <div class="animal-content">
                             <div class="detalles">
                                 <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
+                                <p><span class="encabezado">Sexo:</span> ${formatearSexoAnimal(animal.sexo)}</p>
                                 <p><span class="encabezado">Edad:</span> ${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
                                 <p><span class="encabezado">Medicación:</span> ${animal.medicacion ?? "No hay medicación"}</p>
                             </div>
@@ -170,6 +219,7 @@ function agregarAnimal(event) {
     formData.append("nombre", document.getElementById('form-nombre-animal').value);
     formData.append("id_cliente", document.getElementById('form-nombre-cliente').value);
     formData.append("tipo_animal", document.getElementById('form-tipo-animal').value);
+    formData.append("sexo", document.getElementById('form-sexo-animal').value);
     formData.append("edad", document.getElementById('form-edad').value);
     formData.append("medicacion", document.getElementById('form-medicacion').value);
     const fotoInput = document.getElementById("form-foto");
@@ -189,8 +239,8 @@ function agregarAnimal(event) {
         }
         return response.json().catch(() => ({}));
     }).then(() => {
+        cerrarModalAnimal();
         cargarAnimales();
-        document.getElementById('animal-form').reset();
     }).catch(error => {
         console.error("🚨 Error al agregar animal:", error);
         mostrarErrorAnimalFormulario(error?.message || "No se pudo crear el animal.");
@@ -246,10 +296,8 @@ function obtenerDetallesAnimal(animal) {
 
     const container = document.getElementById("lista-animales");
     const muestraAnimal = document.getElementById("muestra-animal");
-    const formulario = document.getElementById("form-crea-animal");
 
     container.style.display = "none";
-    formulario.style.display = "none";
     muestraAnimal.style.display = "block";
 
     const nombreAnimal = animal.nombre_animal ?? animal.nombre ?? "Sin nombre";
@@ -257,6 +305,7 @@ function obtenerDetallesAnimal(animal) {
         .filter(part => part && part.trim().length > 0)
         .join(" ");
     const tipo = animal.tipo_animal ?? "Sin tipo";
+    const sexo = formatearSexoAnimal(animal.sexo);
     const edad = formatearEdadDesdeAnioNacimiento(animal.edad);
     const medicacion = animal.medicacion ?? "No hay medicación";
     const fotoHTML = animal.foto
@@ -279,6 +328,7 @@ function obtenerDetallesAnimal(animal) {
             <div class="animal-detalle-body">
                 <div>
                     <p><span class="cliente-label">Tipo</span>${tipo}</p>
+                    <p><span class="cliente-label">Sexo</span>${sexo}</p>
                     <p><span class="cliente-label">Edad</span>${edad}</p>
                     <p><span class="cliente-label">Medicación</span>${medicacion}</p>
                     <p><span class="cliente-label">Cliente</span>${nombreCliente || "-"}</p>
@@ -301,6 +351,7 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
     const muestraAnimal = document.getElementById("muestra-animal");
     const nombreAnimal = animal.nombre_animal ?? animal.nombre ?? "";
     const tipoAnimal = animal.tipo_animal ?? "";
+    const sexoAnimal = animal.sexo ?? "";
     const anioNacimiento = animal.edad ?? "";
     const medicacion = animal.medicacion ?? "";
     const fotoActualHTML = animal.foto
@@ -327,6 +378,12 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
                         <input type="text" id="edit_animal_nombre" value="${escaparHTML(nombreAnimal)}" required>
                         <label for="edit_animal_tipo">Tipo</label>
                         <input type="text" id="edit_animal_tipo" value="${escaparHTML(tipoAnimal)}">
+                        <label for="edit_animal_sexo">Sexo</label>
+                        <select id="edit_animal_sexo">
+                            <option value="" ${!sexoAnimal ? "selected" : ""}>Sin especificar</option>
+                            <option value="M" ${sexoAnimal === "M" ? "selected" : ""}>M</option>
+                            <option value="F" ${sexoAnimal === "F" ? "selected" : ""}>F</option>
+                        </select>
                     </div>
                     <div class="form-column">
                         <label for="edit_animal_edad">Año de nacimiento (opcional)</label>
@@ -404,6 +461,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
     }
 
     const tipoAnimal = document.getElementById("edit_animal_tipo")?.value.trim() ?? "";
+    const sexoAnimal = document.getElementById("edit_animal_sexo")?.value ?? "";
     const edad = document.getElementById("edit_animal_edad")?.value.trim() ?? "";
     const medicacion = document.getElementById("edit_animal_medicacion")?.value.trim() ?? "";
     const fotoArchivo = document.getElementById("edit_animal_foto")?.files?.[0] ?? null;
@@ -417,6 +475,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
     const formData = new FormData();
     formData.append("nombre", nombre);
     formData.append("tipo_animal", tipoAnimal);
+    formData.append("sexo", sexoAnimal);
     formData.append("edad", edad);
     formData.append("medicacion", medicacion);
     formData.append("eliminar_foto", eliminarFoto ? "true" : "false");
@@ -451,6 +510,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
                 nombre_animal: nombre,
                 nombre: nombre,
                 tipo_animal: tipoAnimal,
+                sexo: sexoAnimal || null,
                 edad: edad === "" ? null : Number(edad),
                 medicacion: medicacion,
                 foto: fotoActualizada
@@ -467,10 +527,8 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
 function volverAlListadoAnimales(recargar = false) {
     const container = document.getElementById("lista-animales");
     const muestraAnimal = document.getElementById("muestra-animal");
-    const formulario = document.getElementById("form-crea-animal");
 
     container.style.display = "block";
-    formulario.style.display = "block";
     muestraAnimal.style.display = "none";
     muestraAnimal.innerHTML = "";
 

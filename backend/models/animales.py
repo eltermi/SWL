@@ -19,6 +19,7 @@ class Animales(db.Model):
     tipo_animal: Mapped[str] = mapped_column(String(50))
     nombre: Mapped[str] = mapped_column(String(50))
     id_cliente: Mapped[Optional[int]] = mapped_column(Integer)
+    sexo: Mapped[Optional[str]] = mapped_column(Enum('M', 'F'))
     edad: Mapped[Optional[int]] = mapped_column(Integer)
     medicacion: Mapped[Optional[str]] = mapped_column(Text)
     foto: Mapped[Optional[bytes]] = mapped_column(LONGBLOB)
@@ -49,7 +50,7 @@ class Animales(db.Model):
     def obtener_animal_cliente(cls, id_cliente):
         sql_query_cliente = text("""
     
-                        SELECT id_animal, id_cliente, tipo_animal, nombre, edad, medicacion, foto
+                        SELECT id_animal, id_cliente, tipo_animal, nombre, sexo, edad, medicacion, foto
                           FROM ANIMALES
                          WHERE id_cliente = :id_cliente
         """)
@@ -67,6 +68,7 @@ class Animales(db.Model):
                 "id_cliente": row.id_cliente,
                 "nombre_animal": row.nombre,
                 "tipo_animal": row.tipo_animal,
+                "sexo": row.sexo,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
                 "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
@@ -84,6 +86,7 @@ class Animales(db.Model):
                     c.nombre AS nombre_cliente,
                     c.apellidos AS apellidos_cliente,
                     a.tipo_animal,
+                    a.sexo,
                     a.edad,
                     a.medicacion,
                     a.foto
@@ -118,6 +121,7 @@ class Animales(db.Model):
                 "nombre_cliente": row.nombre_cliente,
                 "apellidos_cliente": row.apellidos_cliente,
                 "tipo_animal": row.tipo_animal,
+                "sexo": row.sexo,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
                 "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML

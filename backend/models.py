@@ -67,6 +67,7 @@ class Animales(Base):
     tipo_animal: Mapped[str] = mapped_column(String(50))
     nombre: Mapped[str] = mapped_column(String(50))
     id_cliente: Mapped[Optional[int]] = mapped_column(Integer)
+    sexo: Mapped[Optional[str]] = mapped_column(Enum('M', 'F'))
     edad: Mapped[Optional[int]] = mapped_column(Integer)
     medicacion: Mapped[Optional[str]] = mapped_column(Text)
     foto: Mapped[Optional[bytes]] = mapped_column(LONGBLOB)

@@ -33,6 +33,22 @@ def _obtener_datos_animal_request():
     return request.form.to_dict()
 
 
+def _valor_texto_o_none(valor):
+    if valor is None:
+        return None
+    valor_normalizado = str(valor).strip()
+    return valor_normalizado or None
+
+
+def _validar_sexo(valor):
+    sexo = _valor_texto_o_none(valor)
+    if sexo is None:
+        return None
+    if sexo not in ('M', 'F'):
+        raise ValueError("El campo 'sexo' solo puede estar vacío o tener el valor 'M' o 'F'.")
+    return sexo
+
+
 def _es_true(valor):
     return str(valor or '').strip().lower() in ('1', 'true', 'si', 'sí', 'on')
 
@@ -50,6 +66,7 @@ def obtener_animales():
         'nombre_cliente': animal['nombre_cliente'],
         'apellidos_cliente': animal['apellidos_cliente'],
         'tipo_animal': animal['tipo_animal'],
+        'sexo': animal['sexo'],
         'edad': animal['edad'],
         'medicacion': animal['medicacion'], 
         'foto': animal['foto']
@@ -63,6 +80,7 @@ def crear_animal():
     archivo = request.files.get('foto')
     try:
         anio_nacimiento = _normalizar_anio_nacimiento(datos.get('edad'))
+        sexo = _validar_sexo(datos.get('sexo'))
     except ValueError as error:
         return jsonify({'mensaje': str(error)}), 400
 
@@ -70,6 +88,7 @@ def crear_animal():
         id_cliente=datos['id_cliente'],
         tipo_animal=datos['tipo_animal'],
         nombre=datos['nombre'],
+        sexo=sexo,
         edad=anio_nacimiento,
         medicacion=datos.get('medicacion'),
         foto=archivo.read() if archivo else None
@@ -93,6 +112,7 @@ def obtener_animal(id_animal):
         'id_cliente': animal.id_cliente,
         'tipo_animal': animal.tipo_animal,
         'nombre': animal.nombre,
+        'sexo': animal.sexo,
         'edad': animal.edad,
         'medicacion': animal.medicacion
     })
@@ -117,11 +137,13 @@ def actualizar_animal(id_animal):
 
     try:
         anio_nacimiento = _normalizar_anio_nacimiento(datos.get('edad', animal.edad))
+        sexo = _validar_sexo(datos.get('sexo', animal.sexo))
     except ValueError as error:
         return jsonify({'mensaje': str(error)}), 400
 
     animal.tipo_animal = datos.get('tipo_animal', animal.tipo_animal)
     animal.nombre = datos.get('nombre', animal.nombre)
+    animal.sexo = sexo
     animal.edad = anio_nacimiento
     animal.medicacion = datos.get('medicacion', animal.medicacion)
 
