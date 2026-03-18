@@ -33,6 +33,10 @@ def clientes():
 def animales():
     return render_template("animales.html")
 
+@app.route("/contactos")
+def contactos():
+    return render_template("contactos.html")
+
 # Configurar Swagger UI
 SWAGGER_URL = "/swagger"
 API_URL = "/static/swagger.json"  # Ruta al archivo Swagger JSON
@@ -67,7 +71,6 @@ app.register_blueprint(dashboard_bp, url_prefix='/api')
 # Ejecutar la aplicación
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
-
 
 
 

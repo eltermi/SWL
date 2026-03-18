@@ -1,10 +1,8 @@
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
+from sqlalchemy import Enum, Integer, String, text
 from sqlalchemy.dialects.mysql import LONGBLOB
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from extensions import db
-import datetime
-import decimal
 
 if TYPE_CHECKING:
     from models.animales import Animales
@@ -46,9 +44,27 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
                 clientes.codigo_postal,
                 clientes.municipio,
                 clientes.telefono,
-                contactos_adicionales.nombre AS ad_nombre,
-                contactos_adicionales.apellidos AS ad_apellidos,
-                contactos_adicionales.telefono AS ad_telefono,
+                (
+                    SELECT ca.nombre
+                    FROM SWL.contactos_adicionales ca
+                    WHERE ca.id_cliente = clientes.id_cliente
+                    ORDER BY ca.id_contacto
+                    LIMIT 1
+                ) AS ad_nombre,
+                (
+                    SELECT ca.apellidos
+                    FROM SWL.contactos_adicionales ca
+                    WHERE ca.id_cliente = clientes.id_cliente
+                    ORDER BY ca.id_contacto
+                    LIMIT 1
+                ) AS ad_apellidos,
+                (
+                    SELECT ca.telefono
+                    FROM SWL.contactos_adicionales ca
+                    WHERE ca.id_cliente = clientes.id_cliente
+                    ORDER BY ca.id_contacto
+                    LIMIT 1
+                ) AS ad_telefono,
                 (
                     SELECT CASE
                         WHEN COUNT(*) > 1 THEN CONCAT(
@@ -74,13 +90,22 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
                     WHERE a_todos.id_cliente = clientes.id_cliente
                 ) AS tiene_animales
             FROM SWL.clientes
-            LEFT JOIN contactos_adicionales ON contactos_adicionales.id_cliente = clientes.id_cliente
             WHERE (
                 :filtro_vacio = 1
                 OR clientes.nombre LIKE :filtro
                 OR clientes.municipio LIKE :filtro
                 OR clientes.apellidos LIKE :filtro
-                OR contactos_adicionales.nombre LIKE :filtro
+                OR EXISTS(
+                    SELECT 1
+                    FROM SWL.contactos_adicionales ca_busqueda
+                    WHERE ca_busqueda.id_cliente = clientes.id_cliente
+                      AND (
+                          ca_busqueda.nombre LIKE :filtro
+                          OR ca_busqueda.apellidos LIKE :filtro
+                          OR ca_busqueda.telefono LIKE :filtro
+                          OR ca_busqueda.email LIKE :filtro
+                      )
+                )
                 OR EXISTS(
                     SELECT 1
                     FROM SWL.animales a_busqueda
@@ -103,17 +128,6 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
                     WHERE a_todos.id_cliente = clientes.id_cliente
                 )
             )
-            GROUP BY clientes.id_cliente,
-                    clientes.nombre,
-                    clientes.apellidos,
-                    clientes.calle,
-                    clientes.piso,
-                    clientes.codigo_postal,
-                    clientes.municipio,
-                    clientes.telefono,
-                    contactos_adicionales.nombre,
-                    contactos_adicionales.apellidos,
-                    contactos_adicionales.telefono
             ORDER BY clientes.nombre
         """)
 
@@ -143,13 +157,8 @@ class Clientes(db.Model):  # Usar db.Model en lugar de DeclarativeBase
                             clientes.idioma,
                             clientes.genero,
                             clientes.referencia_origen as referencia,
-                            clientes.whatsapp_avatar,
-                            contactos_adicionales.nombre as ad_nombre,
-                            contactos_adicionales.apellidos as ad_apellidos,
-                            contactos_adicionales.telefono as ad_telefono,
-                            contactos_adicionales.email as ad_email
+                            clientes.whatsapp_avatar
                         FROM SWL.clientes
-                        LEFT JOIN contactos_adicionales ON contactos_adicionales.id_cliente = clientes.id_cliente
                         WHERE clientes.id_cliente = :id_cliente
         """)
         result = db.session.execute(sql_query_cliente, {"id_cliente": id_cliente}).fetchone()

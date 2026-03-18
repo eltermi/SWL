@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Contactos - Sitters with Love{% endblock %}
+
+{% block content %}
+<h2 id="cabecera" class="day-header section-header-brand">Contactos</h2>
+<input type="text" id="buscar" class="buscar" placeholder="Buscar contactos o clientes">
+<div class="cliente-actions">
+    <button type="button" id="abrir-contacto-modal" class="btn-principal">Añadir contacto</button>
+</div>
+<div id="lista-contactos"></div>
+<div id="muestra-contacto"></div>
+
+<div id="contacto-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-contacto-modal></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="contacto-modal-title">
+        <button type="button" class="modal-close" aria-label="Cerrar" data-close-contacto-modal>&times;</button>
+        <h3 id="contacto-modal-title" class="modal-title">Añadir contacto</h3>
+        <form id="contacto-form" class="modal-form" novalidate>
+            <div id="form-contacto-error-general" class="modal-error" role="alert" aria-live="assertive" hidden></div>
+            <div class="modal-field">
+                <label for="form-nombre-contacto">Nombre <span class="required">*</span></label>
+                <input type="text" id="form-nombre-contacto" required>
+            </div>
+            <div class="modal-field">
+                <label for="form-apellidos-contacto">Apellidos</label>
+                <input type="text" id="form-apellidos-contacto">
+            </div>
+            <div class="modal-field">
+                <label for="form-cliente-contacto">Cliente <span class="required">*</span></label>
+                <select id="form-cliente-contacto" required>
+                    <option value="">Selecciona un cliente</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label for="form-telefono-contacto">Teléfono</label>
+                <input type="text" id="form-telefono-contacto">
+            </div>
+            <div class="modal-field">
+                <label for="form-email-contacto">Email</label>
+                <input type="email" id="form-email-contacto">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secundario" data-close-contacto-modal>Cancelar</button>
+                <button type="submit" class="btn-principal">Guardar contacto</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/contactos.js', v='20260318-contactos') }}"></script>
+{% endblock %}

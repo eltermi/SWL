@@ -2,7 +2,7 @@ import base64
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import DataError, IntegrityError
 from extensions import db
-from models import Clientes, Contratos
+from models import Clientes, ContactosAdicionales, Contratos
 from utils.auth import requerir_autenticacion
 from utils.db_errors import mensaje_error_persistencia
 from utils.input_normalizers import normalizar_telefono
@@ -165,6 +165,19 @@ def crear_cliente():
 @requerir_autenticacion
 def obtener_cliente(id_cliente):
     cliente = Clientes.obtener_datos_cliente(id_cliente)
+    if cliente is None:
+        return jsonify({'mensaje': 'Cliente no encontrado'}), 404
+
+    contactos = ContactosAdicionales.obtener_contactos_cliente(id_cliente)
+    contactos_serializados = [{
+        'id_contacto': contacto.id_contacto,
+        'id_cliente': contacto.id_cliente,
+        'nombre': contacto.nombre,
+        'apellidos': contacto.apellidos,
+        'telefono': contacto.telefono,
+        'email': contacto.email
+    } for contacto in contactos]
+
     return jsonify({
         'id_cliente': cliente.id_cliente,
         'nombre': cliente.nombre,
@@ -181,10 +194,11 @@ def obtener_cliente(id_cliente):
         'genero': cliente.genero,
         'referencia': cliente.referencia,
         'whatsapp_avatar': _serializar_avatar(cliente.whatsapp_avatar),
-        'ad_nombre': cliente.ad_nombre,
-        'ad_apellidos': cliente.ad_apellidos,
-        'ad_telefono': cliente.ad_telefono,
-        'ad_email': cliente.ad_email
+        'contactos_adicionales': contactos_serializados,
+        'ad_nombre': contactos_serializados[0]['nombre'] if contactos_serializados else None,
+        'ad_apellidos': contactos_serializados[0]['apellidos'] if contactos_serializados else None,
+        'ad_telefono': contactos_serializados[0]['telefono'] if contactos_serializados else None,
+        'ad_email': contactos_serializados[0]['email'] if contactos_serializados else None
     })
 
 @clientes_bp.route('/clientes/<int:id_cliente>/contratos', methods=['GET'])

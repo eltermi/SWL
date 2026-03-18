@@ -1,10 +1,7 @@
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
-from sqlalchemy.dialects.mysql import LONGBLOB
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKeyConstraint, Index, Integer, String, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from extensions import db
-import datetime
-import decimal
 
 if TYPE_CHECKING:
     from models.Clientes import Clientes
@@ -24,3 +21,50 @@ class ContactosAdicionales(db.Model):
     email: Mapped[Optional[str]] = mapped_column(String(100))
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contactos_adicionales')
+
+    @classmethod
+    def obtener_contactos(cls, filtro=""):
+        sql_query = text("""
+            SELECT
+                ca.id_contacto,
+                ca.id_cliente,
+                ca.nombre,
+                ca.apellidos,
+                ca.telefono,
+                ca.email,
+                c.nombre AS nombre_cliente,
+                c.apellidos AS apellidos_cliente
+            FROM SWL.contactos_adicionales ca
+            LEFT JOIN SWL.clientes c ON c.id_cliente = ca.id_cliente
+            WHERE (
+                :filtro_vacio = 1
+                OR ca.nombre LIKE :filtro
+                OR ca.apellidos LIKE :filtro
+                OR ca.telefono LIKE :filtro
+                OR ca.email LIKE :filtro
+                OR c.nombre LIKE :filtro
+                OR c.apellidos LIKE :filtro
+            )
+            ORDER BY c.nombre, c.apellidos, ca.id_contacto
+        """)
+        filtro_normalizado = f"%{filtro}%" if filtro else ""
+        return db.session.execute(sql_query, {
+            "filtro": filtro_normalizado,
+            "filtro_vacio": 0 if filtro else 1
+        })
+
+    @classmethod
+    def obtener_contactos_cliente(cls, id_cliente):
+        sql_query = text("""
+            SELECT
+                ca.id_contacto,
+                ca.id_cliente,
+                ca.nombre,
+                ca.apellidos,
+                ca.telefono,
+                ca.email
+            FROM SWL.contactos_adicionales ca
+            WHERE ca.id_cliente = :id_cliente
+            ORDER BY ca.id_contacto
+        """)
+        return db.session.execute(sql_query, {"id_cliente": id_cliente}).fetchall()

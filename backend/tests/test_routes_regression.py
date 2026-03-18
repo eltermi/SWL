@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 from flask import Flask
 
-from routes import animales_routes, clientes_routes, contratos_routes
+from routes import animales_routes, clientes_routes, contactos_routes, contratos_routes
 
 
 def _app():
@@ -292,3 +292,82 @@ def test_actualizar_contrato_con_tarifa_inexistente_devuelve_400(monkeypatch):
 
     assert status == 400
     assert response.get_json()["mensaje"] == "La tarifa seleccionada no existe"
+
+
+def test_crear_contacto_normaliza_telefono(monkeypatch):
+    app = _app()
+    capturado = {}
+
+    class DummyContacto:
+        def __init__(self, **kwargs):
+            capturado.update(kwargs)
+            self.id_contacto = 7
+
+    class DummySession:
+        def add(self, _):
+            return None
+
+        def commit(self):
+            return None
+
+    class DummyClienteQuery:
+        @staticmethod
+        def get(_):
+            return object()
+
+    class DummyClientes:
+        query = DummyClienteQuery()
+
+    monkeypatch.setattr(contactos_routes, "ContactosAdicionales", DummyContacto)
+    monkeypatch.setattr(contactos_routes, "Clientes", DummyClientes)
+    monkeypatch.setattr(contactos_routes.db, "session", DummySession())
+
+    payload = {
+        "nombre": "Ana",
+        "id_cliente": 3,
+        "telefono": "\u202a+352\xa0661\xa0280\xa0008\u202c"
+    }
+
+    with app.test_request_context(json=payload):
+        response, status = contactos_routes.crear_contacto.__wrapped__()
+
+    assert status == 201
+    assert response.get_json()["mensaje"] == "Contacto creado exitosamente"
+    assert capturado["telefono"] == "+352661280008"
+
+
+def test_actualizar_contacto_valida_cliente_inexistente(monkeypatch):
+    app = _app()
+
+    dummy_contacto = SimpleNamespace(
+        id_cliente=1,
+        nombre="Ana",
+        apellidos="Test",
+        telefono=None,
+        email=None,
+    )
+
+    class DummyContactoQuery:
+        @staticmethod
+        def get_or_404(_):
+            return dummy_contacto
+
+    class DummyContactos:
+        query = DummyContactoQuery()
+
+    class DummyClienteQuery:
+        @staticmethod
+        def get(_):
+            return None
+
+    class DummyClientes:
+        query = DummyClienteQuery()
+
+    monkeypatch.setattr(contactos_routes, "ContactosAdicionales", DummyContactos)
+    monkeypatch.setattr(contactos_routes, "Clientes", DummyClientes)
+
+    with app.test_request_context(json={"id_cliente": 999}):
+        response, status = contactos_routes.actualizar_contacto.__wrapped__(5)
+
+    assert status == 400
+    assert response.get_json()["mensaje"] == "El cliente seleccionado no existe."

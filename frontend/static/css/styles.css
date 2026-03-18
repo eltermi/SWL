@@ -213,12 +213,15 @@ nav {
 #form-crea-cliente,
 #form-crea-animal,
 #lista-animales,
-#muestra-animal {
+#muestra-animal,
+#lista-contactos,
+#muestra-contacto {
     max-width: 600px;
     margin: 20px auto;
 }
 
-#lista-animales h3 {
+#lista-animales h3,
+#lista-contactos h3 {
     margin-top: 30px;
     margin-bottom: 10px;
     font-size: 20px;
@@ -228,11 +231,13 @@ nav {
     font-family: 'Arial', sans-serif;
 }
 
-#lista-animales h3+.animal {
+#lista-animales h3+.animal,
+#lista-contactos h3+.animal {
     margin-top: 5px;
 }
 
-#lista-animales .animal:last-of-type {
+#lista-animales .animal:last-of-type,
+#lista-contactos .animal:last-of-type {
     margin-bottom: 30px;
 }
 
@@ -1429,6 +1434,24 @@ nav {
     height: 100%;
     object-fit: cover;
     border-radius: 10px;
+}
+
+.cliente-contacts-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.cliente-contact-card {
+    border: 1px solid #d7dfd3;
+    border-radius: 16px;
+    background: #f8fbf6;
+    padding: 18px 20px;
+}
+
+.cliente-contact-name {
+    font-weight: 700;
+    color: #173b1d;
+    margin-bottom: 8px;
 }
 
 .modal {

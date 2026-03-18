@@ -661,18 +661,27 @@ function obtenerDetallesCliente(id_cliente) {
             muestraCliente.style.display = "block";
 
             clienteDetalleActual = cliente;
+            const contactosAdicionales = Array.isArray(cliente.contactos_adicionales)
+                ? cliente.contactos_adicionales
+                : (cliente.ad_nombre ? [{
+                    nombre: cliente.ad_nombre,
+                    apellidos: cliente.ad_apellidos,
+                    telefono: cliente.ad_telefono,
+                    email: cliente.ad_email
+                }] : []);
 
             const nombreCompleto = `${cliente.nombre ?? ""}${cliente.apellidos ? " " + cliente.apellidos : ""}`.trim();
             const avatarClienteHTML = construirAvatarClienteHTML(cliente.whatsapp_avatar, nombreCompleto);
             const emailHTML = cliente.email
                 ? `<p class="cliente-email"><a href="mailto:${cliente.email}">${cliente.email}</a></p>`
                 : "";
-            const contactoAlternativo = cliente.ad_nombre
+            const contactoPrincipal = contactosAdicionales[0] || null;
+            const contactoAlternativo = contactoPrincipal
                 ? `
                         <div class="cliente-alt-contact">
                             <p class="cliente-label">Contacto alternativo</p>
-                            <p class="cliente-alt-nombre">${cliente.ad_nombre}${cliente.ad_apellidos ? " " + cliente.ad_apellidos : ""}</p>
-                            ${cliente.ad_telefono ? `<p class="cliente-alt-telefono">${cliente.ad_telefono}</p>` : ""}
+                            <p class="cliente-alt-nombre">${escaparHTML(contactoPrincipal.nombre ?? "")}${contactoPrincipal.apellidos ? ` ${escaparHTML(contactoPrincipal.apellidos)}` : ""}</p>
+                            ${contactoPrincipal.telefono ? `<p class="cliente-alt-telefono">${escaparHTML(contactoPrincipal.telefono)}</p>` : ""}
                         </div>`
                 : "";
 
@@ -745,6 +754,7 @@ function obtenerDetallesCliente(id_cliente) {
                 .then(([contratos, animales]) => {
                     contratosClienteActuales = Array.isArray(contratos) ? contratos : [];
                     animalesClienteActuales = Array.isArray(animales) ? animales : [];
+                    contenidoHTML += construirContactosAdicionalesHTML(contactosAdicionales);
                     contenidoHTML += construirAnimalesHTML(animales);
                     contenidoHTML += construirContratosHTML(contratos);
                     muestraCliente.innerHTML = contenidoHTML;
@@ -1016,6 +1026,34 @@ function construirAnimalesHTML(animales) {
     }
 
     html += `</div>`;
+    return html;
+}
+
+function construirContactosAdicionalesHTML(contactos) {
+    const contactosNormalizados = Array.isArray(contactos) ? contactos.filter(Boolean) : [];
+
+    let html = `
+        <div class="cliente-section cliente-contacts">
+            <p class="cliente-section-title">Contactos adicionales</p>
+    `;
+
+    if (!contactosNormalizados.length) {
+        html += `<p class="cliente-empty">No hay contactos adicionales registrados.</p></div>`;
+        return html;
+    }
+
+    html += `<div class="cliente-contacts-grid">`;
+    contactosNormalizados.forEach(contacto => {
+        const nombreCompleto = `${contacto.nombre ?? ""}${contacto.apellidos ? ` ${contacto.apellidos}` : ""}`.trim();
+        html += `
+            <div class="cliente-contact-card">
+                <p class="cliente-contact-name">${escaparHTML(nombreCompleto || "Sin nombre")}</p>
+                <p><span class="cliente-label">Teléfono</span>${escaparHTML(contacto.telefono || "-")}</p>
+                <p><span class="cliente-label">Email</span>${escaparHTML(contacto.email || "-")}</p>
+            </div>
+        `;
+    });
+    html += `</div></div>`;
     return html;
 }
 
