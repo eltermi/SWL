@@ -513,8 +513,8 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
                         <label for="edit_animal_sexo">Sexo</label>
                         <select id="edit_animal_sexo">
                             <option value="" ${!sexoAnimal ? "selected" : ""}>Sin especificar</option>
-                            <option value="M" ${sexoAnimal === "M" ? "selected" : ""}>M</option>
-                            <option value="F" ${sexoAnimal === "F" ? "selected" : ""}>F</option>
+                            <option value="M" ${sexoAnimal === "M" ? "selected" : ""}>Macho</option>
+                            <option value="F" ${sexoAnimal === "F" ? "selected" : ""}>Hembra</option>
                         </select>
                     </div>
                     <div class="form-column">
