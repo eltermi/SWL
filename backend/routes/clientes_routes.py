@@ -81,12 +81,17 @@ def _validar_genero(valor):
         raise ValueError("El campo 'genero' solo puede estar vacío o tener el valor 'M' o 'F'.")
     return genero
 
+
+def _es_true(valor):
+    return str(valor or '').strip().lower() in ('1', 'true', 'si', 'sí', 'on')
+
 @clientes_bp.route('/clientes', methods=['GET'])
 @requerir_autenticacion
 def obtener_clientes():
     filtro = request.args.get('buscar', '').strip()
+    incluir_fallecidos = _es_true(request.args.get('incluir_fallecidos'))
 
-    clientes = Clientes.obtener_clientes(filtro)
+    clientes = Clientes.obtener_clientes(filtro, incluir_fallecidos=incluir_fallecidos)
 
     return jsonify([{
         'id_cliente': cliente.id_cliente,
@@ -97,6 +102,7 @@ def obtener_clientes():
         'municipio': cliente.municipio,
         'telefono': cliente.telefono,
         'gatos': cliente.gatos,
+        'solo_fallecidos': bool(cliente.tiene_animales) and not bool(cliente.tiene_animales_vivos),
         'ad_nombre': cliente.ad_nombre,
         'ad_apellidos': cliente.ad_apellidos,
         'ad_telefono': cliente.ad_telefono

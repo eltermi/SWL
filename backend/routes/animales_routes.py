@@ -57,8 +57,9 @@ def _es_true(valor):
 @requerir_autenticacion
 def obtener_animales():
     filtro = request.args.get('buscar', '').strip()
+    incluir_fallecidos = _es_true(request.args.get('incluir_fallecidos'))
 
-    animales = Animales.obtener_animales(filtro)
+    animales = Animales.obtener_animales(filtro, incluir_fallecidos=incluir_fallecidos)
     return jsonify([{
         'id_animal': animal['id_animal'],
         'id_cliente': animal['id_cliente'],
@@ -69,6 +70,7 @@ def obtener_animales():
         'sexo': animal['sexo'],
         'edad': animal['edad'],
         'medicacion': animal['medicacion'], 
+        'fallecido': animal['fallecido'],
         'foto': animal['foto']
     } for animal in animales])
 
@@ -91,6 +93,7 @@ def crear_animal():
         sexo=sexo,
         edad=anio_nacimiento,
         medicacion=datos.get('medicacion'),
+        fallecido=_es_true(datos.get('fallecido')),
         foto=archivo.read() if archivo else None
     )
     try:
@@ -114,7 +117,8 @@ def obtener_animal(id_animal):
         'nombre': animal.nombre,
         'sexo': animal.sexo,
         'edad': animal.edad,
-        'medicacion': animal.medicacion
+        'medicacion': animal.medicacion,
+        'fallecido': bool(animal.fallecido)
     })
 
 # Obtener animales de un cliente
@@ -146,6 +150,8 @@ def actualizar_animal(id_animal):
     animal.sexo = sexo
     animal.edad = anio_nacimiento
     animal.medicacion = datos.get('medicacion', animal.medicacion)
+    if 'fallecido' in datos:
+        animal.fallecido = _es_true(datos.get('fallecido'))
 
     eliminar_foto = _es_true(datos.get('eliminar_foto'))
     foto_actualizada = False

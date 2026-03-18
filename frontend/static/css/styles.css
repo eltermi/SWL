@@ -188,6 +188,20 @@ nav {
     margin: 0 auto 15px;
 }
 
+.list-filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin: -6px auto 18px;
+    color: #5e5a57;
+    font-size: 14px;
+}
+
+.list-filter-toggle input {
+    margin: 0;
+}
+
 .centrar {
     display: block;
     margin: 10px;
@@ -258,6 +272,17 @@ nav {
     background-color: #f0f0f0;
 }
 
+.cliente--solo-fallecidos,
+.animal--fallecido {
+    border-color: #d6c0c0;
+    background: linear-gradient(180deg, #f8f2f1 0%, #f4ebea 100%);
+}
+
+.cliente--solo-fallecidos:hover,
+.animal--fallecido:hover {
+    background: #efe2e1;
+}
+
 .contrato-content,
 .cliente-content,
 .animal-content {
@@ -315,6 +340,25 @@ nav {
 .nombreAnimal {
     font-weight: bold;
     margin-bottom: 5px;
+}
+
+.entity-status-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin: 2px 0 8px;
+}
+
+.entity-status-badge--fallecido {
+    color: #7b2f2f;
+    background-color: #ead3d1;
+    border: 1px solid #d9b8b5;
 }
 
 .nombreAnimal {

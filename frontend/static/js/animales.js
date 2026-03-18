@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('animal-form').addEventListener('submit', agregarAnimal);
     document.getElementById('animal-form').addEventListener('input', limpiarErrorAnimalFormulario);
     document.getElementById('buscar').addEventListener('input', buscarAnimales);
+    document.getElementById('mostrar-fallecidos-animales')?.addEventListener('change', () => {
+        cargarAnimales(document.getElementById('buscar')?.value ?? "");
+    });
     enfocarBuscadorAnimales();
 });
 
@@ -306,6 +309,8 @@ function abrirModalAnimal() {
     limpiarErrorAnimalFormulario();
     animalForm?.reset();
     establecerContenidoEditorMedicacion("form-medicacion", "");
+    const fallecidoInput = document.getElementById("form-fallecido");
+    if (fallecidoInput) fallecidoInput.checked = false;
     animalModal.classList.add("is-active");
     animalModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
@@ -334,8 +339,13 @@ function cargarAnimales(busqueda = "") {
     muestraAnimal.style.display = "none";
     container.style.display = "block";
     mostrarLoadingAnimales(container);
+    const incluirFallecidos = Boolean(document.getElementById("mostrar-fallecidos-animales")?.checked);
+    const params = new URLSearchParams({
+        buscar: busqueda,
+        incluir_fallecidos: incluirFallecidos ? "true" : "false"
+    });
 
-    fetchAPI(`/api/animales?buscar=${busqueda}`)
+    fetchAPI(`/api/animales?${params.toString()}`)
         .then(animales => {
             container.removeAttribute("aria-busy");
             container.innerHTML = "";
@@ -370,15 +380,22 @@ function cargarAnimales(busqueda = "") {
                 grupo.animales.forEach(animal => {
                     const animalDiv = document.createElement("div");
                     animalDiv.classList.add("animal");
+                    if (animal.fallecido) {
+                        animalDiv.classList.add("animal--fallecido");
+                    }
                     animalDiv.setAttribute("data-id", animal.id_animal);
                     animalDiv.addEventListener("click", () => {
                         obtenerDetallesAnimal(animal);
                     });
+                    const badgeFallecido = animal.fallecido
+                        ? `<p class="entity-status-badge entity-status-badge--fallecido">Fallecido</p>`
+                        : "";
 
                     animalDiv.innerHTML = `
                         <div class="animal-content">
                             <div class="detalles">
                                 <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
+                                ${badgeFallecido}
                                 <p><span class="encabezado">Sexo:</span> ${formatearSexoAnimal(animal.sexo)}</p>
                                 <p><span class="encabezado">Edad:</span> ${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
                                 ${construirBloqueMedicacionAnimal(animal.medicacion)}
@@ -400,7 +417,7 @@ function cargarAnimales(busqueda = "") {
 }
 
 function cargarClientesEnFormulario() {
-    fetchAPI('/api/clientes')
+    fetchAPI('/api/clientes?incluir_fallecidos=true')
         .then(clientes => {
             const select = document.getElementById('form-nombre-cliente');
             select.innerHTML = '<option value="">Selecciona un cliente</option>';
@@ -424,6 +441,7 @@ function agregarAnimal(event) {
     formData.append("sexo", document.getElementById('form-sexo-animal').value);
     formData.append("edad", document.getElementById('form-edad').value);
     formData.append("medicacion", obtenerContenidoEditorMedicacion("form-medicacion"));
+    formData.append("fallecido", document.getElementById('form-fallecido')?.checked ? "true" : "false");
     const fotoInput = document.getElementById("form-foto");
     if (fotoInput.files.length > 0) {
         formData.append("foto", fotoInput.files[0]);
@@ -509,6 +527,9 @@ function obtenerDetallesAnimal(animal) {
     const tipo = animal.tipo_animal ?? "Sin tipo";
     const sexo = formatearSexoAnimal(animal.sexo);
     const edad = formatearEdadDesdeAnioNacimiento(animal.edad);
+    const badgeFallecido = animal.fallecido
+        ? `<p class="entity-status-badge entity-status-badge--fallecido">Fallecido</p>`
+        : "";
     const fotoHTML = animal.foto
         ? `<img src="${animal.foto}" alt="Foto de ${nombreAnimal}">`
         : `<div class="animal-detalle-foto-placeholder">Sin foto disponible</div>`;
@@ -518,6 +539,7 @@ function obtenerDetallesAnimal(animal) {
             <div class="animal-detalle-header">
                 <div>
                     <p class="animal-detalle-nombre">${nombreAnimal}</p>
+                    ${badgeFallecido}
                     ${nombreCliente ? `<p class="animal-detalle-cliente">${nombreCliente}</p>` : ""}
                 </div>
                 <div class="animal-detalle-actions">
@@ -555,6 +577,7 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
     const sexoAnimal = animal.sexo ?? "";
     const anioNacimiento = animal.edad ?? "";
     const medicacion = animal.medicacion ?? "";
+    const fallecido = Boolean(animal.fallecido);
     const fotoActualHTML = animal.foto
         ? `
             <div class="cliente-whatsapp-avatar-preview">
@@ -601,6 +624,10 @@ function mostrarFormularioEdicionAnimalDetalle(animal) {
                         <label for="edit_animal_foto">Foto</label>
                         <input type="file" id="edit_animal_foto" accept="image/*">
                         ${fotoActualHTML}
+                        <label class="cliente-edit-checkbox">
+                            <input type="checkbox" id="edit_animal_fallecido" ${fallecido ? "checked" : ""}>
+                            Animal fallecido
+                        </label>
                         <label class="cliente-edit-checkbox">
                             <input type="checkbox" id="edit_animal_eliminar_foto">
                             Eliminar foto actual
@@ -676,6 +703,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
     const medicacion = obtenerContenidoEditorMedicacion("edit_animal_medicacion");
     const fotoArchivo = document.getElementById("edit_animal_foto")?.files?.[0] ?? null;
     const eliminarFoto = Boolean(document.getElementById("edit_animal_eliminar_foto")?.checked);
+    const fallecido = Boolean(document.getElementById("edit_animal_fallecido")?.checked);
     const errorFoto = validarArchivoFotoAnimal(fotoArchivo);
     if (errorFoto) {
         mostrarErrorEdicionAnimalDetalle(errorFoto);
@@ -688,6 +716,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
     formData.append("sexo", sexoAnimal);
     formData.append("edad", edad);
     formData.append("medicacion", medicacion);
+    formData.append("fallecido", fallecido ? "true" : "false");
     formData.append("eliminar_foto", eliminarFoto ? "true" : "false");
     if (fotoArchivo && !eliminarFoto) {
         formData.append("foto", fotoArchivo);
@@ -723,6 +752,7 @@ function guardarCambiosAnimalDesdeDetalle(event, animalOriginal) {
                 sexo: sexoAnimal || null,
                 edad: edad === "" ? null : Number(edad),
                 medicacion: medicacion,
+                fallecido: fallecido,
                 foto: fotoActualizada
             };
             obtenerDetallesAnimal(animalActualizado);

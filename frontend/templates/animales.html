@@ -7,6 +7,10 @@
 
 <h2 id="cabecera" class="day-header section-header-brand">Animales</h2>
 <input type="text" id="buscar" class="buscar" placeholder="Buscar animales">
+<label class="list-filter-toggle" for="mostrar-fallecidos-animales">
+    <input type="checkbox" id="mostrar-fallecidos-animales">
+    Mostrar también animales fallecidos
+</label>
 <div class="cliente-actions">
     <button type="button" id="abrir-animal-modal" class="btn-principal">Añadir animal</button>
 </div>
@@ -61,6 +65,10 @@
                 <label for="form-foto">Foto</label>
                 <input type="file" id="form-foto" accept="image/*">
             </div>
+            <label class="cliente-edit-checkbox" for="form-fallecido">
+                <input type="checkbox" id="form-fallecido">
+                Animal fallecido
+            </label>
             <div class="modal-actions">
                 <button type="button" class="btn-secundario" data-close-animal-modal>Cancelar</button>
                 <button type="submit" class="btn-principal">Guardar animal</button>
@@ -68,5 +76,5 @@
         </form>
     </div>
 </div>
-<script src="{{ url_for('static', filename='js/animales.js', v='20260318-loading-states') }}"></script>
+<script src="{{ url_for('static', filename='js/animales.js', v='20260318-fallecidos') }}"></script>
 {% endblock %}

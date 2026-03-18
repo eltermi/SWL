@@ -187,6 +187,73 @@ def test_actualizar_animal_permite_borrar_sexo(monkeypatch):
     assert dummy_animal.sexo is None
 
 
+def test_crear_animal_marca_fallecido_desde_formulario(monkeypatch):
+    app = _app()
+    capturado = {}
+
+    class DummyAnimales:
+        def __init__(self, **kwargs):
+            capturado.update(kwargs)
+
+    class DummySession:
+        def add(self, _):
+            return None
+
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(animales_routes, "Animales", DummyAnimales)
+    monkeypatch.setattr(animales_routes.db, "session", DummySession())
+
+    payload = {
+        "nombre": "Misu",
+        "id_cliente": "1",
+        "tipo_animal": "Gato",
+        "fallecido": "true",
+    }
+
+    with app.test_request_context(data=payload):
+        response, status = animales_routes.crear_animal.__wrapped__()
+
+    assert status == 201
+    assert capturado["fallecido"] is True
+
+
+def test_actualizar_animal_permite_marcar_fallecido(monkeypatch):
+    app = _app()
+
+    dummy_animal = SimpleNamespace(
+        tipo_animal="Gato",
+        nombre="Misu",
+        sexo="F",
+        edad=2020,
+        medicacion=None,
+        foto=None,
+        fallecido=False,
+    )
+
+    class DummyQuery:
+        @staticmethod
+        def get_or_404(_):
+            return dummy_animal
+
+    class DummyAnimales:
+        query = DummyQuery()
+
+    class DummySession:
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(animales_routes, "Animales", DummyAnimales)
+    monkeypatch.setattr(animales_routes.db, "session", DummySession())
+
+    with app.test_request_context(json={"fallecido": True}):
+        response = animales_routes.actualizar_animal.__wrapped__(1)
+
+    assert response.get_json()["mensaje"] == "Animal actualizado exitosamente"
+    assert dummy_animal.fallecido is True
+
+
 def test_actualizar_contrato_con_tarifa_inexistente_devuelve_400(monkeypatch):
     app = _app()
 

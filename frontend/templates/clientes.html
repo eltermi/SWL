@@ -6,6 +6,10 @@
 
 <h2 id="cabecera" class="day-header section-header-brand">Clientes</h2>
 <input type="text" id="buscar" class="buscar" placeholder="Buscar clientes">
+<label class="list-filter-toggle" for="mostrar-fallecidos-clientes">
+    <input type="checkbox" id="mostrar-fallecidos-clientes">
+    Mostrar también clientes con solo animales fallecidos
+</label>
 <div class="cliente-actions">
     <button type="button" id="abrir-cliente-modal" class="btn-principal">Añadir cliente</button>
 </div>
@@ -156,6 +160,10 @@
                 <label for="animal_foto">Foto</label>
                 <input type="file" id="animal_foto" accept="image/*">
             </div>
+            <label class="cliente-edit-checkbox" for="animal_fallecido">
+                <input type="checkbox" id="animal_fallecido">
+                Animal fallecido
+            </label>
             <div class="modal-actions">
                 <button type="button" class="btn-secundario" data-close-animal-modal>Cancelar</button>
                 <button type="submit" class="btn-principal">Guardar animal</button>
@@ -164,6 +172,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260318-loading-states') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260318-fallecidos') }}"></script>
 
 {% endblock %}

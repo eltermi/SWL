@@ -1,5 +1,5 @@
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
+from sqlalchemy import Boolean, DECIMAL, Date, Enum, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from extensions import db
@@ -22,6 +22,7 @@ class Animales(db.Model):
     sexo: Mapped[Optional[str]] = mapped_column(Enum('M', 'F'))
     edad: Mapped[Optional[int]] = mapped_column(Integer)
     medicacion: Mapped[Optional[str]] = mapped_column(Text)
+    fallecido: Mapped[Optional[bool]] = mapped_column(Boolean)
     foto: Mapped[Optional[bytes]] = mapped_column(LONGBLOB)
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='animales')
@@ -49,10 +50,10 @@ class Animales(db.Model):
     @classmethod
     def obtener_animal_cliente(cls, id_cliente):
         sql_query_cliente = text("""
-    
-                        SELECT id_animal, id_cliente, tipo_animal, nombre, sexo, edad, medicacion, foto
+                        SELECT id_animal, id_cliente, tipo_animal, nombre, sexo, edad, medicacion, fallecido, foto
                           FROM ANIMALES
                          WHERE id_cliente = :id_cliente
+                         ORDER BY id_animal
         """)
         result = db.session.execute(sql_query_cliente, {"id_cliente": id_cliente})
         animales = []
@@ -71,13 +72,14 @@ class Animales(db.Model):
                 "sexo": row.sexo,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
+                "fallecido": bool(row.fallecido),
                 "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
             })
 
         return animales  # Retorna la lista de diccionarios
     
     @classmethod
-    def obtener_animales(cls, filtro):
+    def obtener_animales(cls, filtro, incluir_fallecidos=False):
         sql_query_select = text("""
                 SELECT 
                     a.id_animal,
@@ -89,22 +91,33 @@ class Animales(db.Model):
                     a.sexo,
                     a.edad,
                     a.medicacion,
+                    a.fallecido,
                     a.foto
                 FROM SWL.animales a
                 LEFT JOIN SWL.clientes c ON a.id_cliente = c.id_cliente
         """)
+        condiciones = []
+        parametros = {"incluir_fallecidos": 1 if incluir_fallecidos else 0}
+
+        if not incluir_fallecidos:
+            condiciones.append("COALESCE(a.fallecido, 0) = 0")
 
         if filtro:
-            filtro = f"%{filtro}%"  # Añadir los % en Python
-            sql_where = text("""
-                WHERE c.nombre like :filtro
-                    OR a.nombre like :filtro
+            parametros["filtro"] = f"%{filtro}%"
+            condiciones.append("""
+                (
+                    c.nombre LIKE :filtro
+                    OR c.apellidos LIKE :filtro
+                    OR a.nombre LIKE :filtro
+                )
             """)
-            sql_query = text(f"{sql_query_select.text} {sql_where}")
-            result = db.session.execute(sql_query, {"filtro": filtro})
-        else:
-            sql_query = text(f"{sql_query_select.text} ")
-            result = db.session.execute(sql_query)
+
+        sql_where = ""
+        if condiciones:
+            sql_where = f" WHERE {' AND '.join(condiciones)}"
+
+        sql_query = text(f"{sql_query_select.text}{sql_where} ORDER BY c.nombre, c.apellidos, a.id_animal")
+        result = db.session.execute(sql_query, parametros)
 
         animales = []
         for row in result:
@@ -124,6 +137,7 @@ class Animales(db.Model):
                 "sexo": row.sexo,
                 "edad": row.edad,
                 "medicacion": row.medicacion,
+                "fallecido": bool(row.fallecido),
                 "foto": f"data:{mime};base64,{foto_base64}" if foto_base64 else None  # Formato para HTML
             })
 

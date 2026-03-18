@@ -269,6 +269,9 @@ document.addEventListener('DOMContentLoaded', function () {
     inicializarEditoresMedicacion();
     cargarClientes();
     document.getElementById('buscar').addEventListener('input', buscarClientes);
+    document.getElementById('mostrar-fallecidos-clientes')?.addEventListener('change', () => {
+        cargarClientes(document.getElementById('buscar')?.value ?? "");
+    });
     enfocarBuscadorClientes();
     inicializarModalCliente();
     inicializarEventosDetalleCliente();
@@ -580,8 +583,13 @@ function cargarClientes(busqueda = "") {
     container.style.display = "block";
     clienteDetalleActual = null;
     mostrarLoadingClientes(container);
+    const incluirFallecidos = Boolean(document.getElementById("mostrar-fallecidos-clientes")?.checked);
+    const params = new URLSearchParams({
+        buscar: busqueda,
+        incluir_fallecidos: incluirFallecidos ? "true" : "false"
+    });
 
-    fetchAPI(`/api/clientes?buscar=${busqueda}`)
+    fetchAPI(`/api/clientes?${params.toString()}`)
         .then(clientes => {
             container.removeAttribute("aria-busy");
             container.innerHTML = "";
@@ -606,10 +614,16 @@ function cargarClientes(busqueda = "") {
                 const gatos = textoLista(cliente.gatos);
                 const clienteDiv = document.createElement("div");
                 clienteDiv.classList.add("cliente");
+                if (cliente.solo_fallecidos) {
+                    clienteDiv.classList.add("cliente--solo-fallecidos");
+                }
                 clienteDiv.setAttribute("data-id", cliente.id_cliente);
                 clienteDiv.addEventListener("click", () => {
                     obtenerDetallesCliente(cliente.id_cliente);
                 });
+                const estadoCliente = cliente.solo_fallecidos
+                    ? `<p class="entity-status-badge entity-status-badge--fallecido">Solo animales fallecidos</p>`
+                    : "";
 
                 clienteDiv.innerHTML = `
                     <div class="cliente-content">
@@ -621,6 +635,7 @@ function cargarClientes(busqueda = "") {
                         </div>
                         <div class="detalles">
                             <p class="nombreAnimal">${gatos}</p>
+                            ${estadoCliente}
                             <p>&nbsp;</p>
                             <p>&nbsp;</p>
                             <p>&nbsp;</p>
@@ -970,11 +985,16 @@ function construirAnimalesHTML(animales) {
     if (Array.isArray(animales) && animales.length > 0) {
         html += `<div class="cliente-animals-grid">`;
         animales.forEach(animal => {
+            const clasesAnimal = animal.fallecido ? "animal animal--fallecido" : "animal";
+            const badgeFallecido = animal.fallecido
+                ? `<p class="entity-status-badge entity-status-badge--fallecido">Fallecido</p>`
+                : "";
             html += `
-                <div class="animal">
+                <div class="${clasesAnimal}">
                     <div class="animal-content">
                         <div class="detalles">
                             <p><span class="nombreAnimal">${animal.nombre_animal}</span></p>
+                            ${badgeFallecido}
                             <p><span class="cliente-label">Tipo</span>${animal.tipo_animal ?? "Sin tipo"}</p>
                             <p><span class="cliente-label">Sexo</span>${formatearSexoAnimal(animal.sexo)}</p>
                             <p><span class="cliente-label">Edad</span>${formatearEdadDesdeAnioNacimiento(animal.edad)}</p>
@@ -1412,9 +1432,11 @@ function mostrarFormularioAnimal(idCliente, nombreCliente = "") {
     const modalTitle = document.getElementById("animal-modal-title");
     const submitBtn = animalForm.querySelector("button[type='submit']");
     const fotoInput = document.getElementById("animal_foto");
+    const fallecidoInput = document.getElementById("animal_fallecido");
     if (modalTitle) modalTitle.textContent = "Nuevo animal";
     if (submitBtn) submitBtn.textContent = "Guardar animal";
     if (fotoInput) fotoInput.required = false;
+    if (fallecidoInput) fallecidoInput.checked = false;
 
     const nombreClienteFinal = nombreCliente || `${clienteDetalleActual?.nombre ?? ""}${clienteDetalleActual?.apellidos ? ` ${clienteDetalleActual.apellidos}` : ""}`.trim();
 
@@ -1457,11 +1479,13 @@ function mostrarFormularioEdicionAnimal(idAnimal) {
     const sexoInput = document.getElementById("animal_sexo");
     const edadInput = document.getElementById("animal_edad");
     const medicacionInput = document.getElementById("animal_medicacion");
+    const fallecidoInput = document.getElementById("animal_fallecido");
 
     if (nombreInput) nombreInput.value = animal.nombre_animal ?? animal.nombre ?? "";
     if (tipoInput) tipoInput.value = animal.tipo_animal ?? "";
     if (sexoInput) sexoInput.value = animal.sexo ?? "";
     if (edadInput) edadInput.value = animal.edad ?? "";
+    if (fallecidoInput) fallecidoInput.checked = Boolean(animal.fallecido);
     if (medicacionInput) {
         establecerContenidoEditorMedicacion("animal_medicacion", animal.medicacion ?? "");
     }
@@ -1538,6 +1562,7 @@ async function gestionarEnvioAnimalCliente(event) {
     const edadInput = document.getElementById("animal_edad");
     const medicacionInput = document.getElementById("animal_medicacion");
     const fotoInput = document.getElementById("animal_foto");
+    const fallecidoInput = document.getElementById("animal_fallecido");
     const fotoArchivo = fotoInput?.files?.[0] ?? null;
     const nombre = nombreInput?.value.trim() ?? "";
     const esEdicion = Number.isFinite(animalEnEdicionId) && animalEnEdicionId > 0;
@@ -1568,6 +1593,7 @@ async function gestionarEnvioAnimalCliente(event) {
         formData.append("sexo", sexoInput?.value ?? "");
         formData.append("edad", edadInput?.value.trim() ?? "");
         formData.append("medicacion", obtenerContenidoEditorMedicacion("animal_medicacion"));
+        formData.append("fallecido", fallecidoInput?.checked ? "true" : "false");
         if (fotoArchivo) {
             formData.append("foto", fotoArchivo);
         }
