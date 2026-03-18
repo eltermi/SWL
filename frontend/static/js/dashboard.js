@@ -1,6 +1,72 @@
 let contratosProgramadosCache = [];
 let filtroContratosProgramados = "";
 
+function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
+    return `
+        <div class="loading-state" role="status" aria-live="polite">
+            <p class="loading-state-message">${mensaje}</p>
+            ${subtitulo ? `<p class="loading-state-subtext">${subtitulo}</p>` : ""}
+            ${skeletons}
+        </div>
+    `;
+}
+
+function crearDashboardActivosSkeletons() {
+    return `
+        <div class="loading-skeleton-list" aria-hidden="true">
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--short loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--medium"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--short loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+        </div>
+    `;
+}
+
+function crearDashboardProgramadosSkeletons() {
+    return `
+        <div class="loading-skeleton-list" aria-hidden="true">
+            <div class="loading-skeleton-card loading-skeleton-card--compact">
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--medium"></span>
+            </div>
+            <div class="loading-skeleton-card loading-skeleton-card--compact">
+                <span class="loading-skeleton-line loading-skeleton-line--medium"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+            <div class="loading-skeleton-card loading-skeleton-card--compact">
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+        </div>
+    `;
+}
+
+function mostrarDashboardLoading(containerActivos, containerProgramados) {
+    if (containerActivos) {
+        containerActivos.setAttribute("aria-busy", "true");
+        containerActivos.innerHTML = crearLoadingStateHTML({
+            mensaje: "Cargando contratos activos...",
+            subtitulo: "Consultando la base de datos y preparando la vista.",
+            skeletons: crearDashboardActivosSkeletons()
+        });
+    }
+
+    if (containerProgramados) {
+        containerProgramados.setAttribute("aria-busy", "true");
+        containerProgramados.innerHTML = crearLoadingStateHTML({
+            mensaje: "Cargando lista completa...",
+            subtitulo: "Esto puede tardar unos segundos si accedes desde fuera.",
+            skeletons: crearDashboardProgramadosSkeletons()
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarAccionesDashboard();
     inicializarBuscadorContratos();
@@ -143,6 +209,7 @@ function calcularTotalVisitas(contrato) {
 
 function renderContratosProgramados(contratos, container, opciones = {}) {
     if (!container) return;
+    container.removeAttribute("aria-busy");
     container.innerHTML = "";
     const total = Number.isFinite(opciones.total) ? opciones.total : contratos.length;
     const filtroActivo = String(opciones.filtro ?? "").trim().length > 0;
@@ -244,13 +311,13 @@ function getContratosActivos() {
     container.style.display = "block";
     if (listaProgramados) {
         listaProgramados.style.display = "block";
-        listaProgramados.innerHTML = `<p class="contrato-empty">Cargando contratos...</p>`;
     }
     if (buscador) {
         buscador.value = "";
     }
     filtroContratosProgramados = "";
     contratosProgramadosCache = [];
+    mostrarDashboardLoading(container, listaProgramados);
 
     // Función para parsear fechas DD-MM-YYYY
     function parseDate(str) {
@@ -263,6 +330,8 @@ function getContratosActivos() {
         fetchAPI(`/api/dashboard/contratos_activos`)
     ])
         .then(([contratosProgramados, contratos_activos]) => {
+            container.removeAttribute("aria-busy");
+            container.innerHTML = "";
             contratosProgramadosCache = Array.isArray(contratosProgramados) ? contratosProgramados : [];
             renderContratosProgramadosFiltrados();
             const hayContratos = Object.values(contratos_activos).some(lista => lista.length > 0);
@@ -308,8 +377,10 @@ function getContratosActivos() {
         })
         .catch(error => {
             console.error("🚨 Error cargando contratos:", error);
+            container.removeAttribute("aria-busy");
             container.innerHTML = "<p>Error al cargar los contratos.</p>";
             if (listaProgramados) {
+                listaProgramados.removeAttribute("aria-busy");
                 listaProgramados.innerHTML = "<p>Error al cargar la lista completa.</p>";
             }
         });

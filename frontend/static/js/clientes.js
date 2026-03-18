@@ -29,6 +29,48 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
 const MAX_WHATSAPP_AVATAR_BYTES = 2 * 1024 * 1024;
 
+function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
+    return `
+        <div class="loading-state" role="status" aria-live="polite">
+            <p class="loading-state-message">${mensaje}</p>
+            ${subtitulo ? `<p class="loading-state-subtext">${subtitulo}</p>` : ""}
+            ${skeletons}
+        </div>
+    `;
+}
+
+function crearClientesSkeletons() {
+    return `
+        <div class="loading-skeleton-list" aria-hidden="true">
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--medium loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--short loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--medium"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--medium"></span>
+            </div>
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--medium loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+            </div>
+        </div>
+    `;
+}
+
+function mostrarLoadingClientes(container) {
+    if (!container) return;
+    container.setAttribute("aria-busy", "true");
+    container.innerHTML = crearLoadingStateHTML({
+        mensaje: "Cargando clientes...",
+        subtitulo: "Consultando la base de datos y preparando la lista.",
+        skeletons: crearClientesSkeletons()
+    });
+}
+
 function escaparHTML(texto = "") {
     return String(texto ?? "")
         .replace(/&/g, "&amp;")
@@ -521,14 +563,20 @@ function cargarClientes(busqueda = "") {
     const container = document.getElementById("lista-clientes");
     const muestraCliente = document.getElementById("muestra-cliente");
 
-    container.innerHTML = "";
     muestraCliente.innerHTML = "";
     muestraCliente.style.display = "none";
     container.style.display = "block";
     clienteDetalleActual = null;
+    mostrarLoadingClientes(container);
 
     fetchAPI(`/api/clientes?buscar=${busqueda}`)
         .then(clientes => {
+            container.removeAttribute("aria-busy");
+            container.innerHTML = "";
+            if (!Array.isArray(clientes) || clientes.length === 0) {
+                container.innerHTML = `<p class="cliente-empty" style="text-align:center;">No hay clientes para mostrar.</p>`;
+                return;
+            }
             clientes.forEach(cliente => {
                 const textoLista = valor => {
                     const texto = typeof valor === "string" ? valor.trim() : valor;
@@ -570,7 +618,11 @@ function cargarClientes(busqueda = "") {
                 container.appendChild(clienteDiv);
             });
         })
-        .catch(error => console.error("\uD83D\uDEA8 Error cargando clientes:", error));
+        .catch(error => {
+            console.error("\uD83D\uDEA8 Error cargando clientes:", error);
+            container.removeAttribute("aria-busy");
+            container.innerHTML = `<p class="cliente-empty" style="text-align:center;">Error al cargar los clientes.</p>`;
+        });
 }
 function obtenerDetallesCliente(id_cliente) {
     return fetchAPI(`/api/clientes/${id_cliente}`)

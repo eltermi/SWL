@@ -3,6 +3,48 @@ let animalModal = null;
 let animalForm = null;
 const MEDICACION_ALLOWED_TAGS = new Set(["P", "BR", "UL", "OL", "LI", "STRONG", "EM", "B", "I", "DIV"]);
 
+function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
+    return `
+        <div class="loading-state" role="status" aria-live="polite">
+            <p class="loading-state-message">${mensaje}</p>
+            ${subtitulo ? `<p class="loading-state-subtext">${subtitulo}</p>` : ""}
+            ${skeletons}
+        </div>
+    `;
+}
+
+function crearAnimalesSkeletons() {
+    return `
+        <div class="loading-skeleton-list" aria-hidden="true">
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--medium loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--full"></span>
+            </div>
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--short loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--long"></span>
+            </div>
+            <div class="loading-skeleton-card">
+                <span class="loading-skeleton-line loading-skeleton-line--medium loading-skeleton-line--title"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--short"></span>
+                <span class="loading-skeleton-line loading-skeleton-line--full"></span>
+            </div>
+        </div>
+    `;
+}
+
+function mostrarLoadingAnimales(container) {
+    if (!container) return;
+    container.setAttribute("aria-busy", "true");
+    container.innerHTML = crearLoadingStateHTML({
+        mensaje: "Cargando animales...",
+        subtitulo: "Consultando la base de datos y preparando la lista.",
+        skeletons: crearAnimalesSkeletons()
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarModalAnimal();
     inicializarEditoresMedicacion();
@@ -264,13 +306,19 @@ function cargarAnimales(busqueda = "") {
     const container = document.getElementById("lista-animales");
     const muestraAnimal = document.getElementById("muestra-animal");
 
-    container.innerHTML = "";
     muestraAnimal.innerHTML = "";
     muestraAnimal.style.display = "none";
     container.style.display = "block";
+    mostrarLoadingAnimales(container);
 
     fetchAPI(`/api/animales?buscar=${busqueda}`)
         .then(animales => {
+            container.removeAttribute("aria-busy");
+            container.innerHTML = "";
+            if (!Array.isArray(animales) || animales.length === 0) {
+                container.innerHTML = `<p class="cliente-empty" style="text-align:center;">No hay animales para mostrar.</p>`;
+                return;
+            }
             const animalesPorCliente = {};
 
             animales.forEach(animal => {
@@ -323,7 +371,11 @@ function cargarAnimales(busqueda = "") {
                 });
             });
         })
-        .catch(error => console.error("🚨 Error cargando animales:", error));
+        .catch(error => {
+            console.error("🚨 Error cargando animales:", error);
+            container.removeAttribute("aria-busy");
+            container.innerHTML = `<p class="cliente-empty" style="text-align:center;">Error al cargar los animales.</p>`;
+        });
 }
 
 function cargarClientesEnFormulario() {
