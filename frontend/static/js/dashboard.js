@@ -1,5 +1,9 @@
+let contratosProgramadosCache = [];
+let filtroContratosProgramados = "";
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarAccionesDashboard();
+    inicializarBuscadorContratos();
     getContratosActivos();
 });
 
@@ -8,6 +12,36 @@ function inicializarAccionesDashboard() {
     if (!botonNuevoContrato) return;
     botonNuevoContrato.addEventListener("click", () => {
         window.location.href = "/clientes";
+    });
+}
+
+function inicializarBuscadorContratos() {
+    const buscador = document.getElementById("buscar-contratos");
+    if (!buscador) return;
+    buscador.addEventListener("input", buscarContratosPorAnimal);
+}
+
+function buscarContratosPorAnimal(event) {
+    filtroContratosProgramados = event.target.value ?? "";
+    renderContratosProgramadosFiltrados();
+}
+
+function filtrarContratosProgramadosPorAnimal(contratos, filtro = "") {
+    const termino = String(filtro).trim().toLocaleLowerCase("es-ES");
+    if (!termino) return contratos;
+
+    return contratos.filter(contrato => {
+        const nombreAnimales = String(contrato.nombre_animales ?? "").toLocaleLowerCase("es-ES");
+        return nombreAnimales.includes(termino);
+    });
+}
+
+function renderContratosProgramadosFiltrados() {
+    const container = document.getElementById("contratos-programados");
+    const contratosFiltrados = filtrarContratosProgramadosPorAnimal(contratosProgramadosCache, filtroContratosProgramados);
+    renderContratosProgramados(contratosFiltrados, container, {
+        total: contratosProgramadosCache.length,
+        filtro: filtroContratosProgramados
     });
 }
 
@@ -107,15 +141,16 @@ function calcularTotalVisitas(contrato) {
     return dias > 0 ? dias * visitasDiarias : null;
 }
 
-function renderContratosProgramados(contratos, container) {
+function renderContratosProgramados(contratos, container, opciones = {}) {
     if (!container) return;
     container.innerHTML = "";
+    const total = Number.isFinite(opciones.total) ? opciones.total : contratos.length;
+    const filtroActivo = String(opciones.filtro ?? "").trim().length > 0;
 
     if (!Array.isArray(contratos) || contratos.length === 0) {
         container.innerHTML = `
             <div class="contratos-programados-card">
-                <p class="contratos-programados-title contrato-section-title">Todos los contratos</p>
-                <p class="contrato-empty">No hay contratos programados.</p>
+                <p class="contrato-empty">${filtroActivo ? "No hay contratos para ese animal." : "No hay contratos programados."}</p>
             </div>
         `;
         return;
@@ -146,8 +181,8 @@ function renderContratosProgramados(contratos, container) {
     container.innerHTML = `
         <div class="contratos-programados-card">
             <div class="contratos-programados-title-row">
-                <p class="contratos-programados-title contrato-section-title">Todos los contratos</p>
-                <span class="contratos-programados-count">${contratos.length}</span>
+                <p class="contratos-programados-title contrato-section-title">Lista de contratos</p>
+                <span class="contratos-programados-count">${contratos.length}${filtroActivo ? ` / ${total}` : ""}</span>
             </div>
             <div class="contratos-programados-list">${itemsHTML}</div>
         </div>
@@ -190,19 +225,32 @@ function crearPagoCard({ etiqueta, importe, esTotal = false }) {
 }
 
 function getContratosActivos() {
-    const h2_cabecera = document.getElementById("cabecera");
     const container = document.getElementById("contratos-activos");
     const muestraContrato = document.getElementById("muestra-contrato");
     const listaProgramados = document.getElementById("contratos-programados");
+    const seccionActivos = document.getElementById("dashboard-contratos-activos-section");
+    const seccionProgramados = document.getElementById("dashboard-contratos-programados-section");
+    const buscador = document.getElementById("buscar-contratos");
 
     container.innerHTML = "";
     muestraContrato.innerHTML = "";
     muestraContrato.style.display = "none";
+    if (seccionActivos) {
+        seccionActivos.style.display = "block";
+    }
+    if (seccionProgramados) {
+        seccionProgramados.style.display = "block";
+    }
     container.style.display = "block";
     if (listaProgramados) {
         listaProgramados.style.display = "block";
         listaProgramados.innerHTML = `<p class="contrato-empty">Cargando contratos...</p>`;
     }
+    if (buscador) {
+        buscador.value = "";
+    }
+    filtroContratosProgramados = "";
+    contratosProgramadosCache = [];
 
     // Función para parsear fechas DD-MM-YYYY
     function parseDate(str) {
@@ -215,9 +263,8 @@ function getContratosActivos() {
         fetchAPI(`/api/dashboard/contratos_activos`)
     ])
         .then(([contratosProgramados, contratos_activos]) => {
-            if (listaProgramados) {
-                renderContratosProgramados(contratosProgramados, listaProgramados);
-            }
+            contratosProgramadosCache = Array.isArray(contratosProgramados) ? contratosProgramados : [];
+            renderContratosProgramadosFiltrados();
             const hayContratos = Object.values(contratos_activos).some(lista => lista.length > 0);
             if (!hayContratos) {
                 container.innerHTML = "<p style='text-align:center'>NO HAY CONTRATOS ACTIVOS</p>";
@@ -274,11 +321,15 @@ function obtenerDetallesContrato(id_contrato) {
             const container = document.getElementById("contratos-activos");
             const muestraContrato = document.getElementById("muestra-contrato");
             const listaProgramados = document.getElementById("contratos-programados");
+            const seccionActivos = document.getElementById("dashboard-contratos-activos-section");
+            const seccionProgramados = document.getElementById("dashboard-contratos-programados-section");
 
-            container.style.display = "none";
             muestraContrato.style.display = "block";
-            if (listaProgramados) {
-                listaProgramados.style.display = "none";
+            if (seccionActivos) {
+                seccionActivos.style.display = "none";
+            }
+            if (seccionProgramados) {
+                seccionProgramados.style.display = "none";
             }
 
             const nombreAnimales = contrato.nombre_animales || "No hay animales asignados";

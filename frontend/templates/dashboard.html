@@ -6,9 +6,19 @@
     <div class="dashboard-actions">
         <button type="button" id="btn-nuevo-contrato-dashboard" class="btn-principal">Nuevo contrato</button>
     </div>
-    <h2 id="cabecera" class="day-header"></h2>
-    <div id="contratos-activos"></div>
-    <div id="contratos-programados"></div>
+    <section id="dashboard-contratos-activos-section" class="dashboard-section dashboard-section--activos">
+        <div class="dashboard-section-header">
+            <h2 id="cabecera" class="day-header dashboard-section-title">Contratos activos</h2>
+        </div>
+        <div id="contratos-activos"></div>
+    </section>
+    <section id="dashboard-contratos-programados-section" class="dashboard-section dashboard-section--programados">
+        <div class="dashboard-section-header">
+            <h2 class="day-header dashboard-section-title">Todos los contratos</h2>
+        </div>
+        <input type="text" id="buscar-contratos" class="buscar" placeholder="Buscar por animal">
+        <div id="contratos-programados"></div>
+    </section>
     <div id="muestra-contrato"></div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

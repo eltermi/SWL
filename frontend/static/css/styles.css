@@ -367,6 +367,34 @@ nav {
     margin-bottom: 24px;
 }
 
+.dashboard-section {
+    max-width: 720px;
+    margin: 20px auto;
+    padding: 18px;
+    border: 1px solid #ececec;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-section--activos {
+    border-color: rgba(208, 2, 27, 0.12);
+}
+
+.dashboard-section--programados {
+    border-color: rgba(92, 1, 1, 0.12);
+}
+
+.dashboard-section-header {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0e6e6;
+}
+
+.dashboard-section-title {
+    margin: 0;
+}
+
 .dashboard-actions {
     display: flex;
     justify-content: flex-end;
