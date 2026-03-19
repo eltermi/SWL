@@ -227,6 +227,16 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
         const nombre = contrato.nombre_animales || "Sin animales asignados";
         const fechaInicio = contrato.fecha_inicio ?? "-";
         const fechaFin = contrato.fecha_fin ?? "-";
+        const total = Number(contrato.total ?? 0);
+        const pagado = Number(contrato.pagado ?? 0);
+        let estadoPagoHTML = "";
+
+        if (Number.isFinite(total) && Number.isFinite(pagado) && pagado > 0) {
+            const checks = pagado >= total && total > 0 ? "✓✓" : "✓";
+            const titulo = checks === "✓✓" ? "Pagado completo" : "Pago parcial";
+            estadoPagoHTML = `<span class="contratos-programados-pago" title="${titulo}" aria-label="${titulo}">${checks}</span>`;
+        }
+
         const avatarHTML = contrato.whatsapp_avatar
             ? `
                 <div class="contratos-programados-avatar">
@@ -239,6 +249,7 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
                 <div class="contratos-programados-item-info">
                     <span class="contratos-programados-nombre">${nombre}</span>
                     <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
+                    ${estadoPagoHTML}
                 </div>
                 ${avatarHTML}
             </div>

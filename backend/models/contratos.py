@@ -119,6 +119,8 @@ class Contratos(db.Model):
             SELECT  c.id_contrato,
                     c.fecha_inicio,
                     c.fecha_fin,
+                    c.Total AS total,
+                    c.Pagado AS pagado,
                     MAX(cl.whatsapp_avatar) AS whatsapp_avatar,
                 CASE 
                     WHEN COUNT(a.nombre) > 1 
@@ -146,6 +148,8 @@ class Contratos(db.Model):
                 "nombre_animales": row.nombre_animales or "Sin animales asignados",
                 "fecha_inicio": row.fecha_inicio.strftime("%d-%m-%Y") if row.fecha_inicio else None,
                 "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None,
+                "total": float(row.total or 0),
+                "pagado": float(row.pagado or 0),
                 "whatsapp_avatar": (
                     f"data:{cls._detectar_mime_imagen(row.whatsapp_avatar)};base64,"
                     f"{base64.b64encode(row.whatsapp_avatar).decode('utf-8')}"
