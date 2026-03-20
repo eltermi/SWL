@@ -1,6 +1,10 @@
 let contratosProgramadosCache = [];
 let filtroContratosProgramados = "";
 
+function contratoTieneFacturaEnviada(contrato) {
+    return Number(contrato?.factura_enviada) === 1;
+}
+
 function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
     return `
         <div class="loading-state" role="status" aria-live="polite">
@@ -230,26 +234,45 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
         const total = Number(contrato.total ?? 0);
         const pagado = Number(contrato.pagado ?? 0);
         let estadoPagoHTML = "";
+        let estadoFacturaHTML = "";
 
         if (Number.isFinite(total) && Number.isFinite(pagado) && pagado > 0) {
             const checks = pagado >= total && total > 0 ? "✓✓" : "✓";
             const titulo = checks === "✓✓" ? "Pagado completo" : "Pago parcial";
             estadoPagoHTML = `<span class="contratos-programados-pago" title="${titulo}" aria-label="${titulo}">${checks}</span>`;
         }
+        if (contratoTieneFacturaEnviada(contrato)) {
+            estadoFacturaHTML = `<span class="contratos-programados-factura" title="Factura enviada" aria-label="Factura enviada">✓</span>`;
+        }
 
-        const avatarHTML = contrato.whatsapp_avatar
+        const estadosHTML = estadoPagoHTML
+            ? `
+                <div class="contratos-programados-estados">
+                    ${estadoPagoHTML}
+                </div>
+            `
+            : "";
+        const avatarBaseHTML = contrato.whatsapp_avatar
             ? `
                 <div class="contratos-programados-avatar">
                     <img src="${contrato.whatsapp_avatar}" alt="Avatar del cliente">
                 </div>
             `
-            : "";
+            : `<div class="contratos-programados-avatar contratos-programados-avatar--placeholder" aria-hidden="true"></div>`;
+        const avatarHTML = `
+            <div class="contratos-programados-media">
+                ${avatarBaseHTML}
+                <div class="contratos-programados-status-row">
+                    ${estadoFacturaHTML}
+                </div>
+            </div>
+        `;
         return `
-            <div class="contratos-programados-item" data-id="${contrato.id_contrato}">
+            <div class="contratos-programados-item" data-id="${contrato.id_contrato}" onclick="obtenerDetallesContrato(${Number(contrato.id_contrato) || 0})">
                 <div class="contratos-programados-item-info">
                     <span class="contratos-programados-nombre">${nombre}</span>
                     <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
-                    ${estadoPagoHTML}
+                    ${estadosHTML}
                 </div>
                 ${avatarHTML}
             </div>
@@ -266,14 +289,6 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
         </div>
     `;
 
-    container.querySelectorAll(".contratos-programados-item").forEach(item => {
-        item.addEventListener("click", () => {
-            const id = item.getAttribute("data-id");
-            if (id) {
-                obtenerDetallesContrato(Number(id));
-            }
-        });
-    });
 }
 
 function formatearImporte(valor) {

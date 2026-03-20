@@ -109,6 +109,10 @@
                 <label for="observaciones">Observaciones</label>
                 <textarea id="observaciones" rows="3" placeholder="Notas importantes"></textarea>
             </div>
+            <label class="cliente-checkbox" for="factura_enviada">
+                <input type="checkbox" id="factura_enviada">
+                Factura enviada
+            </label>
             <div class="modal-actions">
                 <button type="button" class="btn-secundario" data-close-modal>Cancelar</button>
                 <button type="submit" class="btn-principal">Guardar contrato</button>
@@ -172,6 +176,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260318-fallecidos') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260320-factura-enviada') }}"></script>
 
 {% endblock %}

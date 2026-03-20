@@ -29,6 +29,7 @@ class Contratos(db.Model):
     observaciones: Mapped[Optional[str]] = mapped_column(Text)
     num_factura: Mapped[Optional[str]] = mapped_column(String(45))
     num_total_visitas: Mapped[Optional[str]] = mapped_column(String(45))
+    factura_enviada: Mapped[Optional[int]] = mapped_column(Integer)
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contratos')
     tarifas_contrato: Mapped[List['TarifasContrato']] = relationship('TarifasContrato', back_populates='contratos')
@@ -67,6 +68,7 @@ class Contratos(db.Model):
                     c.Pagado AS pagado,
                     c.num_factura,
                     c.num_total_visitas,
+                    c.factura_enviada,
                     t.descripcion AS nombre_tarifa,
                     (
                         SELECT 
@@ -104,6 +106,7 @@ class Contratos(db.Model):
                     "pagado": float(row.pagado or 0),
                     "num_factura": row.num_factura,
                     "num_total_visitas": row.num_total_visitas,
+                    "factura_enviada": row.factura_enviada,
                     "tarifa": row.nombre_tarifa,
                     "nombre_animales": row.nombre_animales
                 })
@@ -121,6 +124,7 @@ class Contratos(db.Model):
                     c.fecha_fin,
                     c.Total AS total,
                     c.Pagado AS pagado,
+                    c.factura_enviada,
                     MAX(cl.whatsapp_avatar) AS whatsapp_avatar,
                 CASE 
                     WHEN COUNT(a.nombre) > 1 
@@ -150,6 +154,7 @@ class Contratos(db.Model):
                 "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None,
                 "total": float(row.total or 0),
                 "pagado": float(row.pagado or 0),
+                "factura_enviada": row.factura_enviada,
                 "whatsapp_avatar": (
                     f"data:{cls._detectar_mime_imagen(row.whatsapp_avatar)};base64,"
                     f"{base64.b64encode(row.whatsapp_avatar).decode('utf-8')}"
@@ -183,7 +188,9 @@ class Contratos(db.Model):
                 contratos.Pagado AS pagado,
                 contratos.num_factura,
                 contratos.num_total_visitas,
+                contratos.factura_enviada,
                 contratos.observaciones,
+                tarifas.id_tarifa,
                 tarifas.descripcion AS nombre_tarifa,
                 tarifas.precio_base AS precio_tarifa
             FROM SWL.contratos
@@ -194,7 +201,7 @@ class Contratos(db.Model):
             WHERE contratos.id_contrato = :id_contrato
             GROUP BY contratos.id_contrato, contratos.id_cliente, contratos.fecha_inicio, contratos.fecha_fin, 
                     contratos.numero_visitas_diarias, contratos.horario_visitas, contratos.Total,
-                    contratos.Pagado, contratos.num_factura, contratos.num_total_visitas, contratos.observaciones, tarifas.descripcion, tarifas.precio_base
+                    contratos.Pagado, contratos.num_factura, contratos.num_total_visitas, contratos.factura_enviada, contratos.observaciones, tarifas.id_tarifa, tarifas.descripcion, tarifas.precio_base
             ORDER BY contratos.fecha_inicio, contratos.fecha_fin;
         """)
 
@@ -222,6 +229,7 @@ class Contratos(db.Model):
             "fecha_fin": result.fecha_fin.strftime("%d-%m-%Y"),
             "horario": result.horario, 
             "visitas": result.visitas,
+            "id_tarifa": result.id_tarifa,
             "tarifa": result.nombre_tarifa,
             "precio_tarifa": float(result.precio_tarifa) if result.precio_tarifa is not None else None,
             "total": total,
@@ -229,6 +237,7 @@ class Contratos(db.Model):
             "pendiente": pendiente,
             "num_factura": result.num_factura,
             "num_total_visitas": result.num_total_visitas,
+            "factura_enviada": result.factura_enviada,
             "observaciones": result.observaciones,
             "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None,
             "whatsapp_avatar": f"data:{mime_whatsapp_avatar};base64,{whatsapp_avatar_base64}" if whatsapp_avatar_base64 else None
@@ -248,6 +257,7 @@ class Contratos(db.Model):
                     c.Pagado AS pagado,
                     c.num_factura,
                     c.num_total_visitas,
+                    c.factura_enviada,
                     c.observaciones,
                     tc.id_tarifa,
                     t.descripcion AS nombre_tarifa,
@@ -281,6 +291,7 @@ class Contratos(db.Model):
                 "pendiente": pendiente,
                 "num_factura": row.num_factura,
                 "num_total_visitas": row.num_total_visitas,
+                "factura_enviada": row.factura_enviada,
                 "observaciones": row.observaciones
             })
 

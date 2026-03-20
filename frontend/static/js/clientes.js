@@ -978,6 +978,10 @@ function construirContratoCard(contrato) {
     `;
 }
 
+function contratoTieneFacturaEnviada(contrato) {
+    return Number(contrato?.factura_enviada) === 1;
+}
+
 function construirAnimalesHTML(animales) {
     const idCliente = Number(clienteDetalleActual?.id_cliente) || 0;
     const botonNuevoAnimal = idCliente > 0
@@ -1159,6 +1163,7 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     }
     const totalContratoInput = document.getElementById("total_contrato");
     const pagadoInput = document.getElementById("pagado");
+    const facturaEnviadaInput = document.getElementById("factura_enviada");
     if (numeroFacturaResumen) {
         numeroFacturaResumen.textContent = `Número de factura: Se asignará al guardar (?-${idCliente})`;
     }
@@ -1166,6 +1171,7 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     if (submitBtn) submitBtn.textContent = "Guardar contrato";
     if (totalContratoInput) totalContratoInput.value = "0.00";
     if (pagadoInput) pagadoInput.value = "0.00";
+    if (facturaEnviadaInput) facturaEnviadaInput.checked = false;
     if (mitadTotalResumen) mitadTotalResumen.textContent = "50% del total: 0,00 €";
     if (contratoModalCliente) {
         contratoModalCliente.textContent = nombreCliente;
@@ -1176,9 +1182,14 @@ function mostrarFormularioContrato(idCliente, nombreCliente = "") {
     abrirModalContrato();
 }
 
-function mostrarFormularioEdicionContrato(idContrato) {
+async function mostrarFormularioEdicionContrato(idContrato) {
     if (!contratoModal || !contratoForm) return;
-    const contrato = contratosClienteActuales.find(item => Number(item?.id_contrato) === Number(idContrato));
+    let contrato = contratosClienteActuales.find(item => Number(item?.id_contrato) === Number(idContrato)) || null;
+    try {
+        contrato = await fetchAPI(`/api/contratos/${Number(idContrato)}`);
+    } catch (error) {
+        console.error("No se pudo refrescar el contrato para editar:", error);
+    }
     if (!contrato) {
         alert("No se pudo cargar el contrato para editar.");
         return;
@@ -1208,6 +1219,7 @@ function mostrarFormularioEdicionContrato(idContrato) {
     const horaMananaInput = document.getElementById("hora_manana");
     const horaTardeInput = document.getElementById("hora_tarde");
     const observacionesInput = document.getElementById("observaciones");
+    const facturaEnviadaInput = document.getElementById("factura_enviada");
 
     if (modalTitle) modalTitle.textContent = "Modificar contrato";
     if (submitBtn) submitBtn.textContent = "Guardar cambios";
@@ -1245,6 +1257,7 @@ function mostrarFormularioEdicionContrato(idContrato) {
     if (totalContratoInput) totalContratoInput.value = Number(contrato.total || 0).toFixed(2);
     if (pagadoInput) pagadoInput.value = Number(contrato.pagado || 0).toFixed(2);
     if (observacionesInput) observacionesInput.value = contrato.observaciones || "";
+    if (facturaEnviadaInput) facturaEnviadaInput.checked = contratoTieneFacturaEnviada(contrato);
     if (mitadTotalResumen) actualizarMitadTotalContrato();
 
     if (contratoModalCliente) {
@@ -1915,6 +1928,7 @@ function gestionarEnvioContrato(event) {
     const hora_tarde = document.getElementById("hora_tarde").value;
     const id_tarifa = parseInt(document.getElementById("tarifa_contrato").value, 10);
     const observaciones = document.getElementById("observaciones").value.trim();
+    const factura_enviada = document.getElementById("factura_enviada")?.checked ? 1 : null;
 
     const horario_visitas = {};
     if (hora_manana) horario_visitas["Mañana"] = hora_manana;
@@ -1934,7 +1948,8 @@ function gestionarEnvioContrato(event) {
         total,
         pagado,
         id_tarifa,
-        observaciones
+        observaciones,
+        factura_enviada
     };
     if (!esEdicion) {
         payload.id_cliente = clienteId;

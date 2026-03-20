@@ -71,6 +71,14 @@ def formatear_num_total_visitas(numero_visitas):
     return texto or "0"
 
 
+def parsear_factura_enviada(valor):
+    if valor in (None, "", False, 0, "0", "false", "False"):
+        return None
+    if valor in (True, 1, "1", "true", "True"):
+        return 1
+    raise ValueError("El valor de factura enviada no es válido")
+
+
 def calcular_num_total_visitas_desde_fechas(fecha_inicio, fecha_fin, numero_visitas_diarias):
     inicio = fecha_inicio if isinstance(fecha_inicio, date) else datetime.strptime(str(fecha_inicio), "%Y-%m-%d").date()
     fin = fecha_fin if isinstance(fecha_fin, date) else datetime.strptime(str(fecha_fin), "%Y-%m-%d").date()
@@ -105,7 +113,8 @@ def obtener_contratos():
         'total': float(contrato.total or 0),
         'pagado': float(contrato.pagado or 0),
         'num_factura': contrato.num_factura,
-        'num_total_visitas': contrato.num_total_visitas
+        'num_total_visitas': contrato.num_total_visitas,
+        'factura_enviada': contrato.factura_enviada
     } for contrato in contratos])
 
 # Crear un nuevo contrato
@@ -121,6 +130,7 @@ def crear_contrato():
         num_total_visitas = parsear_num_total_visitas(datos.get('num_total_visitas'))
         total = calcular_total_desde_visitas_y_tarifa(num_total_visitas, id_tarifa)
         pagado = parsear_pagado(datos.get('pagado', 0))
+        factura_enviada = parsear_factura_enviada(datos.get('factura_enviada'))
     except (KeyError, ValueError) as error:
         return jsonify({'mensaje': str(error)}), 400
 
@@ -133,7 +143,8 @@ def crear_contrato():
         total=total,
         pagado=pagado,
         num_total_visitas=formatear_num_total_visitas(num_total_visitas),
-        observaciones=datos.get('observaciones')
+        observaciones=datos.get('observaciones'),
+        factura_enviada=factura_enviada
     )
     try:
         db.session.add(nuevo_contrato)
@@ -190,7 +201,8 @@ def obtener_contratos_activos():
                 'total': c['total'],
                 'pagado': c['pagado'],
                 'num_factura': c['num_factura'],
-                'num_total_visitas': c['num_total_visitas']
+                'num_total_visitas': c['num_total_visitas'],
+                'factura_enviada': c.get('factura_enviada')
             })
 
     return jsonify(contratos_json)
@@ -260,6 +272,8 @@ def actualizar_contrato(id_contrato):
 
         if 'pagado' in datos:
             contrato.pagado = parsear_pagado(datos.get('pagado'))
+        if 'factura_enviada' in datos:
+            contrato.factura_enviada = parsear_factura_enviada(datos.get('factura_enviada'))
     except ValueError as error:
         return jsonify({'mensaje': str(error)}), 400
 

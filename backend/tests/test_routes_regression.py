@@ -294,6 +294,123 @@ def test_actualizar_contrato_con_tarifa_inexistente_devuelve_400(monkeypatch):
     assert response.get_json()["mensaje"] == "La tarifa seleccionada no existe"
 
 
+def test_crear_contrato_guarda_factura_enviada(monkeypatch):
+    app = _app()
+    capturado = {}
+
+    class DummyContrato:
+        def __init__(self, **kwargs):
+            capturado.update(kwargs)
+            self.id_contrato = 11
+            self.id_cliente = kwargs["id_cliente"]
+            self.num_factura = None
+
+    class DummyTarifa:
+        precio_base = 10
+
+    class DummyTarifasQuery:
+        @staticmethod
+        def get(_):
+            return DummyTarifa()
+
+    class DummyTarifas:
+        query = DummyTarifasQuery()
+
+    class DummyTarifaContrato:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+    class DummySession:
+        def add(self, _):
+            return None
+
+        def flush(self):
+            return None
+
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(contratos_routes, "Contratos", DummyContrato)
+    monkeypatch.setattr(contratos_routes, "Tarifas", DummyTarifas)
+    monkeypatch.setattr(contratos_routes, "TarifasContrato", DummyTarifaContrato)
+    monkeypatch.setattr(contratos_routes.db, "session", DummySession())
+
+    payload = {
+        "id_cliente": 3,
+        "fecha_inicio": "2026-03-01",
+        "fecha_fin": "2026-03-02",
+        "numero_visitas_diarias": 1,
+        "num_total_visitas": "2",
+        "pagado": "0",
+        "id_tarifa": 7,
+        "factura_enviada": 1,
+    }
+
+    with app.test_request_context(json=payload):
+        response, status = contratos_routes.crear_contrato.__wrapped__()
+
+    assert status == 201
+    assert capturado["factura_enviada"] == 1
+
+
+def test_actualizar_contrato_permite_marcar_factura_enviada(monkeypatch):
+    app = _app()
+
+    dummy_contrato = SimpleNamespace(
+        fecha_inicio="2026-03-01",
+        fecha_fin="2026-03-02",
+        numero_visitas_diarias=1,
+        horario_visitas={},
+        observaciones=None,
+        num_total_visitas="2",
+        total=0,
+        pagado=0,
+        factura_enviada=None,
+    )
+
+    class DummyContratoQuery:
+        @staticmethod
+        def get_or_404(_):
+            return dummy_contrato
+
+    class DummyContratos:
+        query = DummyContratoQuery()
+
+    class DummyTarifa:
+        precio_base = 10
+
+    class DummyTarifasQuery:
+        @staticmethod
+        def get(_):
+            return DummyTarifa()
+
+    class DummyTarifas:
+        query = DummyTarifasQuery()
+
+    class DummyTarifaContratoQuery:
+        @staticmethod
+        def filter_by(**_kwargs):
+            return SimpleNamespace(first=lambda: SimpleNamespace(id_tarifa=5))
+
+    class DummyTarifasContrato:
+        query = DummyTarifaContratoQuery()
+
+    class DummySession:
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(contratos_routes, "Contratos", DummyContratos)
+    monkeypatch.setattr(contratos_routes, "Tarifas", DummyTarifas)
+    monkeypatch.setattr(contratos_routes, "TarifasContrato", DummyTarifasContrato)
+    monkeypatch.setattr(contratos_routes.db, "session", DummySession())
+
+    with app.test_request_context(json={"factura_enviada": 1}):
+        response = contratos_routes.actualizar_contrato.__wrapped__(10)
+
+    assert response.get_json()["mensaje"] == "Contrato actualizado exitosamente"
+    assert dummy_contrato.factura_enviada == 1
+
+
 def test_crear_contacto_normaliza_telefono(monkeypatch):
     app = _app()
     capturado = {}

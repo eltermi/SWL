@@ -656,6 +656,22 @@ nav {
     flex: 0 0 auto;
 }
 
+.contratos-programados-media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+
+.contratos-programados-media--sin-avatar {
+    min-width: 54px;
+}
+
+.contratos-programados-avatar--placeholder {
+    visibility: hidden;
+}
+
 .contratos-programados-avatar img {
     width: 100%;
     height: 100%;
@@ -684,6 +700,27 @@ nav {
     color: #1f9d55;
     font-weight: 700;
     letter-spacing: 0.08em;
+}
+
+.contratos-programados-estados {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contratos-programados-status-row {
+    min-height: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.contratos-programados-factura {
+    font-size: 0.82rem;
+    line-height: 1;
+    color: #d0021b;
+    font-weight: 700;
 }
 
 .contrato-sections {
