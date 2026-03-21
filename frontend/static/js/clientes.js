@@ -71,6 +71,12 @@ function mostrarLoadingClientes(container) {
     });
 }
 
+function actualizarContadorClientes(total = 0) {
+    const count = document.getElementById("clientes-count");
+    if (!count) return;
+    count.textContent = String(Number.isFinite(total) ? total : 0);
+}
+
 function escaparHTML(texto = "") {
     return String(texto ?? "")
         .replace(/&/g, "&amp;")
@@ -582,6 +588,7 @@ function cargarClientes(busqueda = "") {
     muestraCliente.style.display = "none";
     container.style.display = "block";
     clienteDetalleActual = null;
+    actualizarContadorClientes(0);
     mostrarLoadingClientes(container);
     const incluirFallecidos = Boolean(document.getElementById("mostrar-fallecidos-clientes")?.checked);
     const params = new URLSearchParams({
@@ -593,6 +600,7 @@ function cargarClientes(busqueda = "") {
         .then(clientes => {
             container.removeAttribute("aria-busy");
             container.innerHTML = "";
+            actualizarContadorClientes(Array.isArray(clientes) ? clientes.length : 0);
             if (!Array.isArray(clientes) || clientes.length === 0) {
                 container.innerHTML = `<p class="cliente-empty" style="text-align:center;">No hay clientes para mostrar.</p>`;
                 return;
@@ -648,6 +656,7 @@ function cargarClientes(busqueda = "") {
         .catch(error => {
             console.error("\uD83D\uDEA8 Error cargando clientes:", error);
             container.removeAttribute("aria-busy");
+            actualizarContadorClientes(0);
             container.innerHTML = `<p class="cliente-empty" style="text-align:center;">Error al cargar los clientes.</p>`;
         });
 }

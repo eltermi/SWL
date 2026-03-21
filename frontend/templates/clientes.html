@@ -5,6 +5,9 @@
 {% block content %}
 
 <h2 id="cabecera" class="day-header section-header-brand">Clientes</h2>
+<div class="entity-list-count-row">
+    <span id="clientes-count" class="contratos-programados-count">0</span>
+</div>
 <input type="text" id="buscar" class="buscar" placeholder="Buscar clientes">
 <label class="list-filter-toggle" for="mostrar-fallecidos-clientes">
     <input type="checkbox" id="mostrar-fallecidos-clientes">
@@ -176,6 +179,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260320-factura-enviada') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260321-contador-listado') }}"></script>
 
 {% endblock %}

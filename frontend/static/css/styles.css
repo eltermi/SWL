@@ -188,6 +188,12 @@ nav {
     margin: 0 auto 15px;
 }
 
+.entity-list-count-row {
+    display: flex;
+    justify-content: center;
+    margin: 4px 0 12px;
+}
+
 .list-filter-toggle {
     display: flex;
     align-items: center;

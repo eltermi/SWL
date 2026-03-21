@@ -6,6 +6,9 @@
 
 
 <h2 id="cabecera" class="day-header section-header-brand">Animales</h2>
+<div class="entity-list-count-row">
+    <span id="animales-count" class="contratos-programados-count">0</span>
+</div>
 <input type="text" id="buscar" class="buscar" placeholder="Buscar animales">
 <label class="list-filter-toggle" for="mostrar-fallecidos-animales">
     <input type="checkbox" id="mostrar-fallecidos-animales">
@@ -76,5 +79,5 @@
         </form>
     </div>
 </div>
-<script src="{{ url_for('static', filename='js/animales.js', v='20260318-fallecidos') }}"></script>
+<script src="{{ url_for('static', filename='js/animales.js', v='20260321-contador-listado') }}"></script>
 {% endblock %}

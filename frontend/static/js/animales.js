@@ -45,6 +45,12 @@ function mostrarLoadingAnimales(container) {
     });
 }
 
+function actualizarContadorAnimales(total = 0) {
+    const count = document.getElementById("animales-count");
+    if (!count) return;
+    count.textContent = String(Number.isFinite(total) ? total : 0);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarModalAnimal();
     inicializarEditoresMedicacion();
@@ -338,6 +344,7 @@ function cargarAnimales(busqueda = "") {
     muestraAnimal.innerHTML = "";
     muestraAnimal.style.display = "none";
     container.style.display = "block";
+    actualizarContadorAnimales(0);
     mostrarLoadingAnimales(container);
     const incluirFallecidos = Boolean(document.getElementById("mostrar-fallecidos-animales")?.checked);
     const params = new URLSearchParams({
@@ -349,6 +356,7 @@ function cargarAnimales(busqueda = "") {
         .then(animales => {
             container.removeAttribute("aria-busy");
             container.innerHTML = "";
+            actualizarContadorAnimales(Array.isArray(animales) ? animales.length : 0);
             if (!Array.isArray(animales) || animales.length === 0) {
                 container.innerHTML = `<p class="cliente-empty" style="text-align:center;">No hay animales para mostrar.</p>`;
                 return;
@@ -412,6 +420,7 @@ function cargarAnimales(busqueda = "") {
         .catch(error => {
             console.error("🚨 Error cargando animales:", error);
             container.removeAttribute("aria-busy");
+            actualizarContadorAnimales(0);
             container.innerHTML = `<p class="cliente-empty" style="text-align:center;">Error al cargar los animales.</p>`;
         });
 }
