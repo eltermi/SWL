@@ -1,13 +1,227 @@
-from flask import Blueprint, request, jsonify
+import hmac
+import os
+from flask import Blueprint, request, jsonify, Response
 from sqlalchemy.exc import DataError, IntegrityError
+from sqlalchemy import text
 from extensions import db
 from models import Contratos, TarifasContrato, Tarifas
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from utils.auth import requerir_autenticacion
 from utils.db_errors import mensaje_error_persistencia
 
 contratos_bp = Blueprint('contratos', __name__)
+CALENDAR_FEED_TOKEN_ENV = "CALENDAR_FEED_TOKEN"
+
+
+def _obtener_token_feed_calendario():
+    token = os.environ.get(CALENDAR_FEED_TOKEN_ENV)
+    if token is None:
+        return None
+    token_normalizado = token.strip()
+    return token_normalizado or None
+
+
+def _escapar_texto_ics(valor):
+    if valor is None:
+        return ""
+    texto = str(valor)
+    texto = texto.replace("\\", "\\\\")
+    texto = texto.replace(";", r"\;")
+    texto = texto.replace(",", r"\,")
+    texto = texto.replace("\r\n", r"\n").replace("\n", r"\n").replace("\r", r"\n")
+    return texto
+
+
+def _plegar_linea_ics(linea, longitud=75):
+    if len(linea) <= longitud:
+        return [linea]
+    fragmentos = [linea[:longitud]]
+    resto = linea[longitud:]
+    while resto:
+        fragmentos.append(f" {resto[:longitud - 1]}")
+        resto = resto[longitud - 1:]
+    return fragmentos
+
+
+def _formatear_linea_ics(clave, valor):
+    return _plegar_linea_ics(f"{clave}:{valor}")
+
+
+def _construir_direccion_cliente(fila):
+    linea_1_partes = [
+        str(valor).strip()
+        for valor in [fila.get("calle"), fila.get("piso")]
+        if valor and str(valor).strip()
+    ]
+    linea_2_partes = [
+        str(valor).strip()
+        for valor in [fila.get("codigo_postal"), fila.get("municipio")]
+        if valor and str(valor).strip()
+    ]
+    lineas = []
+    if linea_1_partes:
+        lineas.append(", ".join(linea_1_partes))
+    if linea_2_partes:
+        lineas.append(" ".join(linea_2_partes))
+    return "\n".join(lineas)
+
+
+def _normalizar_tipo_animal(valor):
+    if valor is None:
+        return ""
+    return str(valor).strip().lower()
+
+
+def _formatear_lista_natural(elementos):
+    items = [str(item).strip() for item in elementos if item and str(item).strip()]
+    if not items:
+        return ""
+    if len(items) == 1:
+        return items[0]
+    if len(items) == 2:
+        return f"{items[0]} y {items[1]}"
+    return f"{', '.join(items[:-1])} y {items[-1]}"
+
+
+def _deserializar_animales_calendario(valor):
+    if not valor:
+        return []
+
+    animales = []
+    for item in str(valor).split("||"):
+        if not item:
+            continue
+        partes = item.split("::", 2)
+        if len(partes) != 3:
+            continue
+        id_animal, tipo_animal, nombre = partes
+        try:
+            id_animal_int = int(id_animal)
+        except (TypeError, ValueError):
+            continue
+        nombre_limpio = str(nombre).strip()
+        if not nombre_limpio:
+            continue
+        animales.append({
+            "id_animal": id_animal_int,
+            "tipo_animal": _normalizar_tipo_animal(tipo_animal),
+            "nombre": nombre_limpio,
+        })
+    return animales
+
+
+def _construir_resumen_contrato(fila):
+    animales = _deserializar_animales_calendario(fila.get("animales_calendario"))
+    gatos = [animal["nombre"] for animal in animales if animal["tipo_animal"] == "gato"]
+    perros = [animal["nombre"] for animal in animales if animal["tipo_animal"] == "perro"]
+
+    if gatos:
+        return f"CS - {_formatear_lista_natural(gatos[:3])}"
+    if perros:
+        return f"DB - {perros[0]}"
+    return f"Contrato {fila.get('id_contrato')}"
+
+
+def _construir_descripcion_contrato(fila):
+    observaciones = fila.get("observaciones")
+    if observaciones is None:
+        return ""
+    return str(observaciones).strip()
+
+
+def _obtener_contratos_para_calendario():
+    sql_query = text("""
+        SELECT c.id_contrato,
+               c.fecha_inicio,
+               c.fecha_fin,
+               c.numero_visitas_diarias,
+               c.horario_visitas,
+               c.observaciones,
+               c.num_factura,
+               cl.nombre AS cliente_nombre,
+               cl.apellidos AS cliente_apellidos,
+               cl.calle,
+               cl.piso,
+               cl.codigo_postal,
+               cl.municipio,
+               cl.pais,
+               GROUP_CONCAT(
+                   CONCAT(
+                       a.id_animal,
+                       '::',
+                       COALESCE(a.tipo_animal, ''),
+                       '::',
+                       COALESCE(a.nombre, '')
+                   )
+                   ORDER BY a.id_animal
+                   SEPARATOR '||'
+               ) AS animales_calendario
+        FROM contratos c
+        LEFT JOIN clientes cl ON cl.id_cliente = c.id_cliente
+        LEFT JOIN animales a ON a.id_cliente = c.id_cliente
+        WHERE c.fecha_fin >= :hoy
+        GROUP BY c.id_contrato,
+                 c.fecha_inicio,
+                 c.fecha_fin,
+                 c.numero_visitas_diarias,
+                 c.horario_visitas,
+                 c.observaciones,
+                 c.num_factura,
+                 cl.nombre,
+                 cl.apellidos,
+                 cl.calle,
+                 cl.piso,
+                 cl.codigo_postal,
+                 cl.municipio,
+                 cl.pais
+        ORDER BY c.fecha_inicio ASC, c.id_contrato ASC
+    """)
+    resultados = db.session.execute(sql_query, {"hoy": date.today()}).mappings().all()
+    return [dict(fila) for fila in resultados]
+
+
+def _generar_ics_contratos(contratos):
+    ahora_utc = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    lineas = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Sitters With Love//Contratos//ES",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "X-WR-CALNAME:Sitters With Love - Contratos",
+        "X-WR-CALDESC:Contratos activos y futuros",
+    ]
+
+    for contrato in contratos:
+        fecha_inicio = contrato.get("fecha_inicio")
+        fecha_fin = contrato.get("fecha_fin")
+        if not fecha_inicio or not fecha_fin:
+            continue
+
+        dtstart = fecha_inicio.strftime("%Y%m%d")
+        dtend = (fecha_fin + timedelta(days=1)).strftime("%Y%m%d")
+        uid = f"contrato-{contrato['id_contrato']}@sitterswithlove.local"
+        resumen = _escapar_texto_ics(_construir_resumen_contrato(contrato))
+        descripcion = _escapar_texto_ics(_construir_descripcion_contrato(contrato))
+        direccion = _escapar_texto_ics(_construir_direccion_cliente(contrato))
+
+        lineas.extend([
+            "BEGIN:VEVENT",
+            f"UID:{uid}",
+            f"DTSTAMP:{ahora_utc}",
+            f"DTSTART;VALUE=DATE:{dtstart}",
+            f"DTEND;VALUE=DATE:{dtend}",
+        ])
+        lineas.extend(_formatear_linea_ics("SUMMARY", resumen))
+        if direccion:
+            lineas.extend(_formatear_linea_ics("LOCATION", direccion))
+        if descripcion:
+            lineas.extend(_formatear_linea_ics("DESCRIPTION", descripcion))
+        lineas.append("END:VEVENT")
+
+    lineas.append("END:VCALENDAR")
+    return "\r\n".join(lineas) + "\r\n"
 
 
 def calcular_total_contrato(fecha_inicio, fecha_fin, numero_visitas_diarias):
@@ -212,6 +426,29 @@ def obtener_contratos_activos():
 def obtener_contratos_programados():
     contratos = Contratos.obtener_contratos_programados()
     return jsonify(contratos)
+
+
+@contratos_bp.route('/calendario/contratos.ics', methods=['GET'])
+def obtener_feed_calendario_contratos():
+    token_configurado = _obtener_token_feed_calendario()
+    if token_configurado is None:
+        return jsonify({
+            "mensaje": f"El feed de calendario no está configurado. Falta la variable {CALENDAR_FEED_TOKEN_ENV}."
+        }), 503
+
+    token_recibido = (request.args.get("token") or "").strip()
+    if not token_recibido or not hmac.compare_digest(token_recibido, token_configurado):
+        return jsonify({"mensaje": "Token de calendario no válido"}), 401
+
+    contenido = _generar_ics_contratos(_obtener_contratos_para_calendario())
+    return Response(
+        contenido,
+        mimetype="text/calendar",
+        headers={
+            "Content-Disposition": 'inline; filename="swl-contratos.ics"',
+            "Cache-Control": "private, max-age=300",
+        },
+    )
 
 # Actualizar un contrato
 @contratos_bp.route('/contratos/<int:id_contrato>', methods=['PUT'])

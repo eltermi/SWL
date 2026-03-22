@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from datetime import date
 
 from flask import Flask
 
@@ -451,6 +452,94 @@ def test_crear_contacto_normaliza_telefono(monkeypatch):
     assert status == 201
     assert response.get_json()["mensaje"] == "Contacto creado exitosamente"
     assert capturado["telefono"] == "+352661280008"
+
+
+def test_feed_calendario_contratos_requiere_token_configurado(monkeypatch):
+    app = _app()
+    monkeypatch.delenv("CALENDAR_FEED_TOKEN", raising=False)
+
+    with app.test_request_context():
+        response, status = contratos_routes.obtener_feed_calendario_contratos()
+
+    assert status == 503
+    assert "CALENDAR_FEED_TOKEN" in response.get_json()["mensaje"]
+
+
+def test_feed_calendario_contratos_rechaza_token_invalido(monkeypatch):
+    app = _app()
+    monkeypatch.setenv("CALENDAR_FEED_TOKEN", "token-valido")
+
+    with app.test_request_context(query_string={"token": "incorrecto"}):
+        response, status = contratos_routes.obtener_feed_calendario_contratos()
+
+    assert status == 401
+    assert response.get_json()["mensaje"] == "Token de calendario no válido"
+
+
+def test_feed_calendario_contratos_devuelve_ics(monkeypatch):
+    app = _app()
+    monkeypatch.setenv("CALENDAR_FEED_TOKEN", "token-valido")
+    monkeypatch.setattr(contratos_routes, "_obtener_contratos_para_calendario", lambda: [{
+        "id_contrato": 42,
+        "fecha_inicio": date(2026, 3, 25),
+        "fecha_fin": date(2026, 3, 27),
+        "numero_visitas_diarias": 2,
+        "horario_visitas": {"manana": True},
+        "observaciones": "Dar medicacion",
+        "num_factura": "42-3",
+        "cliente_nombre": "Ana",
+        "cliente_apellidos": "Pérez",
+        "calle": "Calle Mayor 1",
+        "piso": "2A",
+        "codigo_postal": "1234",
+        "municipio": "Luxembourg",
+        "pais": "Luxembourg",
+        "animales_calendario": "10::GATO::Nellu||11::gato::Misu||12::GaTo::Lola||13::gato::Tina",
+    }])
+
+    with app.test_request_context(query_string={"token": "token-valido"}):
+        response = contratos_routes.obtener_feed_calendario_contratos()
+
+    cuerpo = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert response.mimetype == "text/calendar"
+    assert "BEGIN:VCALENDAR" in cuerpo
+    assert "SUMMARY:CS - Nellu\\, Misu y Lola" in cuerpo
+    assert "DTSTART;VALUE=DATE:20260325" in cuerpo
+    assert "DTEND;VALUE=DATE:20260328" in cuerpo
+    assert "LOCATION:Calle Mayor 1\\, 2A\\n1234 Luxembourg" in cuerpo
+    assert "DESCRIPTION:Dar medicacion" in cuerpo
+
+
+def test_feed_calendario_contratos_titulo_perro(monkeypatch):
+    app = _app()
+    monkeypatch.setenv("CALENDAR_FEED_TOKEN", "token-valido")
+    monkeypatch.setattr(contratos_routes, "_obtener_contratos_para_calendario", lambda: [{
+        "id_contrato": 43,
+        "fecha_inicio": date(2026, 3, 29),
+        "fecha_fin": date(2026, 3, 30),
+        "numero_visitas_diarias": 1,
+        "horario_visitas": {},
+        "observaciones": None,
+        "num_factura": "43-3",
+        "cliente_nombre": "Laura",
+        "cliente_apellidos": "Pérez",
+        "calle": "Rue du Test 2",
+        "piso": None,
+        "codigo_postal": "5678",
+        "municipio": "Esch",
+        "pais": "Luxembourg",
+        "animales_calendario": "20::Perro::Hebe",
+    }])
+
+    with app.test_request_context(query_string={"token": "token-valido"}):
+        response = contratos_routes.obtener_feed_calendario_contratos()
+
+    cuerpo = response.get_data(as_text=True)
+    assert response.status_code == 200
+    assert "SUMMARY:DB - Hebe" in cuerpo
+    assert "LOCATION:Rue du Test 2\\n5678 Esch" in cuerpo
+    assert "DESCRIPTION:" not in cuerpo
 
 
 def test_actualizar_contacto_valida_cliente_inexistente(monkeypatch):
