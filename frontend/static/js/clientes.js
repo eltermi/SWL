@@ -29,6 +29,38 @@ const CAMPOS_OBLIGATORIOS_CONTRATO = [
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
 const MAX_WHATSAPP_AVATAR_BYTES = 2 * 1024 * 1024;
 
+function contratoTieneLlaveRecogida(contrato) {
+    return Number(contrato?.llave_recogida) === 1;
+}
+
+function contratoTieneCitaLlave(contrato) {
+    return typeof contrato?.fecha_hora_recogida_llave === "string" && contrato.fecha_hora_recogida_llave.trim().length > 0;
+}
+
+function formatearFechaHoraLlave(fechaHoraTexto) {
+    if (!fechaHoraTexto || typeof fechaHoraTexto !== "string") return "-";
+    const normalizada = fechaHoraTexto.includes("T") ? fechaHoraTexto : fechaHoraTexto.replace(" ", "T");
+    const fecha = new Date(normalizada);
+    if (Number.isNaN(fecha.getTime())) return fechaHoraTexto;
+    return fecha.toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function construirEstadoLlaveHTML(contrato) {
+    if (contratoTieneLlaveRecogida(contrato)) {
+        return `<span class="contrato-llave-estado contrato-llave-estado--ok">Llave recogida</span>`;
+    }
+    if (contratoTieneCitaLlave(contrato)) {
+        return `<span class="contrato-llave-estado contrato-llave-estado--pendiente">Recogida pendiente</span>`;
+    }
+    return `<span class="contrato-llave-estado contrato-llave-estado--sin-dato">Sin información</span>`;
+}
+
 function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
     return `
         <div class="loading-state" role="status" aria-live="polite">
@@ -932,6 +964,8 @@ function construirContratoCard(contrato) {
     const tarifaConImporte = contrato.tarifa
         ? `${contrato.tarifa}${Number.isFinite(precioTarifa) ? ` (${precioTarifa.toFixed(2)} €)` : ""}`
         : "-";
+    const fechaHoraLlave = formatearFechaHoraLlave(contrato.fecha_hora_recogida_llave);
+    const estadoLlaveHTML = construirEstadoLlaveHTML(contrato);
 
     return `
         <div class="cliente-contract-card contrato-detalle-card">
@@ -965,6 +999,11 @@ function construirContratoCard(contrato) {
                         <div class="contrato-section">
                             <p class="contrato-section-title">Factura</p>
                             <p>${contrato.num_factura ?? "-"}</p>
+                        </div>
+                        <div class="contrato-section">
+                            <p class="contrato-section-title">Llaves</p>
+                            <p class="contrato-fecha-item"><span class="contrato-data-label">Cita</span>${fechaHoraLlave}</p>
+                            <p class="contrato-fecha-item"><span class="contrato-data-label">Estado</span>${estadoLlaveHTML}</p>
                         </div>
                     </div>
                     <div class="contrato-payments">
@@ -1228,6 +1267,8 @@ async function mostrarFormularioEdicionContrato(idContrato) {
     const horaMananaInput = document.getElementById("hora_manana");
     const horaTardeInput = document.getElementById("hora_tarde");
     const observacionesInput = document.getElementById("observaciones");
+    const fechaHoraRecogidaLlaveInput = document.getElementById("fecha_hora_recogida_llave");
+    const llaveRecogidaInput = document.getElementById("llave_recogida");
     const facturaEnviadaInput = document.getElementById("factura_enviada");
 
     if (modalTitle) modalTitle.textContent = "Modificar contrato";
@@ -1266,6 +1307,8 @@ async function mostrarFormularioEdicionContrato(idContrato) {
     if (totalContratoInput) totalContratoInput.value = Number(contrato.total || 0).toFixed(2);
     if (pagadoInput) pagadoInput.value = Number(contrato.pagado || 0).toFixed(2);
     if (observacionesInput) observacionesInput.value = contrato.observaciones || "";
+    if (fechaHoraRecogidaLlaveInput) fechaHoraRecogidaLlaveInput.value = contrato.fecha_hora_recogida_llave || "";
+    if (llaveRecogidaInput) llaveRecogidaInput.checked = contratoTieneLlaveRecogida(contrato);
     if (facturaEnviadaInput) facturaEnviadaInput.checked = contratoTieneFacturaEnviada(contrato);
     if (mitadTotalResumen) actualizarMitadTotalContrato();
 
@@ -1738,6 +1781,7 @@ function inicializarModalContrato() {
     const visitasDiariasInput = document.getElementById("numero_visitas_diarias");
     const visitasTotalesInput = document.getElementById("numero_visitas_totales");
     const totalContratoInput = document.getElementById("total_contrato");
+    const fechaHoraRecogidaLlaveInput = document.getElementById("fecha_hora_recogida_llave");
 
     fechaInicioInput?.addEventListener("change", () => {
         sincronizarFechaFinConInicio();
@@ -1750,6 +1794,7 @@ function inicializarModalContrato() {
         actualizarTotalContratoDesdeVisitas(total);
     });
     totalContratoInput?.addEventListener("input", actualizarMitadTotalContrato);
+    fechaHoraRecogidaLlaveInput?.addEventListener("input", limpiarAvisoLlaveContrato);
 }
 
 function sincronizarFechaFinConInicio() {
@@ -1819,6 +1864,7 @@ function limpiarErroresContrato() {
         errorBox.textContent = "";
         errorBox.hidden = true;
     }
+    limpiarAvisoLlaveContrato();
 }
 
 function mostrarErroresContrato(errores) {
@@ -1834,6 +1880,14 @@ function mostrarErrorContrato(mensaje) {
     if (!errorBox) return;
     errorBox.textContent = mensaje;
     errorBox.hidden = false;
+}
+
+function limpiarAvisoLlaveContrato() {
+    const campo = document.getElementById("fecha_hora_recogida_llave");
+    if (campo) {
+        campo.classList.remove("campo-error");
+        campo.removeAttribute("title");
+    }
 }
 
 function calcularDiasEntre(fechaInicio, fechaFin) {
@@ -1937,6 +1991,8 @@ function gestionarEnvioContrato(event) {
     const hora_tarde = document.getElementById("hora_tarde").value;
     const id_tarifa = parseInt(document.getElementById("tarifa_contrato").value, 10);
     const observaciones = document.getElementById("observaciones").value.trim();
+    const fecha_hora_recogida_llave = document.getElementById("fecha_hora_recogida_llave")?.value || null;
+    const llave_recogida = document.getElementById("llave_recogida")?.checked ? 1 : 0;
     const factura_enviada = document.getElementById("factura_enviada")?.checked ? 1 : null;
 
     const horario_visitas = {};
@@ -1958,6 +2014,8 @@ function gestionarEnvioContrato(event) {
         pagado,
         id_tarifa,
         observaciones,
+        fecha_hora_recogida_llave,
+        llave_recogida,
         factura_enviada
     };
     if (!esEdicion) {

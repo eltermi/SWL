@@ -48,6 +48,12 @@ def _formatear_linea_ics(clave, valor):
     return _plegar_linea_ics(f"{clave}:{valor}")
 
 
+def _formatear_fecha_hora_ics(valor):
+    if valor is None:
+        return None
+    return valor.strftime("%Y%m%dT%H%M%S")
+
+
 def _construir_direccion_cliente(fila):
     linea_1_partes = [
         str(valor).strip()
@@ -130,6 +136,34 @@ def _construir_descripcion_contrato(fila):
     return str(observaciones).strip()
 
 
+def _construir_resumen_llaves(fila):
+    return f"Llaves - {_construir_resumen_contrato(fila)}"
+
+
+def _normalizar_fecha_hora_llave(valor):
+    if valor is None:
+        return None
+    if isinstance(valor, datetime):
+        return valor
+    texto = str(valor).strip()
+    if not texto:
+        return None
+    for formato in ("%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return datetime.strptime(texto, formato)
+        except ValueError:
+            continue
+    raise ValueError("La fecha y hora de recogida de llave no es válida")
+
+
+def _parsear_llave_recogida(valor):
+    if valor in (None, "", False, 0, "0", "false", "False"):
+        return 0
+    if valor in (True, 1, "1", "true", "True"):
+        return 1
+    raise ValueError("El valor de llave recogida no es válido")
+
+
 def _obtener_contratos_para_calendario():
     sql_query = text("""
         SELECT c.id_contrato,
@@ -146,6 +180,8 @@ def _obtener_contratos_para_calendario():
                cl.codigo_postal,
                cl.municipio,
                cl.pais,
+               c.fecha_hora_recogida_llave,
+               c.llave_recogida,
                GROUP_CONCAT(
                    CONCAT(
                        a.id_animal,
@@ -174,7 +210,9 @@ def _obtener_contratos_para_calendario():
                  cl.piso,
                  cl.codigo_postal,
                  cl.municipio,
-                 cl.pais
+                 cl.pais,
+                 c.fecha_hora_recogida_llave,
+                 c.llave_recogida
         ORDER BY c.fecha_inicio ASC, c.id_contrato ASC
     """)
     resultados = db.session.execute(sql_query, {"hoy": date.today()}).mappings().all()
@@ -219,6 +257,24 @@ def _generar_ics_contratos(contratos):
         if descripcion:
             lineas.extend(_formatear_linea_ics("DESCRIPTION", descripcion))
         lineas.append("END:VEVENT")
+
+        fecha_hora_llave = contrato.get("fecha_hora_recogida_llave")
+        if fecha_hora_llave:
+            inicio_llave = _formatear_fecha_hora_ics(fecha_hora_llave)
+            fin_llave = _formatear_fecha_hora_ics(fecha_hora_llave + timedelta(hours=1))
+            resumen_llave = _escapar_texto_ics(_construir_resumen_llaves(contrato))
+
+            lineas.extend([
+                "BEGIN:VEVENT",
+                f"UID:llaves-contrato-{contrato['id_contrato']}@sitterswithlove.local",
+                f"DTSTAMP:{ahora_utc}",
+                f"DTSTART:{inicio_llave}",
+                f"DTEND:{fin_llave}",
+            ])
+            lineas.extend(_formatear_linea_ics("SUMMARY", resumen_llave))
+            if direccion:
+                lineas.extend(_formatear_linea_ics("LOCATION", direccion))
+            lineas.append("END:VEVENT")
 
     lineas.append("END:VCALENDAR")
     return "\r\n".join(lineas) + "\r\n"
@@ -328,7 +384,9 @@ def obtener_contratos():
         'pagado': float(contrato.pagado or 0),
         'num_factura': contrato.num_factura,
         'num_total_visitas': contrato.num_total_visitas,
-        'factura_enviada': contrato.factura_enviada
+        'factura_enviada': contrato.factura_enviada,
+        'fecha_hora_recogida_llave': contrato.fecha_hora_recogida_llave.strftime("%Y-%m-%dT%H:%M") if contrato.fecha_hora_recogida_llave else None,
+        'llave_recogida': int(contrato.llave_recogida or 0)
     } for contrato in contratos])
 
 # Crear un nuevo contrato
@@ -345,6 +403,8 @@ def crear_contrato():
         total = calcular_total_desde_visitas_y_tarifa(num_total_visitas, id_tarifa)
         pagado = parsear_pagado(datos.get('pagado', 0))
         factura_enviada = parsear_factura_enviada(datos.get('factura_enviada'))
+        fecha_hora_recogida_llave = _normalizar_fecha_hora_llave(datos.get('fecha_hora_recogida_llave'))
+        llave_recogida = _parsear_llave_recogida(datos.get('llave_recogida'))
     except (KeyError, ValueError) as error:
         return jsonify({'mensaje': str(error)}), 400
 
@@ -358,7 +418,9 @@ def crear_contrato():
         pagado=pagado,
         num_total_visitas=formatear_num_total_visitas(num_total_visitas),
         observaciones=datos.get('observaciones'),
-        factura_enviada=factura_enviada
+        factura_enviada=factura_enviada,
+        fecha_hora_recogida_llave=fecha_hora_recogida_llave,
+        llave_recogida=llave_recogida
     )
     try:
         db.session.add(nuevo_contrato)
@@ -462,6 +524,16 @@ def actualizar_contrato(id_contrato):
     contrato.horario_visitas = datos.get('horario_visitas', contrato.horario_visitas)
     if 'observaciones' in datos:
         contrato.observaciones = datos.get('observaciones')
+    if 'fecha_hora_recogida_llave' in datos:
+        try:
+            contrato.fecha_hora_recogida_llave = _normalizar_fecha_hora_llave(datos.get('fecha_hora_recogida_llave'))
+        except ValueError as error:
+            return jsonify({'mensaje': str(error)}), 400
+    if 'llave_recogida' in datos:
+        try:
+            contrato.llave_recogida = _parsear_llave_recogida(datos.get('llave_recogida'))
+        except ValueError as error:
+            return jsonify({'mensaje': str(error)}), 400
     id_tarifa_para_total = None
     if 'id_tarifa' in datos:
         try:

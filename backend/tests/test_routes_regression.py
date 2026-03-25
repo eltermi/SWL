@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from datetime import date
+from datetime import date, datetime
 
 from flask import Flask
 
@@ -494,6 +494,8 @@ def test_feed_calendario_contratos_devuelve_ics(monkeypatch):
         "codigo_postal": "1234",
         "municipio": "Luxembourg",
         "pais": "Luxembourg",
+        "fecha_hora_recogida_llave": datetime(2026, 3, 24, 18, 30),
+        "llave_recogida": 0,
         "animales_calendario": "10::GATO::Nellu||11::gato::Misu||12::GaTo::Lola||13::gato::Tina",
     }])
 
@@ -509,6 +511,9 @@ def test_feed_calendario_contratos_devuelve_ics(monkeypatch):
     assert "DTEND;VALUE=DATE:20260328" in cuerpo
     assert "LOCATION:Calle Mayor 1\\, 2A\\n1234 Luxembourg" in cuerpo
     assert "DESCRIPTION:Dar medicacion" in cuerpo
+    assert "SUMMARY:Llaves - CS - Nellu\\, Misu y Lola" in cuerpo
+    assert "DTSTART:20260324T183000" in cuerpo
+    assert "DTEND:20260324T193000" in cuerpo
 
 
 def test_feed_calendario_contratos_titulo_perro(monkeypatch):
@@ -529,6 +534,8 @@ def test_feed_calendario_contratos_titulo_perro(monkeypatch):
         "codigo_postal": "5678",
         "municipio": "Esch",
         "pais": "Luxembourg",
+        "fecha_hora_recogida_llave": None,
+        "llave_recogida": 1,
         "animales_calendario": "20::Perro::Hebe",
     }])
 
@@ -540,6 +547,7 @@ def test_feed_calendario_contratos_titulo_perro(monkeypatch):
     assert "SUMMARY:DB - Hebe" in cuerpo
     assert "LOCATION:Rue du Test 2\\n5678 Esch" in cuerpo
     assert "DESCRIPTION:" not in cuerpo
+    assert "SUMMARY:Llaves - DB - Hebe" not in cuerpo
 
 
 def test_actualizar_contacto_valida_cliente_inexistente(monkeypatch):

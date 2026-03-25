@@ -5,6 +5,50 @@ function contratoTieneFacturaEnviada(contrato) {
     return Number(contrato?.factura_enviada) === 1;
 }
 
+function contratoTieneLlaveRecogida(contrato) {
+    return Number(contrato?.llave_recogida) === 1;
+}
+
+function contratoTieneCitaLlave(contrato) {
+    return typeof contrato?.fecha_hora_recogida_llave === "string" && contrato.fecha_hora_recogida_llave.trim().length > 0;
+}
+
+function obtenerBadgeLlaveContrato(contrato) {
+    if (contratoTieneLlaveRecogida(contrato)) {
+        return `
+            <span class="contratos-programados-llave contratos-programados-llave--ok" title="Llave recogida" aria-label="Llave recogida">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M14.5 3a6.5 6.5 0 0 0-5.88 9.28L2 18.9V22h3.1l1.5-1.5 1.4 1.4 2.1-2.1-1.4-1.4.9-.9 1.4 1.4 2.1-2.1-1.4-1.4 1.18-1.18A6.5 6.5 0 1 0 14.5 3Zm0 3a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+                </svg>
+            </span>
+        `;
+    }
+    if (contratoTieneCitaLlave(contrato)) {
+        return `
+            <span class="contratos-programados-llave contratos-programados-llave--pendiente" title="Recogida de llave pendiente" aria-label="Recogida de llave pendiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M14.5 3a6.5 6.5 0 0 0-5.88 9.28L2 18.9V22h3.1l1.5-1.5 1.4 1.4 2.1-2.1-1.4-1.4.9-.9 1.4 1.4 2.1-2.1-1.4-1.4 1.18-1.18A6.5 6.5 0 1 0 14.5 3Zm0 3a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+                </svg>
+            </span>
+        `;
+    }
+    return "";
+}
+
+function formatearFechaHoraLlave(fechaHoraTexto) {
+    if (!fechaHoraTexto || typeof fechaHoraTexto !== "string") return "-";
+    const normalizada = fechaHoraTexto.includes("T") ? fechaHoraTexto : fechaHoraTexto.replace(" ", "T");
+    const fecha = new Date(normalizada);
+    if (Number.isNaN(fecha.getTime())) return fechaHoraTexto;
+    return fecha.toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 function crearLoadingStateHTML({ mensaje, subtitulo = "", skeletons = "" }) {
     return `
         <div class="loading-state" role="status" aria-live="polite">
@@ -235,6 +279,7 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
         const pagado = Number(contrato.pagado ?? 0);
         let estadoPagoHTML = "";
         let estadoFacturaHTML = "";
+        const estadoLlaveHTML = obtenerBadgeLlaveContrato(contrato);
 
         if (Number.isFinite(total) && Number.isFinite(pagado) && pagado > 0) {
             const checks = pagado >= total && total > 0 ? "✓✓" : "✓";
@@ -246,12 +291,14 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
         }
 
         const estadosHTML = estadoPagoHTML
-            ? `
-                <div class="contratos-programados-estados">
-                    ${estadoPagoHTML}
-                </div>
-            `
-            : "";
+            ? `<div class="contratos-programados-estados">${estadoPagoHTML}</div>`
+            : `<div class="contratos-programados-estados" aria-hidden="true"></div>`;
+        const llaveHTML = estadoLlaveHTML
+            ? `<div class="contratos-programados-key-slot">${estadoLlaveHTML}</div>`
+            : `<div class="contratos-programados-key-slot" aria-hidden="true"></div>`;
+        const facturaHTML = estadoFacturaHTML
+            ? `<div class="contratos-programados-status-row">${estadoFacturaHTML}</div>`
+            : `<div class="contratos-programados-status-row" aria-hidden="true"></div>`;
         const avatarBaseHTML = contrato.whatsapp_avatar
             ? `
                 <div class="contratos-programados-avatar">
@@ -259,22 +306,17 @@ function renderContratosProgramados(contratos, container, opciones = {}) {
                 </div>
             `
             : `<div class="contratos-programados-avatar contratos-programados-avatar--placeholder" aria-hidden="true"></div>`;
-        const avatarHTML = `
-            <div class="contratos-programados-media">
-                ${avatarBaseHTML}
-                <div class="contratos-programados-status-row">
-                    ${estadoFacturaHTML}
-                </div>
-            </div>
-        `;
+        const avatarHTML = `<div class="contratos-programados-media">${avatarBaseHTML}</div>`;
         return `
             <div class="contratos-programados-item" data-id="${contrato.id_contrato}" onclick="obtenerDetallesContrato(${Number(contrato.id_contrato) || 0})">
                 <div class="contratos-programados-item-info">
                     <span class="contratos-programados-nombre">${nombre}</span>
                     <span class="contratos-programados-fechas">${fechaInicio} → ${fechaFin}</span>
-                    ${estadosHTML}
                 </div>
                 ${avatarHTML}
+                ${estadosHTML}
+                ${llaveHTML}
+                ${facturaHTML}
             </div>
         `;
     }).join("");
@@ -479,6 +521,10 @@ function obtenerDetallesContrato(id_contrato) {
                     <span class="contrato-visitas-value">${totalVisitas}</span>
                 </p>
             ` : "";
+            const fechaHoraLlave = formatearFechaHoraLlave(contrato.fecha_hora_recogida_llave);
+            const estadoLlaveTexto = contratoTieneLlaveRecogida(contrato)
+                ? "Recogida"
+                : (contratoTieneCitaLlave(contrato) ? "Pendiente" : "Sin información");
 
             muestraContrato.innerHTML = `
                 <div class="contrato-detalle-card">
@@ -513,6 +559,11 @@ function obtenerDetallesContrato(id_contrato) {
                                 <div class="contrato-section">
                                     <p class="contrato-section-title">Factura</p>
                                     <p>${contrato.num_factura ?? "-"}</p>
+                                </div>
+                                <div class="contrato-section">
+                                    <p class="contrato-section-title">Llaves</p>
+                                    <p class="contrato-fecha-item"><span class="contrato-data-label">Cita</span>${fechaHoraLlave}</p>
+                                    <p class="contrato-fecha-item"><span class="contrato-data-label">Estado</span>${estadoLlaveTexto}</p>
                                 </div>
                             </div>
                             ${pagosHTML}

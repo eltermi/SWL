@@ -112,6 +112,14 @@
                 <label for="observaciones">Observaciones</label>
                 <textarea id="observaciones" rows="3" placeholder="Notas importantes"></textarea>
             </div>
+            <div class="modal-field">
+                <label for="fecha_hora_recogida_llave">Recogida de llave</label>
+                <input type="datetime-local" id="fecha_hora_recogida_llave">
+            </div>
+            <label class="cliente-checkbox" for="llave_recogida">
+                <input type="checkbox" id="llave_recogida">
+                Llave recogida
+            </label>
             <label class="cliente-checkbox" for="factura_enviada">
                 <input type="checkbox" id="factura_enviada">
                 Factura enviada
@@ -179,6 +187,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes.js', v='20260321-contador-listado') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes.js', v='20260325-llaves-contrato') }}"></script>
 
 {% endblock %}

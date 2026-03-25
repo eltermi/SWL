@@ -1,8 +1,8 @@
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import DECIMAL, Date, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
+from sqlalchemy import DECIMAL, Date, DateTime, ForeignKeyConstraint, Index, Integer, JSON, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from extensions import db
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import decimal
 import base64
 
@@ -30,6 +30,8 @@ class Contratos(db.Model):
     num_factura: Mapped[Optional[str]] = mapped_column(String(45))
     num_total_visitas: Mapped[Optional[str]] = mapped_column(String(45))
     factura_enviada: Mapped[Optional[int]] = mapped_column(Integer)
+    fecha_hora_recogida_llave: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    llave_recogida: Mapped[int] = mapped_column(Integer, server_default=text("0"))
 
     clientes: Mapped['Clientes'] = relationship('Clientes', back_populates='contratos')
     tarifas_contrato: Mapped[List['TarifasContrato']] = relationship('TarifasContrato', back_populates='contratos')
@@ -47,6 +49,12 @@ class Contratos(db.Model):
         if contenido.startswith(b"RIFF") and contenido[8:12] == b"WEBP":
             return "image/webp"
         return "image/jpeg"
+
+    @staticmethod
+    def _formatear_fecha_hora_llave(valor):
+        if valor is None:
+            return None
+        return valor.strftime("%Y-%m-%dT%H:%M")
     
     @classmethod
     def obtener_contratos_activos(cls):
@@ -69,6 +77,8 @@ class Contratos(db.Model):
                     c.num_factura,
                     c.num_total_visitas,
                     c.factura_enviada,
+                    c.fecha_hora_recogida_llave,
+                    c.llave_recogida,
                     t.descripcion AS nombre_tarifa,
                     (
                         SELECT 
@@ -107,6 +117,8 @@ class Contratos(db.Model):
                     "num_factura": row.num_factura,
                     "num_total_visitas": row.num_total_visitas,
                     "factura_enviada": row.factura_enviada,
+                    "fecha_hora_recogida_llave": cls._formatear_fecha_hora_llave(row.fecha_hora_recogida_llave),
+                    "llave_recogida": int(row.llave_recogida or 0),
                     "tarifa": row.nombre_tarifa,
                     "nombre_animales": row.nombre_animales
                 })
@@ -125,6 +137,8 @@ class Contratos(db.Model):
                     c.Total AS total,
                     c.Pagado AS pagado,
                     c.factura_enviada,
+                    c.fecha_hora_recogida_llave,
+                    c.llave_recogida,
                     MAX(cl.whatsapp_avatar) AS whatsapp_avatar,
                 CASE 
                     WHEN COUNT(a.nombre) > 1 
@@ -155,6 +169,8 @@ class Contratos(db.Model):
                 "total": float(row.total or 0),
                 "pagado": float(row.pagado or 0),
                 "factura_enviada": row.factura_enviada,
+                "fecha_hora_recogida_llave": cls._formatear_fecha_hora_llave(row.fecha_hora_recogida_llave),
+                "llave_recogida": int(row.llave_recogida or 0),
                 "whatsapp_avatar": (
                     f"data:{cls._detectar_mime_imagen(row.whatsapp_avatar)};base64,"
                     f"{base64.b64encode(row.whatsapp_avatar).decode('utf-8')}"
@@ -189,6 +205,8 @@ class Contratos(db.Model):
                 contratos.num_factura,
                 contratos.num_total_visitas,
                 contratos.factura_enviada,
+                contratos.fecha_hora_recogida_llave,
+                contratos.llave_recogida,
                 contratos.observaciones,
                 tarifas.id_tarifa,
                 tarifas.descripcion AS nombre_tarifa,
@@ -201,7 +219,7 @@ class Contratos(db.Model):
             WHERE contratos.id_contrato = :id_contrato
             GROUP BY contratos.id_contrato, contratos.id_cliente, contratos.fecha_inicio, contratos.fecha_fin, 
                     contratos.numero_visitas_diarias, contratos.horario_visitas, contratos.Total,
-                    contratos.Pagado, contratos.num_factura, contratos.num_total_visitas, contratos.factura_enviada, contratos.observaciones, tarifas.id_tarifa, tarifas.descripcion, tarifas.precio_base
+                    contratos.Pagado, contratos.num_factura, contratos.num_total_visitas, contratos.factura_enviada, contratos.fecha_hora_recogida_llave, contratos.llave_recogida, contratos.observaciones, tarifas.id_tarifa, tarifas.descripcion, tarifas.precio_base
             ORDER BY contratos.fecha_inicio, contratos.fecha_fin;
         """)
 
@@ -238,6 +256,8 @@ class Contratos(db.Model):
             "num_factura": result.num_factura,
             "num_total_visitas": result.num_total_visitas,
             "factura_enviada": result.factura_enviada,
+            "fecha_hora_recogida_llave": cls._formatear_fecha_hora_llave(result.fecha_hora_recogida_llave),
+            "llave_recogida": int(result.llave_recogida or 0),
             "observaciones": result.observaciones,
             "foto": f"data:image/jpeg;base64,{foto_base64}" if foto_base64 else None,
             "whatsapp_avatar": f"data:{mime_whatsapp_avatar};base64,{whatsapp_avatar_base64}" if whatsapp_avatar_base64 else None
@@ -258,6 +278,8 @@ class Contratos(db.Model):
                     c.num_factura,
                     c.num_total_visitas,
                     c.factura_enviada,
+                    c.fecha_hora_recogida_llave,
+                    c.llave_recogida,
                     c.observaciones,
                     tc.id_tarifa,
                     t.descripcion AS nombre_tarifa,
@@ -292,6 +314,8 @@ class Contratos(db.Model):
                 "num_factura": row.num_factura,
                 "num_total_visitas": row.num_total_visitas,
                 "factura_enviada": row.factura_enviada,
+                "fecha_hora_recogida_llave": cls._formatear_fecha_hora_llave(row.fecha_hora_recogida_llave),
+                "llave_recogida": int(row.llave_recogida or 0),
                 "observaciones": row.observaciones
             })
 

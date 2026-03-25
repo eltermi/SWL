@@ -633,9 +633,12 @@ nav {
 }
 
 .contratos-programados-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px 54px;
+    grid-template-areas:
+        "info info avatar"
+        "pago llave factura";
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     padding: 10px 12px;
     border-radius: 12px;
@@ -646,10 +649,20 @@ nav {
 }
 
 .contratos-programados-item-info {
+    grid-area: info;
     display: flex;
     flex-direction: column;
     gap: 4px;
     min-width: 0;
+}
+
+.contratos-programados-key-slot {
+    grid-area: llave;
+    width: 36px;
+    min-width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .contratos-programados-avatar {
@@ -663,11 +676,11 @@ nav {
 }
 
 .contratos-programados-media {
+    grid-area: avatar;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    flex: 0 0 auto;
 }
 
 .contratos-programados-media--sin-avatar {
@@ -709,17 +722,44 @@ nav {
 }
 
 .contratos-programados-estados {
+    grid-area: pago;
     display: flex;
     align-items: center;
     gap: 8px;
+    min-height: 0.82rem;
 }
 
 .contratos-programados-status-row {
+    grid-area: factura;
     min-height: 0.82rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    width: 54px;
+}
+
+.contratos-programados-llave {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contratos-programados-llave svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    fill: currentColor;
+}
+
+.contratos-programados-llave--ok {
+    color: #1f9d55;
+}
+
+.contratos-programados-llave--pendiente {
+    color: #d0021b;
 }
 
 .contratos-programados-factura {
@@ -749,6 +789,25 @@ nav {
 
 .contrato-fecha-item {
     margin: 0;
+}
+
+.contrato-llave-estado {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.contrato-llave-estado--ok {
+    color: #1f9d55;
+}
+
+.contrato-llave-estado--pendiente {
+    color: #d0021b;
+}
+
+.contrato-llave-estado--sin-dato {
+    color: #6b6b6b;
 }
 
 .contrato-section-title {
