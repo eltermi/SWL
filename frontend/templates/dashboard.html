@@ -8,9 +8,22 @@
     </div>
     <section id="dashboard-contratos-activos-section" class="dashboard-section dashboard-section--activos">
         <div class="dashboard-section-header">
-            <h2 id="cabecera" class="day-header dashboard-section-title section-header-brand">Contratos activos</h2>
+            <h2 id="cabecera" class="dashboard-section-title">
+                <button
+                    type="button"
+                    id="dashboard-contratos-activos-toggle"
+                    class="dashboard-section-toggle"
+                    aria-expanded="true"
+                    aria-controls="dashboard-contratos-activos-content"
+                >
+                    <span class="day-header section-header-brand">Contratos activos</span>
+                    <span id="dashboard-contratos-activos-icon" class="dashboard-section-toggle-icon" aria-hidden="true">▲</span>
+                </button>
+            </h2>
         </div>
-        <div id="contratos-activos"></div>
+        <div id="dashboard-contratos-activos-content" class="dashboard-collapsible-content">
+            <div id="contratos-activos"></div>
+        </div>
     </section>
     <section id="dashboard-contratos-programados-section" class="dashboard-section dashboard-section--programados">
         <div class="dashboard-section-header">
@@ -20,5 +33,5 @@
         <div id="contratos-programados"></div>
     </section>
     <div id="muestra-contrato"></div>
-    <script src="{{ url_for('static', filename='js/dashboard.js', v='20260325-llaves-contrato') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js', v='20260329-dashboard-colapsable') }}"></script>
 {% endblock %}
