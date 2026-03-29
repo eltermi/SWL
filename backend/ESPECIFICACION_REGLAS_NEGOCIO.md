@@ -120,7 +120,7 @@ Observación funcional:
 4. `pagado` puede superar `total`; no hay regla que lo prohíba.
 5. La tarifa de un contrato se trata como motor principal de cálculo cuando está presente.
 6. La app usa formato de fecha `%Y-%m-%d` para parseo interno en cálculos.
-7. La lista de contratos de cliente ordena por contrato más reciente (`id_contrato DESC`).
+7. La lista de contratos de cliente muestra primero contratos activos o futuros y después los finalizados; dentro de cada bloque ordena por `fecha_inicio` ascendente y, en empate, por `id_contrato` ascendente.
 8. El campo `horario_visitas` no tiene validación estructural (solo se guarda JSON recibido).
 
 ## 5. Cálculos y fórmulas exactas

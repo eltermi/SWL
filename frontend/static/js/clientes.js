@@ -934,7 +934,25 @@ function construirContratosHTML(contratos) {
         return html;
     }
 
-    const contratosOrdenados = [...contratos].sort((a, b) => (Number(b.id_contrato) || 0) - (Number(a.id_contrato) || 0));
+    const contratosOrdenados = [...contratos].sort((a, b) => {
+        const finalizadoA = esContratoFinalizado(a) ? 1 : 0;
+        const finalizadoB = esContratoFinalizado(b) ? 1 : 0;
+
+        if (finalizadoA !== finalizadoB) {
+            return finalizadoA - finalizadoB;
+        }
+
+        const fechaInicioA = parseFechaContrato(a?.fecha_inicio);
+        const fechaInicioB = parseFechaContrato(b?.fecha_inicio);
+        const timestampA = fechaInicioA instanceof Date ? fechaInicioA.getTime() : Number.POSITIVE_INFINITY;
+        const timestampB = fechaInicioB instanceof Date ? fechaInicioB.getTime() : Number.POSITIVE_INFINITY;
+
+        if (timestampA !== timestampB) {
+            return timestampA - timestampB;
+        }
+
+        return (Number(a?.id_contrato) || 0) - (Number(b?.id_contrato) || 0);
+    });
     html += `<div class="cliente-contracts-grid">`;
     contratosOrdenados.forEach(contrato => {
         html += construirContratoCard(contrato);

@@ -288,7 +288,13 @@ class Contratos(db.Model):
             LEFT JOIN tarifas_contrato tc ON tc.id_contrato = c.id_contrato
             LEFT JOIN tarifas t ON t.id_tarifa = tc.id_tarifa
             WHERE c.id_cliente = :id_cliente
-            ORDER BY c.id_contrato DESC;
+            ORDER BY
+                CASE
+                    WHEN c.fecha_fin < CURRENT_DATE() THEN 1
+                    ELSE 0
+                END ASC,
+                c.fecha_inicio ASC,
+                c.id_contrato ASC;
         """)
 
         resultados = db.session.execute(sql_query, {"id_cliente": id_cliente}).fetchall()
