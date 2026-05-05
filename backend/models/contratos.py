@@ -180,6 +180,53 @@ class Contratos(db.Model):
         return contratos
 
     @classmethod
+    def obtener_contratos_impagados(cls):
+        hoy = date.today()
+        sql_query = text("""
+            SELECT  c.id_contrato,
+                    c.fecha_inicio,
+                    c.fecha_fin,
+                    c.Total AS total,
+                    c.Pagado AS pagado,
+                    MAX(cl.whatsapp_avatar) AS whatsapp_avatar,
+                    CASE
+                        WHEN COUNT(a.nombre) > 1
+                        THEN CONCAT(
+                            SUBSTRING_INDEX(GROUP_CONCAT(a.nombre ORDER BY a.nombre SEPARATOR ', '), ', ', COUNT(a.nombre) - 1),
+                            ' y ',
+                            SUBSTRING_INDEX(GROUP_CONCAT(a.nombre ORDER BY a.nombre SEPARATOR ', '), ', ', -1)
+                        )
+                        ELSE GROUP_CONCAT(a.nombre ORDER BY a.nombre SEPARATOR ', ')
+                    END AS nombre_animales
+            FROM contratos c
+            LEFT JOIN clientes cl ON c.id_cliente = cl.id_cliente
+            LEFT JOIN animales a ON a.id_cliente = cl.id_cliente
+            WHERE c.fecha_fin < :hoy
+              AND COALESCE(c.Pagado, 0) < COALESCE(c.Total, 0)
+            GROUP BY c.id_contrato, c.fecha_inicio, c.fecha_fin, c.Total, c.Pagado
+            ORDER BY c.fecha_fin DESC, c.id_contrato DESC;
+        """)
+
+        resultados = db.session.execute(sql_query, {"hoy": hoy}).fetchall()
+
+        contratos = []
+        for row in resultados:
+            contratos.append({
+                "id_contrato": row.id_contrato,
+                "nombre_animales": row.nombre_animales or "Sin animales asignados",
+                "fecha_inicio": row.fecha_inicio.strftime("%d-%m-%Y") if row.fecha_inicio else None,
+                "fecha_fin": row.fecha_fin.strftime("%d-%m-%Y") if row.fecha_fin else None,
+                "total": float(row.total or 0),
+                "pagado": float(row.pagado or 0),
+                "whatsapp_avatar": (
+                    f"data:{cls._detectar_mime_imagen(row.whatsapp_avatar)};base64,"
+                    f"{base64.b64encode(row.whatsapp_avatar).decode('utf-8')}"
+                ) if row.whatsapp_avatar else None
+            })
+
+        return contratos
+
+    @classmethod
     def obtener_contrato(cls, id_contrato):
 
         sql_query = text("""

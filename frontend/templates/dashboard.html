@@ -27,11 +27,30 @@
     </section>
     <section id="dashboard-contratos-programados-section" class="dashboard-section dashboard-section--programados">
         <div class="dashboard-section-header">
-            <h2 class="day-header dashboard-section-title section-header-brand">Todos los contratos</h2>
+            <h2 class="dashboard-section-title">
+                <button
+                    type="button"
+                    id="dashboard-contratos-programados-toggle"
+                    class="dashboard-section-toggle"
+                    aria-expanded="true"
+                    aria-controls="dashboard-contratos-programados-content"
+                >
+                    <span class="day-header section-header-brand">Todos los contratos</span>
+                    <span id="dashboard-contratos-programados-icon" class="dashboard-section-toggle-icon" aria-hidden="true">▲</span>
+                </button>
+            </h2>
         </div>
-        <input type="text" id="buscar-contratos" class="buscar" placeholder="Buscar por animal">
-        <div id="contratos-programados"></div>
+        <div id="dashboard-contratos-programados-content" class="dashboard-collapsible-content">
+            <input type="text" id="buscar-contratos" class="buscar" placeholder="Buscar por animal">
+            <div id="contratos-programados"></div>
+        </div>
+    </section>
+    <section id="dashboard-contratos-impagados-section" class="dashboard-section dashboard-section--impagados">
+        <div class="dashboard-section-header">
+            <h2 class="day-header dashboard-section-title">IMPAGADOS</h2>
+        </div>
+        <div id="contratos-impagados"></div>
     </section>
     <div id="muestra-contrato"></div>
-    <script src="{{ url_for('static', filename='js/dashboard.js', v='20260329-dashboard-colapsable') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js', v='20260505-dashboard-impagados') }}"></script>
 {% endblock %}

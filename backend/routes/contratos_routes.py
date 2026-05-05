@@ -490,6 +490,13 @@ def obtener_contratos_programados():
     return jsonify(contratos)
 
 
+@contratos_bp.route('/dashboard/contratos_impagados', methods=['GET'])
+@requerir_autenticacion
+def obtener_contratos_impagados():
+    contratos = Contratos.obtener_contratos_impagados()
+    return jsonify(contratos)
+
+
 @contratos_bp.route('/calendario/contratos.ics', methods=['GET'])
 def obtener_feed_calendario_contratos():
     token_configurado = _obtener_token_feed_calendario()

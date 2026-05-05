@@ -1,10 +1,27 @@
 let contratosProgramadosCache = [];
 let filtroContratosProgramados = "";
 let dashboardActivosColapsado = false;
+let dashboardProgramadosColapsado = false;
 
 function actualizarToggleContratosActivos(expandido) {
-    const toggle = document.getElementById("dashboard-contratos-activos-toggle");
-    const icono = document.getElementById("dashboard-contratos-activos-icon");
+    actualizarToggleDashboard({
+        toggleId: "dashboard-contratos-activos-toggle",
+        iconoId: "dashboard-contratos-activos-icon",
+        expandido
+    });
+}
+
+function actualizarToggleContratosProgramados(expandido) {
+    actualizarToggleDashboard({
+        toggleId: "dashboard-contratos-programados-toggle",
+        iconoId: "dashboard-contratos-programados-icon",
+        expandido
+    });
+}
+
+function actualizarToggleDashboard({ toggleId, iconoId, expandido }) {
+    const toggle = document.getElementById(toggleId);
+    const icono = document.getElementById(iconoId);
     if (toggle) {
         toggle.setAttribute("aria-expanded", expandido ? "true" : "false");
     }
@@ -29,6 +46,22 @@ function colapsarContenidoDashboard(contenido) {
     actualizarToggleContratosActivos(false);
 }
 
+function colapsarContenidoDashboardProgramados(contenido) {
+    if (!contenido || dashboardProgramadosColapsado) return;
+
+    const alturaActual = contenido.scrollHeight;
+    contenido.style.height = `${alturaActual}px`;
+    contenido.classList.remove("is-collapsed");
+
+    requestAnimationFrame(() => {
+        contenido.style.height = "0px";
+        contenido.classList.add("is-collapsed");
+    });
+
+    dashboardProgramadosColapsado = true;
+    actualizarToggleContratosProgramados(false);
+}
+
 function expandirContenidoDashboard(contenido) {
     if (!contenido || !dashboardActivosColapsado) return;
 
@@ -43,9 +76,29 @@ function expandirContenidoDashboard(contenido) {
     actualizarToggleContratosActivos(true);
 }
 
+function expandirContenidoDashboardProgramados(contenido) {
+    if (!contenido || !dashboardProgramadosColapsado) return;
+
+    contenido.classList.remove("is-collapsed");
+    contenido.style.height = "0px";
+
+    requestAnimationFrame(() => {
+        contenido.style.height = `${contenido.scrollHeight}px`;
+    });
+
+    dashboardProgramadosColapsado = false;
+    actualizarToggleContratosProgramados(true);
+}
+
 function ajustarAlturaContenidoDashboard() {
     const contenido = document.getElementById("dashboard-contratos-activos-content");
     if (!contenido || dashboardActivosColapsado) return;
+    contenido.style.height = "auto";
+}
+
+function ajustarAlturaContenidoDashboardProgramados() {
+    const contenido = document.getElementById("dashboard-contratos-programados-content");
+    if (!contenido || dashboardProgramadosColapsado) return;
     contenido.style.height = "auto";
 }
 
@@ -73,6 +126,33 @@ function inicializarToggleContratosActivos() {
             return;
         }
         colapsarContenidoDashboard(contenido);
+    });
+}
+
+function inicializarToggleContratosProgramados() {
+    const toggle = document.getElementById("dashboard-contratos-programados-toggle");
+    const contenido = document.getElementById("dashboard-contratos-programados-content");
+    if (!toggle || !contenido) return;
+
+    actualizarToggleContratosProgramados(!dashboardProgramadosColapsado);
+    contenido.style.height = dashboardProgramadosColapsado ? "0px" : "auto";
+    contenido.classList.toggle("is-collapsed", dashboardProgramadosColapsado);
+
+    contenido.addEventListener("transitionend", event => {
+        if (event.propertyName !== "height") return;
+        if (dashboardProgramadosColapsado) {
+            contenido.style.height = "0px";
+            return;
+        }
+        contenido.style.height = "auto";
+    });
+
+    toggle.addEventListener("click", () => {
+        if (dashboardProgramadosColapsado) {
+            expandirContenidoDashboardProgramados(contenido);
+            return;
+        }
+        colapsarContenidoDashboardProgramados(contenido);
     });
 }
 
@@ -190,10 +270,21 @@ function mostrarDashboardLoading(containerActivos, containerProgramados) {
     }
 }
 
+function mostrarImpagadosLoading(containerImpagados) {
+    if (!containerImpagados) return;
+    containerImpagados.setAttribute("aria-busy", "true");
+    containerImpagados.innerHTML = crearLoadingStateHTML({
+        mensaje: "Cargando contratos impagados...",
+        subtitulo: "Buscando contratos terminados con saldo pendiente.",
+        skeletons: crearDashboardActivosSkeletons()
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     inicializarAccionesDashboard();
     inicializarBuscadorContratos();
     inicializarToggleContratosActivos();
+    inicializarToggleContratosProgramados();
     getContratosActivos();
 });
 
@@ -233,6 +324,7 @@ function renderContratosProgramadosFiltrados() {
         total: contratosProgramadosCache.length,
         filtro: filtroContratosProgramados
     });
+    ajustarAlturaContenidoDashboardProgramados();
 }
 
 function getNombreDia(fechaTexto) {
@@ -438,13 +530,19 @@ function crearPagoCard({ etiqueta, importe, esTotal = false }) {
 function getContratosActivos() {
     const container = document.getElementById("contratos-activos");
     const contenidoActivos = document.getElementById("dashboard-contratos-activos-content");
+    const contenidoProgramados = document.getElementById("dashboard-contratos-programados-content");
     const muestraContrato = document.getElementById("muestra-contrato");
     const listaProgramados = document.getElementById("contratos-programados");
+    const listaImpagados = document.getElementById("contratos-impagados");
     const seccionActivos = document.getElementById("dashboard-contratos-activos-section");
     const seccionProgramados = document.getElementById("dashboard-contratos-programados-section");
+    const seccionImpagados = document.getElementById("dashboard-contratos-impagados-section");
     const buscador = document.getElementById("buscar-contratos");
 
     container.innerHTML = "";
+    if (listaImpagados) {
+        listaImpagados.innerHTML = "";
+    }
     muestraContrato.innerHTML = "";
     muestraContrato.style.display = "none";
     if (seccionActivos) {
@@ -456,9 +554,15 @@ function getContratosActivos() {
     if (contenidoActivos) {
         contenidoActivos.style.display = "block";
     }
+    if (contenidoProgramados) {
+        contenidoProgramados.style.display = "block";
+    }
     container.style.display = "block";
     if (listaProgramados) {
         listaProgramados.style.display = "block";
+    }
+    if (seccionImpagados) {
+        seccionImpagados.style.display = "block";
     }
     if (buscador) {
         buscador.value = "";
@@ -466,6 +570,7 @@ function getContratosActivos() {
     filtroContratosProgramados = "";
     contratosProgramadosCache = [];
     mostrarDashboardLoading(container, listaProgramados);
+    mostrarImpagadosLoading(listaImpagados);
 
     // Función para parsear fechas DD-MM-YYYY
     function parseDate(str) {
@@ -475,13 +580,15 @@ function getContratosActivos() {
 
     Promise.all([
         fetchAPI(`/api/dashboard/contratos_programados`),
-        fetchAPI(`/api/dashboard/contratos_activos`)
+        fetchAPI(`/api/dashboard/contratos_activos`),
+        fetchAPI(`/api/dashboard/contratos_impagados`)
     ])
-        .then(([contratosProgramados, contratos_activos]) => {
+        .then(([contratosProgramados, contratos_activos, contratosImpagados]) => {
             container.removeAttribute("aria-busy");
             container.innerHTML = "";
             contratosProgramadosCache = Array.isArray(contratosProgramados) ? contratosProgramados : [];
             renderContratosProgramadosFiltrados();
+            renderContratosImpagados(contratosImpagados, listaImpagados);
             const hayContratos = Object.values(contratos_activos).some(lista => lista.length > 0);
             if (!hayContratos) {
                 container.innerHTML = "<p style='text-align:center'>NO HAY CONTRATOS ACTIVOS</p>";
@@ -535,7 +642,43 @@ function getContratosActivos() {
                 listaProgramados.removeAttribute("aria-busy");
                 listaProgramados.innerHTML = "<p>Error al cargar la lista completa.</p>";
             }
+            if (listaImpagados) {
+                listaImpagados.removeAttribute("aria-busy");
+                listaImpagados.innerHTML = "<p>Error al cargar los impagados.</p>";
+            }
         });
+}
+
+function renderContratosImpagados(contratos, container) {
+    if (!container) return;
+    container.removeAttribute("aria-busy");
+    container.innerHTML = "";
+
+    if (!Array.isArray(contratos) || contratos.length === 0) {
+        container.innerHTML = "<p style='text-align:center'>NO HAY CONTRATOS IMPAGADOS</p>";
+        return;
+    }
+
+    contratos.forEach(contrato => {
+        const total = Number(contrato.total ?? 0);
+        const pagado = Number(contrato.pagado ?? 0);
+        const pendiente = Number.isFinite(total) && Number.isFinite(pagado)
+            ? Math.max(total - pagado, 0)
+            : null;
+        const contratoDiv = document.createElement("div");
+        contratoDiv.classList.add("contrato");
+        contratoDiv.setAttribute("data-id", contrato.id_contrato);
+        contratoDiv.addEventListener("click", () => {
+            obtenerDetallesContrato(contrato.id_contrato);
+        });
+
+        contratoDiv.innerHTML = `
+            <p class="animales">${contrato.nombre_animales || "Sin animales asignados"}</p>
+            <p><span class="contrato-importe-pendiente">PENDIENTE: ${formatearImporte(pendiente)}</span> - TOTAL: ${formatearImporte(total)}</p>
+        `;
+
+        container.appendChild(contratoDiv);
+    });
 }
 
 function obtenerDetallesContrato(id_contrato) {
@@ -546,6 +689,7 @@ function obtenerDetallesContrato(id_contrato) {
             const listaProgramados = document.getElementById("contratos-programados");
             const seccionActivos = document.getElementById("dashboard-contratos-activos-section");
             const seccionProgramados = document.getElementById("dashboard-contratos-programados-section");
+            const seccionImpagados = document.getElementById("dashboard-contratos-impagados-section");
 
             muestraContrato.style.display = "block";
             if (seccionActivos) {
@@ -553,6 +697,9 @@ function obtenerDetallesContrato(id_contrato) {
             }
             if (seccionProgramados) {
                 seccionProgramados.style.display = "none";
+            }
+            if (seccionImpagados) {
+                seccionImpagados.style.display = "none";
             }
 
             const nombreAnimales = contrato.nombre_animales || "No hay animales asignados";

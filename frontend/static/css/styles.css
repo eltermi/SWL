@@ -393,6 +393,11 @@ nav {
     flex: 1;
 }
 
+.contrato-importe-pendiente {
+    color: #d0021b;
+    font-weight: 700;
+}
+
 .tabla-horario {
     width: 100%;
     max-width: 320px;
@@ -457,6 +462,11 @@ nav {
 
 #contratos-programados {
     margin-bottom: 24px;
+}
+
+#contratos-impagados {
+    max-width: 600px;
+    margin: 20px auto;
 }
 
 .loading-state {
@@ -585,6 +595,10 @@ nav {
     border-color: rgba(92, 1, 1, 0.12);
 }
 
+.dashboard-section--impagados {
+    border-color: rgba(208, 2, 27, 0.2);
+}
+
 .dashboard-section-header {
     margin-bottom: 14px;
     padding-bottom: 12px;
@@ -593,6 +607,10 @@ nav {
 
 .dashboard-section-title {
     margin: 0;
+}
+
+.dashboard-section--impagados .dashboard-section-title {
+    color: #d0021b;
 }
 
 .dashboard-section-toggle {
