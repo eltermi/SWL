@@ -12,6 +12,7 @@ from utils.db_errors import mensaje_error_persistencia
 
 contratos_bp = Blueprint('contratos', __name__)
 CALENDAR_FEED_TOKEN_ENV = "CALENDAR_FEED_TOKEN"
+CALENDAR_FEED_HISTORY_DAYS = 365
 
 
 def _obtener_token_feed_calendario():
@@ -165,6 +166,7 @@ def _parsear_llave_recogida(valor):
 
 
 def _obtener_contratos_para_calendario():
+    fecha_minima = date.today() - timedelta(days=CALENDAR_FEED_HISTORY_DAYS)
     sql_query = text("""
         SELECT c.id_contrato,
                c.fecha_inicio,
@@ -196,7 +198,7 @@ def _obtener_contratos_para_calendario():
         FROM contratos c
         LEFT JOIN clientes cl ON cl.id_cliente = c.id_cliente
         LEFT JOIN animales a ON a.id_cliente = c.id_cliente
-        WHERE c.fecha_fin >= :hoy
+        WHERE c.fecha_fin >= :fecha_minima
         GROUP BY c.id_contrato,
                  c.fecha_inicio,
                  c.fecha_fin,
@@ -215,7 +217,7 @@ def _obtener_contratos_para_calendario():
                  c.llave_recogida
         ORDER BY c.fecha_inicio ASC, c.id_contrato ASC
     """)
-    resultados = db.session.execute(sql_query, {"hoy": date.today()}).mappings().all()
+    resultados = db.session.execute(sql_query, {"fecha_minima": fecha_minima}).mappings().all()
     return [dict(fila) for fila in resultados]
 
 
@@ -228,7 +230,7 @@ def _generar_ics_contratos(contratos):
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
         "X-WR-CALNAME:Sitters With Love - Contratos",
-        "X-WR-CALDESC:Contratos activos y futuros",
+        f"X-WR-CALDESC:Contratos de los ultimos {CALENDAR_FEED_HISTORY_DAYS} dias y futuros",
     ]
 
     for contrato in contratos:

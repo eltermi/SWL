@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from flask import Flask
 
@@ -548,6 +548,29 @@ def test_feed_calendario_contratos_titulo_perro(monkeypatch):
     assert "LOCATION:Rue du Test 2\\n5678 Esch" in cuerpo
     assert "DESCRIPTION:" not in cuerpo
     assert "SUMMARY:Llaves - DB - Hebe" not in cuerpo
+
+
+def test_obtener_contratos_para_calendario_limita_a_ultimos_12_meses(monkeypatch):
+    app = _app()
+    capturado = {}
+
+    class DummyResult:
+        def mappings(self):
+            return self
+
+        def all(self):
+            return []
+
+    def fake_execute(_sql_query, params):
+        capturado.update(params)
+        return DummyResult()
+
+    monkeypatch.setattr(contratos_routes.db.session, "execute", fake_execute)
+
+    with app.app_context():
+        contratos_routes._obtener_contratos_para_calendario()
+
+    assert capturado["fecha_minima"] == date.today() - timedelta(days=365)
 
 
 def test_actualizar_contacto_valida_cliente_inexistente(monkeypatch):
